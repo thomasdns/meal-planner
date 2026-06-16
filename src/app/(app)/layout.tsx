@@ -15,5 +15,5 @@ export default async function AuthenticatedLayout({
     redirect("/auth/sign-in");
   }
 
-  return <AppShell session={session}>{children}</AppShell>;
+  return <AppShell>{children}</AppShell>;
 }

@@ -126,3 +126,7 @@ src/
 ## Statut
 
 Projet en cours de developpement.
+
+## Auteur
+
+Thomas

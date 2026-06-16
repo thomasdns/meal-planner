@@ -1,5 +1,4 @@
 import Link from "next/link";
-import type { Session } from "next-auth";
 
 const navigationItems = [
   { href: "/dashboard", label: "Tableau de bord" },
@@ -11,10 +10,9 @@ const navigationItems = [
 
 type AppShellProps = {
   children: React.ReactNode;
-  session: Session;
 };
 
-export function AppShell({ children, session }: AppShellProps) {
+export function AppShell({ children }: AppShellProps) {
   return (
     <div className="min-h-screen bg-slate-50 text-slate-950">
       <header className="border-b border-slate-200 bg-white">
@@ -23,9 +21,6 @@ export function AppShell({ children, session }: AppShellProps) {
             <Link href="/dashboard" className="text-lg font-semibold">
               Meal Planner
             </Link>
-            <p className="text-sm text-slate-600">
-              {session.user?.name ?? session.user?.email}
-            </p>
           </div>
 
           <nav aria-label="Navigation principale">
