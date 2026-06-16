@@ -140,7 +140,7 @@ export async function upsertMealPlanForCurrentUser(input: {
   });
 }
 
-function getCurrentWeekDays(): WeekDay[] {
+export function getCurrentWeekDays(): WeekDay[] {
   const today = new Date();
   const utcToday = new Date(
     Date.UTC(today.getFullYear(), today.getMonth(), today.getDate()),
@@ -161,11 +161,11 @@ function getCurrentWeekDays(): WeekDay[] {
   });
 }
 
-function dateStringToUtcDate(value: string) {
+export function dateStringToUtcDate(value: string) {
   return new Date(`${value}T00:00:00.000Z`);
 }
 
-function dateToDateInputValue(date: Date) {
+export function dateToDateInputValue(date: Date) {
   return date.toISOString().slice(0, 10);
 }
 
