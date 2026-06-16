@@ -2,7 +2,9 @@ import bcrypt from "bcryptjs";
 import type { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 
+import { signInSchema } from "@/features/auth/auth.validation";
 import { prisma } from "@/lib/prisma";
+import { checkRateLimit } from "@/lib/rate-limit";
 
 export const authOptions: NextAuthOptions = {
   secret: process.env.NEXTAUTH_SECRET,
@@ -26,13 +28,27 @@ export const authOptions: NextAuthOptions = {
         },
       },
       async authorize(credentials) {
-        if (!credentials?.email || !credentials.password) {
+        const parsed = signInSchema.safeParse({
+          email: credentials?.email,
+          password: credentials?.password,
+        });
+
+        if (!parsed.success) {
+          return null;
+        }
+
+        const rateLimit = checkRateLimit(`sign-in:${parsed.data.email}`, {
+          limit: 10,
+          windowMs: 15 * 60 * 1000,
+        });
+
+        if (!rateLimit.allowed) {
           return null;
         }
 
         const user = await prisma.user.findUnique({
           where: {
-            email: credentials.email,
+            email: parsed.data.email,
           },
         });
 
@@ -41,7 +57,7 @@ export const authOptions: NextAuthOptions = {
         }
 
         const isPasswordValid = await bcrypt.compare(
-          credentials.password,
+          parsed.data.password,
           user.password,
         );
 

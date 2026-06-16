@@ -4,9 +4,27 @@ Application web de planification de repas hebdomadaire.
 
 ## Objectif
 
-Ce projet a pour but de pratiquer le developpement full stack avec une approche professionnelle.
+Ce projet a pour but de pratiquer le developpement full stack avec une approche
+professionnelle, de l'initialisation du depot jusqu'au deploiement et a la
+securisation.
 
-Il couvre notamment :
+## Fonctionnalites
+
+- Inscription et connexion.
+- Gestion des recettes.
+- Ingredients modifiables et supprimables.
+- Categories modifiables, supprimables et colorees.
+- Planning hebdomadaire avec navigation entre semaines.
+- Association recette, jour et type de repas.
+- Suppression d'un repas planifie.
+- Generation automatique de liste de courses.
+- Liste de courses cochable, imprimable et exportable en CSV.
+- Recherche et filtres de recettes.
+- Tableau de bord utilisateur.
+- Profil utilisateur avec modification du nom et de l'email.
+- Interface admin protegee.
+
+## Stack technique
 
 - Next.js
 - TypeScript
@@ -14,30 +32,10 @@ Il couvre notamment :
 - PostgreSQL
 - Prisma
 - NextAuth
-- Git et GitHub
-- Deploiement sur Vercel
-
-## Fonctionnalites prevues
-
-- Inscription et connexion
-- Gestion des recettes
-- Categories de recettes
-- Planning hebdomadaire
-- Association entre une recette, un jour et un repas
-- Generation automatique de liste de courses
-- Tableau de bord
-- Profil utilisateur
-
-## Stack technique
-
-- Frontend et backend : Next.js
-- Langage : TypeScript
-- Style : Tailwind CSS
-- Base de donnees : PostgreSQL
-- ORM : Prisma
-- Authentification : NextAuth
-- Versioning : Git et GitHub
-- Deploiement : Vercel
+- Docker
+- GitHub Actions
+- Playwright
+- Vercel
 
 ## Demarrage local
 
@@ -45,6 +43,18 @@ Installer les dependances :
 
 ```bash
 npm install
+```
+
+Demarrer PostgreSQL avec Docker :
+
+```bash
+docker compose up -d
+```
+
+Appliquer les migrations :
+
+```bash
+npx prisma migrate deploy
 ```
 
 Lancer le serveur de developpement :
@@ -57,17 +67,6 @@ Ouvrir l'application :
 
 ```txt
 http://localhost:3000
-```
-
-## Scripts utiles
-
-```bash
-npm run dev
-npm run build
-npm run lint
-npm run test
-npm run audit
-npm run vercel-build
 ```
 
 ## Variables d'environnement
@@ -84,19 +83,60 @@ Sous Windows PowerShell :
 Copy-Item .env.example .env.local
 ```
 
-## Base de donnees locale
+Variables principales :
 
-Demarrer PostgreSQL avec Docker :
-
-```bash
-docker compose up -d
+```txt
+DATABASE_URL
+NEXTAUTH_URL
+NEXTAUTH_SECRET
+NEXT_SERVER_ACTIONS_ENCRYPTION_KEY
+ADMIN_EMAILS
 ```
 
-Appliquer les migrations :
+## Scripts utiles
 
 ```bash
-npx prisma migrate deploy
+npm run dev
+npm run lint
+npm run test
+npm run test:e2e
+npm run build
+npm run audit
+npm run vercel-build
 ```
+
+## Qualite
+
+Le projet contient :
+
+- tests unitaires avec Vitest ;
+- tests end-to-end avec Playwright ;
+- pipeline GitHub Actions ;
+- build de production verifie ;
+- audit dependances via npm.
+
+La pipeline GitHub Actions lance :
+
+```bash
+npm run lint
+npm run test
+npm run build
+npm run test:e2e
+```
+
+## Securite
+
+Voir [SECURITY.md](./SECURITY.md).
+
+Points principaux :
+
+- validations serveur ;
+- controles d'autorisation dans les actions sensibles ;
+- headers HTTP de securite ;
+- rate limiting sur inscription et connexion ;
+- acces admin limite par `ADMIN_EMAILS`.
+
+## Base de donnees
 
 Ouvrir Prisma Studio :
 
@@ -104,13 +144,21 @@ Ouvrir Prisma Studio :
 npx prisma studio
 ```
 
+Les migrations Prisma sont dans :
+
+```txt
+prisma/migrations
+```
+
 ## Deploiement
 
 Voir [DEPLOYMENT.md](./DEPLOYMENT.md).
 
-## Ameliorations futures
+Le deploiement cible utilise :
 
-Voir [ROADMAP.md](./ROADMAP.md).
+- Vercel pour l'application ;
+- PostgreSQL en ligne, par exemple Neon ;
+- variables d'environnement configurees dans Vercel.
 
 ## Organisation du projet
 
@@ -119,13 +167,20 @@ src/
 +-- app/
 +-- components/
 +-- features/
++-- generated/
 +-- lib/
 +-- types/
 ```
 
+## Documentation projet
+
+- [DEPLOYMENT.md](./DEPLOYMENT.md)
+- [SECURITY.md](./SECURITY.md)
+- [ROADMAP.md](./ROADMAP.md)
+
 ## Statut
 
-Projet en cours de developpement.
+Projet en cours d'amelioration continue.
 
 ## Auteur
 

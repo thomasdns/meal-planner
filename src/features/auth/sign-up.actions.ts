@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 
 import { signUpSchema } from "@/features/auth/auth.validation";
 import { prisma } from "@/lib/prisma";
+import { checkRateLimit } from "@/lib/rate-limit";
 
 export type SignUpState = {
   error?: string;
@@ -23,6 +24,17 @@ export async function signUpAction(
   if (!parsed.success) {
     return {
       error: parsed.error.issues[0]?.message ?? "Donnees invalides.",
+    };
+  }
+
+  const rateLimit = checkRateLimit(`sign-up:${parsed.data.email}`, {
+    limit: 5,
+    windowMs: 60 * 60 * 1000,
+  });
+
+  if (!rateLimit.allowed) {
+    return {
+      error: "Trop de tentatives. Reessaie plus tard.",
     };
   }
 

@@ -14,7 +14,21 @@ produit, les corrections techniques et les sujets de securite.
 - Garder des taches petites, testables et faciles a relire.
 - Associer chaque amelioration a un critere d'acceptation.
 
-## Priorite haute
+## Termine
+
+- Mise en production avec Vercel et PostgreSQL en ligne.
+- Interface admin protegee.
+- Categories avancees.
+- Planning hebdomadaire avance.
+- Liste de courses avancee.
+- Recherche et filtres de recettes.
+- Tests unitaires.
+- Tests end-to-end.
+- Pipeline GitHub Actions.
+- Documentation de deploiement.
+- Documentation securite.
+
+## Priorite haute restante
 
 ### Mise en production complete
 
@@ -27,6 +41,8 @@ Criteres d'acceptation :
 - Les migrations Prisma sont appliquees en production.
 - L'inscription et la connexion fonctionnent sur l'URL publique.
 
+Statut : termine.
+
 ### Corrections de securite dependances
 
 Objectif : suivre les vulnerabilites signalees par `npm audit`.
@@ -36,6 +52,8 @@ Criteres d'acceptation :
 - Les alertes sont analysees une par une.
 - Aucune mise a jour cassante n'est appliquee sans verification.
 - Les tests, le lint et le build passent apres chaque mise a jour.
+
+Statut : en surveillance. Voir `SECURITY.md`.
 
 ### Protection contre les abus
 
@@ -47,6 +65,9 @@ Criteres d'acceptation :
   frequentes.
 - Les erreurs restent volontairement peu detaillees cote utilisateur.
 - Les validations serveur restent obligatoires.
+
+Statut : premiere protection en place. Evolution recommandee vers Redis ou
+Vercel KV pour une production plus robuste.
 
 ## Priorite moyenne
 
