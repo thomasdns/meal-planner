@@ -10,9 +10,14 @@ const navigationItems = [
 
 type AppShellProps = {
   children: React.ReactNode;
+  showAdminNav?: boolean;
 };
 
-export function AppShell({ children }: AppShellProps) {
+export function AppShell({ children, showAdminNav = false }: AppShellProps) {
+  const items = showAdminNav
+    ? [...navigationItems, { href: "/admin", label: "Admin" }]
+    : navigationItems;
+
   return (
     <div className="min-h-screen bg-slate-50 text-slate-950">
       <header className="border-b border-slate-200 bg-white">
@@ -25,7 +30,7 @@ export function AppShell({ children }: AppShellProps) {
 
           <nav aria-label="Navigation principale">
             <ul className="flex flex-wrap gap-2">
-              {navigationItems.map((item) => (
+              {items.map((item) => (
                 <li key={item.href}>
                   <Link
                     href={item.href}

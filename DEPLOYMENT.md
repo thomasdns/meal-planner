@@ -17,6 +17,7 @@ DATABASE_URL
 NEXTAUTH_URL
 NEXTAUTH_SECRET
 NEXT_SERVER_ACTIONS_ENCRYPTION_KEY
+ADMIN_EMAILS
 ```
 
 `DATABASE_URL` doit pointer vers la base PostgreSQL en ligne.
@@ -30,6 +31,15 @@ https://meal-planner.example.com
 `NEXTAUTH_SECRET` doit etre une valeur aleatoire forte.
 
 `NEXT_SERVER_ACTIONS_ENCRYPTION_KEY` doit etre une valeur base64 de 32 octets.
+
+`ADMIN_EMAILS` contient la liste des emails autorises a acceder a
+l'interface admin, separes par des virgules.
+
+Exemple :
+
+```txt
+admin@example.com
+```
 
 ## Commande de build Vercel
 
@@ -105,6 +115,7 @@ DATABASE_URL
 NEXTAUTH_URL
 NEXTAUTH_SECRET
 NEXT_SERVER_ACTIONS_ENCRYPTION_KEY
+ADMIN_EMAILS
 ```
 
 `NEXTAUTH_URL` doit correspondre a l'URL publique exacte de l'application.
@@ -123,6 +134,8 @@ node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"
 
 Generer une valeur differente pour `NEXTAUTH_SECRET` et pour
 `NEXT_SERVER_ACTIONS_ENCRYPTION_KEY`.
+
+Pour `ADMIN_EMAILS`, renseigner l'email du compte qui doit acceder a `/admin`.
 
 ## Configuration du build Vercel
 
