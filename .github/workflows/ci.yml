@@ -31,8 +31,8 @@ jobs:
     env:
       DATABASE_URL: postgresql://meal_planner_user:meal_planner_password@localhost:5432/meal_planner_db
       NEXTAUTH_URL: http://localhost:3000
-      NEXTAUTH_SECRET: ci-nextauth-secret
-      NEXT_SERVER_ACTIONS_ENCRYPTION_KEY: ci-server-actions-key
+      NEXTAUTH_SECRET: Y2ktbmV4dGF1dGgtc2VjcmV0LW1lYWwtcGxhbm5lcg==
+      NEXT_SERVER_ACTIONS_ENCRYPTION_KEY: Y2ktc2VydmVyLWFjdGlvbnMta2V5LTMyLWJ5dGVzISE=
       ADMIN_EMAILS: admin@example.com
 
     steps:
@@ -59,3 +59,9 @@ jobs:
 
       - name: Build application
         run: npm run build
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Run end-to-end tests
+        run: npm run test:e2e
