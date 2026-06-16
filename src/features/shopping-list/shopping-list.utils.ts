@@ -12,6 +12,7 @@ export type ShoppingListItemView = {
   name: string;
   quantity: number | null;
   unit: string | null;
+  checked: boolean;
   recipeTitles: string[];
 };
 
@@ -40,6 +41,7 @@ export function aggregateShoppingListItems(
       name: source.ingredient.name,
       quantity: source.ingredient.quantity,
       unit: source.ingredient.unit,
+      checked: false,
       recipeTitles: [source.recipeTitle],
     });
   }

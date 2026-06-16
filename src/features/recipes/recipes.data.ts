@@ -8,6 +8,8 @@ export type RecipeListItem = {
   title: string;
   description: string | null;
   servings: number;
+  totalTime: number | null;
+  categoryId: string | null;
   categoryName: string | null;
   ingredientsCount: number;
   createdAt: Date;
@@ -33,12 +35,40 @@ export type RecipeDetail = {
   ingredients: RecipeIngredientItem[];
 };
 
-export async function getCurrentUserRecipes(): Promise<RecipeListItem[]> {
+export type RecipeFilters = {
+  query?: string;
+  categoryId?: string;
+  maxTotalTime?: number;
+};
+
+export async function getCurrentUserRecipes(
+  filters: RecipeFilters = {},
+): Promise<RecipeListItem[]> {
   const user = await requireUser();
+  const query = filters.query?.trim();
 
   const recipes = await prisma.recipe.findMany({
     where: {
       userId: user.id,
+      ...(query
+        ? {
+            OR: [
+              {
+                title: {
+                  contains: query,
+                  mode: "insensitive",
+                },
+              },
+              {
+                description: {
+                  contains: query,
+                  mode: "insensitive",
+                },
+              },
+            ],
+          }
+        : {}),
+      ...(filters.categoryId ? { categoryId: filters.categoryId } : {}),
     },
     orderBy: {
       createdAt: "desc",
@@ -48,6 +78,9 @@ export async function getCurrentUserRecipes(): Promise<RecipeListItem[]> {
       title: true,
       description: true,
       servings: true,
+      prepTime: true,
+      cookTime: true,
+      categoryId: true,
       createdAt: true,
       category: {
         select: {
@@ -62,15 +95,28 @@ export async function getCurrentUserRecipes(): Promise<RecipeListItem[]> {
     },
   });
 
-  return recipes.map((recipe) => ({
-    id: recipe.id,
-    title: recipe.title,
-    description: recipe.description,
-    servings: recipe.servings,
-    categoryName: recipe.category?.name ?? null,
-    ingredientsCount: recipe._count.ingredients,
-    createdAt: recipe.createdAt,
-  }));
+  return recipes
+    .map((recipe) => {
+      const totalTime =
+        recipe.prepTime || recipe.cookTime
+          ? (recipe.prepTime ?? 0) + (recipe.cookTime ?? 0)
+          : null;
+
+      return {
+        id: recipe.id,
+        title: recipe.title,
+        description: recipe.description,
+        servings: recipe.servings,
+        totalTime,
+        categoryId: recipe.categoryId,
+        categoryName: recipe.category?.name ?? null,
+        ingredientsCount: recipe._count.ingredients,
+        createdAt: recipe.createdAt,
+      };
+    })
+    .filter((recipe) =>
+      filters.maxTotalTime ? (recipe.totalTime ?? Infinity) <= filters.maxTotalTime : true,
+    );
 }
 
 export async function getCurrentUserRecipeDetail(

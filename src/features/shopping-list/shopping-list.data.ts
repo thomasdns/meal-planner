@@ -57,10 +57,42 @@ export async function getCurrentUserWeeklyShoppingList(): Promise<WeeklyShopping
       })),
     ),
   );
+  const savedItems = await prisma.shoppingListItem.findMany({
+    where: {
+      userId: user.id,
+    },
+    select: {
+      name: true,
+      unit: true,
+      checked: true,
+    },
+  });
+  const checkedItems = new Map(
+    savedItems.map((item) => [
+      getShoppingListKey(item.name, item.unit),
+      item.checked,
+    ]),
+  );
 
   return {
     startDate: days[0].date,
     endDate: dateToDateInputValue(new Date(endDate.getTime() - 1)),
-    items,
+    items: items
+      .map((item) => ({
+        ...item,
+        checked:
+          checkedItems.get(getShoppingListKey(item.name, item.unit)) ?? false,
+      }))
+      .sort((left, right) => {
+        if (left.checked !== right.checked) {
+          return left.checked ? 1 : -1;
+        }
+
+        return left.name.localeCompare(right.name, "fr-FR");
+      }),
   };
+}
+
+function getShoppingListKey(name: string, unit: string | null) {
+  return `${name.trim().toLowerCase()}::${unit?.trim().toLowerCase() ?? ""}`;
 }

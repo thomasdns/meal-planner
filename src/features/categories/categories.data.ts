@@ -54,3 +54,61 @@ export async function createCategoryForCurrentUser(input: {
     },
   });
 }
+
+export async function updateCategoryForCurrentUser(
+  categoryId: string,
+  input: {
+    name: string;
+    color?: string;
+  },
+) {
+  const user = await requireUser();
+
+  const category = await prisma.category.findFirst({
+    where: {
+      id: categoryId,
+      userId: user.id,
+    },
+    select: {
+      id: true,
+    },
+  });
+
+  if (!category) {
+    throw new Error("Category not found");
+  }
+
+  await prisma.category.update({
+    where: {
+      id: category.id,
+    },
+    data: {
+      name: input.name,
+      color: input.color,
+    },
+  });
+}
+
+export async function deleteCategoryForCurrentUser(categoryId: string) {
+  const user = await requireUser();
+
+  const category = await prisma.category.findFirst({
+    where: {
+      id: categoryId,
+      userId: user.id,
+    },
+    select: {
+      id: true,
+    },
+  });
+
+  if (!category) {
+    throw new Error("Category not found");
+  }
+
+  await prisma.category.delete({
+    where: {
+      id: category.id,
+    },
+  });
+}

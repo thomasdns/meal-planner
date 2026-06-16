@@ -53,6 +53,12 @@ export function RecipeList({ recipes }: RecipeListProps) {
               <dt className="text-slate-500">Ingredients</dt>
               <dd className="font-medium">{recipe.ingredientsCount}</dd>
             </div>
+            <div>
+              <dt className="text-slate-500">Temps</dt>
+              <dd className="font-medium">
+                {recipe.totalTime ? `${recipe.totalTime} min` : "-"}
+              </dd>
+            </div>
           </dl>
 
           <Link

@@ -29,6 +29,7 @@ describe("aggregateShoppingListItems", () => {
         name: "Tomates",
         quantity: 5,
         unit: "piece",
+        checked: false,
         recipeTitles: ["Pates au pesto", "Salade"],
       },
     ]);
