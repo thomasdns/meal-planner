@@ -28,8 +28,8 @@ export function ProfileForm({ name, email }: ProfileFormProps) {
       <div>
         <h2 className="text-lg font-semibold">Informations personnelles</h2>
         <p className="text-sm text-slate-600">
-          Ton email sert d&apos;identifiant de connexion et n&apos;est pas
-          modifiable ici.
+          Ton email sert d&apos;identifiant de connexion. Si tu le modifies, il
+          faudra utiliser le nouvel email a la prochaine connexion.
         </p>
       </div>
 
@@ -65,10 +65,11 @@ export function ProfileForm({ name, email }: ProfileFormProps) {
         </label>
         <input
           id="email"
+          name="email"
           type="email"
-          value={email ?? ""}
-          disabled
-          className="w-full rounded-md border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-500"
+          required
+          defaultValue={email ?? ""}
+          className="w-full rounded-md border border-slate-300 bg-transparent px-3 py-2 text-sm outline-none focus:border-emerald-600"
         />
       </div>
 

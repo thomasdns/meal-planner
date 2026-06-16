@@ -58,8 +58,27 @@ export async function getCurrentUserProfile(): Promise<CurrentUserProfile> {
   };
 }
 
-export async function updateCurrentUserProfile(input: { name: string }) {
+export async function updateCurrentUserProfile(input: {
+  name: string;
+  email: string;
+}) {
   const user = await requireUser();
+
+  const existingUser = await prisma.user.findFirst({
+    where: {
+      email: input.email,
+      NOT: {
+        id: user.id,
+      },
+    },
+    select: {
+      id: true,
+    },
+  });
+
+  if (existingUser) {
+    throw new Error("Email already used");
+  }
 
   await prisma.user.update({
     where: {
@@ -67,6 +86,7 @@ export async function updateCurrentUserProfile(input: { name: string }) {
     },
     data: {
       name: input.name,
+      email: input.email,
     },
   });
 }

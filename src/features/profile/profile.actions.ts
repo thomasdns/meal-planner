@@ -16,6 +16,7 @@ export async function updateProfileAction(
 ): Promise<UpdateProfileState> {
   const parsed = updateProfileSchema.safeParse({
     name: formData.get("name"),
+    email: formData.get("email"),
   });
 
   if (!parsed.success) {
@@ -24,7 +25,13 @@ export async function updateProfileAction(
     };
   }
 
-  await updateCurrentUserProfile(parsed.data);
+  try {
+    await updateCurrentUserProfile(parsed.data);
+  } catch {
+    return {
+      error: "Cette adresse email est deja utilisee.",
+    };
+  }
 
   revalidatePath("/profile");
   revalidatePath("/dashboard");
