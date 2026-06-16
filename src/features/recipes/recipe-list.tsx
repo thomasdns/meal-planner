@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 import type { RecipeListItem } from "@/features/recipes/recipes.data";
 
 type RecipeListProps = {
@@ -28,7 +30,14 @@ export function RecipeList({ recipes }: RecipeListProps) {
               <p className="text-xs font-medium uppercase text-emerald-700">
                 {recipe.categoryName ?? "Sans categorie"}
               </p>
-              <h2 className="mt-1 text-lg font-semibold">{recipe.title}</h2>
+              <h2 className="mt-1 text-lg font-semibold">
+                <Link
+                  href={`/recipes/${recipe.id}`}
+                  className="hover:text-emerald-700"
+                >
+                  {recipe.title}
+                </Link>
+              </h2>
             </div>
             {recipe.description ? (
               <p className="text-sm text-slate-600">{recipe.description}</p>
@@ -45,6 +54,13 @@ export function RecipeList({ recipes }: RecipeListProps) {
               <dd className="font-medium">{recipe.ingredientsCount}</dd>
             </div>
           </dl>
+
+          <Link
+            href={`/recipes/${recipe.id}`}
+            className="mt-4 inline-flex text-sm font-medium text-emerald-700 hover:text-emerald-800"
+          >
+            Voir la recette
+          </Link>
         </article>
       ))}
     </div>
