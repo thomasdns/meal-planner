@@ -2,11 +2,23 @@
 
 import { revalidatePath } from "next/cache";
 
-import { createIngredientSchema } from "@/features/recipes/ingredient.validation";
-import { createIngredientForCurrentUserRecipe } from "@/features/recipes/recipes.data";
+import {
+  createIngredientSchema,
+  updateIngredientSchema,
+} from "@/features/recipes/ingredient.validation";
+import {
+  createIngredientForCurrentUserRecipe,
+  deleteIngredientForCurrentUser,
+  updateIngredientForCurrentUser,
+} from "@/features/recipes/recipes.data";
 
 export type CreateIngredientState = {
   error?: string;
+};
+
+export type UpdateIngredientState = {
+  error?: string;
+  success?: string;
 };
 
 export async function createIngredientAction(
@@ -38,4 +50,55 @@ export async function createIngredientAction(
   revalidatePath("/recipes");
 
   return {};
+}
+
+export async function updateIngredientAction(
+  ingredientId: string,
+  _previousState: UpdateIngredientState,
+  formData: FormData,
+): Promise<UpdateIngredientState> {
+  const parsed = updateIngredientSchema.safeParse({
+    name: formData.get("name"),
+    quantity: formData.get("quantity"),
+    unit: formData.get("unit"),
+  });
+
+  if (!parsed.success) {
+    return {
+      error: parsed.error.issues[0]?.message ?? "Donnees invalides.",
+    };
+  }
+
+  try {
+    const recipeId = await updateIngredientForCurrentUser(
+      ingredientId,
+      parsed.data,
+    );
+
+    revalidatePath(`/recipes/${recipeId}`);
+    revalidatePath("/recipes");
+    revalidatePath("/shopping-list");
+    revalidatePath("/dashboard");
+  } catch {
+    return {
+      error: "Impossible de modifier cet ingredient.",
+    };
+  }
+
+  return {
+    success: "Ingredient mis a jour.",
+  };
+}
+
+export async function deleteIngredientAction(ingredientId: string) {
+  try {
+    const recipeId = await deleteIngredientForCurrentUser(ingredientId);
+
+    revalidatePath(`/recipes/${recipeId}`);
+    revalidatePath("/recipes");
+    revalidatePath("/shopping-list");
+    revalidatePath("/dashboard");
+  } catch {
+    return;
+  }
 }

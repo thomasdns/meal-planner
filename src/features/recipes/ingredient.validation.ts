@@ -28,3 +28,7 @@ export const createIngredientSchema = z.object({
 });
 
 export type CreateIngredientInput = z.infer<typeof createIngredientSchema>;
+
+export const updateIngredientSchema = createIngredientSchema;
+
+export type UpdateIngredientInput = z.infer<typeof updateIngredientSchema>;

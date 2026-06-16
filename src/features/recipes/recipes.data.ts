@@ -25,6 +25,9 @@ export type RecipeDetail = {
   title: string;
   description: string | null;
   servings: number;
+  prepTime: number | null;
+  cookTime: number | null;
+  steps: string | null;
   categoryId: string | null;
   categoryName: string | null;
   ingredients: RecipeIngredientItem[];
@@ -85,6 +88,9 @@ export async function getCurrentUserRecipeDetail(
       title: true,
       description: true,
       servings: true,
+      prepTime: true,
+      cookTime: true,
+      steps: true,
       categoryId: true,
       category: {
         select: {
@@ -114,6 +120,9 @@ export async function getCurrentUserRecipeDetail(
     title: recipe.title,
     description: recipe.description,
     servings: recipe.servings,
+    prepTime: recipe.prepTime,
+    cookTime: recipe.cookTime,
+    steps: recipe.steps,
     categoryId: recipe.categoryId,
     categoryName: recipe.category?.name ?? null,
     ingredients: recipe.ingredients,
@@ -124,6 +133,9 @@ export async function createRecipeForCurrentUser(input: {
   title: string;
   description?: string;
   servings: number;
+  prepTime?: number;
+  cookTime?: number;
+  steps?: string;
   categoryId?: string;
 }) {
   const user = await requireUser();
@@ -149,6 +161,9 @@ export async function createRecipeForCurrentUser(input: {
       title: input.title,
       description: input.description,
       servings: input.servings,
+      prepTime: input.prepTime,
+      cookTime: input.cookTime,
+      steps: input.steps,
       userId: user.id,
       categoryId: category?.id,
     },
@@ -161,6 +176,9 @@ export async function updateRecipeForCurrentUser(
     title: string;
     description?: string;
     servings: number;
+    prepTime?: number;
+    cookTime?: number;
+    steps?: string;
     categoryId?: string;
   },
 ) {
@@ -204,6 +222,9 @@ export async function updateRecipeForCurrentUser(
       title: input.title,
       description: input.description,
       servings: input.servings,
+      prepTime: input.prepTime ?? null,
+      cookTime: input.cookTime ?? null,
+      steps: input.steps ?? null,
       categoryId: category?.id ?? null,
     },
   });
@@ -265,4 +286,74 @@ export async function createIngredientForCurrentUserRecipe(
       recipeId: recipe.id,
     },
   });
+}
+
+export async function updateIngredientForCurrentUser(
+  ingredientId: string,
+  input: {
+    name: string;
+    quantity?: number;
+    unit?: string;
+  },
+) {
+  const user = await requireUser();
+
+  const ingredient = await prisma.recipeIngredient.findFirst({
+    where: {
+      id: ingredientId,
+      recipe: {
+        userId: user.id,
+      },
+    },
+    select: {
+      id: true,
+      recipeId: true,
+    },
+  });
+
+  if (!ingredient) {
+    throw new Error("Ingredient not found");
+  }
+
+  await prisma.recipeIngredient.update({
+    where: {
+      id: ingredient.id,
+    },
+    data: {
+      name: input.name,
+      quantity: input.quantity ?? null,
+      unit: input.unit ?? null,
+    },
+  });
+
+  return ingredient.recipeId;
+}
+
+export async function deleteIngredientForCurrentUser(ingredientId: string) {
+  const user = await requireUser();
+
+  const ingredient = await prisma.recipeIngredient.findFirst({
+    where: {
+      id: ingredientId,
+      recipe: {
+        userId: user.id,
+      },
+    },
+    select: {
+      id: true,
+      recipeId: true,
+    },
+  });
+
+  if (!ingredient) {
+    throw new Error("Ingredient not found");
+  }
+
+  await prisma.recipeIngredient.delete({
+    where: {
+      id: ingredient.id,
+    },
+  });
+
+  return ingredient.recipeId;
 }

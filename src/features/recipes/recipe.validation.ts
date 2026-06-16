@@ -1,5 +1,17 @@
 import { z } from "zod";
 
+const optionalMinutesSchema = z
+  .union([z.literal(""), z.coerce.number().int()])
+  .optional()
+  .transform((value) => (value === "" ? undefined : value))
+  .pipe(
+    z
+      .number()
+      .min(0, "Le temps ne peut pas etre negatif.")
+      .max(1440, "Le temps ne doit pas depasser 24 heures.")
+      .optional(),
+  );
+
 export const createRecipeSchema = z.object({
   title: z
     .string()
@@ -17,6 +29,14 @@ export const createRecipeSchema = z.object({
     .int("Le nombre de portions doit etre un entier.")
     .min(1, "Il faut au moins 1 portion.")
     .max(20, "Le nombre de portions ne doit pas depasser 20."),
+  prepTime: optionalMinutesSchema,
+  cookTime: optionalMinutesSchema,
+  steps: z
+    .string()
+    .trim()
+    .max(3000, "Les etapes ne doivent pas depasser 3000 caracteres.")
+    .optional()
+    .transform((value) => (value ? value : undefined)),
   categoryId: z
     .string()
     .trim()

@@ -30,7 +30,7 @@ export function CreateRecipeForm({ categories }: CreateRecipeFormProps) {
         <h2 className="text-lg font-semibold">Nouvelle recette</h2>
         <p className="text-sm text-slate-600">
           Commence avec les informations essentielles. Les ingredients seront
-          ajoutes dans une prochaine etape.
+          ajoutes depuis la page de detail.
         </p>
       </div>
 
@@ -77,6 +77,51 @@ export function CreateRecipeForm({ categories }: CreateRecipeFormProps) {
           max={20}
           defaultValue={1}
           required
+          className="w-full rounded-md border border-slate-300 bg-transparent px-3 py-2 text-sm outline-none focus:border-emerald-600"
+        />
+      </div>
+
+      <div className="grid gap-4 sm:grid-cols-2">
+        <div className="space-y-1">
+          <label htmlFor="prepTime" className="text-sm font-medium">
+            Preparation (min)
+          </label>
+          <input
+            id="prepTime"
+            name="prepTime"
+            type="number"
+            min={0}
+            max={1440}
+            placeholder="15"
+            className="w-full rounded-md border border-slate-300 bg-transparent px-3 py-2 text-sm outline-none focus:border-emerald-600"
+          />
+        </div>
+
+        <div className="space-y-1">
+          <label htmlFor="cookTime" className="text-sm font-medium">
+            Cuisson (min)
+          </label>
+          <input
+            id="cookTime"
+            name="cookTime"
+            type="number"
+            min={0}
+            max={1440}
+            placeholder="20"
+            className="w-full rounded-md border border-slate-300 bg-transparent px-3 py-2 text-sm outline-none focus:border-emerald-600"
+          />
+        </div>
+      </div>
+
+      <div className="space-y-1">
+        <label htmlFor="steps" className="text-sm font-medium">
+          Etapes de preparation
+        </label>
+        <textarea
+          id="steps"
+          name="steps"
+          rows={5}
+          placeholder={"1. Preparer les ingredients\n2. Cuire\n3. Servir"}
           className="w-full rounded-md border border-slate-300 bg-transparent px-3 py-2 text-sm outline-none focus:border-emerald-600"
         />
       </div>

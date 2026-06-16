@@ -1,6 +1,9 @@
 import { describe, expect, it } from "vitest";
 
-import { createIngredientSchema } from "@/features/recipes/ingredient.validation";
+import {
+  createIngredientSchema,
+  updateIngredientSchema,
+} from "@/features/recipes/ingredient.validation";
 import {
   createRecipeSchema,
   updateRecipeSchema,
@@ -22,6 +25,9 @@ describe("recipe validation", () => {
         title: "Pates au pesto",
         description: undefined,
         servings: 4,
+        prepTime: undefined,
+        cookTime: undefined,
+        steps: undefined,
         categoryId: undefined,
       });
     }
@@ -41,6 +47,9 @@ describe("recipe validation", () => {
       title: "Pates au pesto rosso",
       description: "Version mise a jour",
       servings: "3",
+      prepTime: "10",
+      cookTime: "15",
+      steps: "Melanger puis servir.",
       categoryId: "",
     });
 
@@ -51,9 +60,22 @@ describe("recipe validation", () => {
         title: "Pates au pesto rosso",
         description: "Version mise a jour",
         servings: 3,
+        prepTime: 10,
+        cookTime: 15,
+        steps: "Melanger puis servir.",
         categoryId: undefined,
       });
     }
+  });
+
+  it("rejects invalid recipe time", () => {
+    const result = updateRecipeSchema.safeParse({
+      title: "Pates",
+      servings: "2",
+      prepTime: "-1",
+    });
+
+    expect(result.success).toBe(false);
   });
 });
 
@@ -72,6 +94,24 @@ describe("ingredient validation", () => {
         name: "Tomates",
         quantity: undefined,
         unit: undefined,
+      });
+    }
+  });
+
+  it("accepts an ingredient update", () => {
+    const result = updateIngredientSchema.safeParse({
+      name: "Tomates cerises",
+      quantity: "250",
+      unit: "g",
+    });
+
+    expect(result.success).toBe(true);
+
+    if (result.success) {
+      expect(result.data).toEqual({
+        name: "Tomates cerises",
+        quantity: 250,
+        unit: "g",
       });
     }
   });

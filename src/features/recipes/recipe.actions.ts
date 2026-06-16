@@ -31,6 +31,9 @@ export async function createRecipeAction(
     title: formData.get("title"),
     description: formData.get("description"),
     servings: formData.get("servings"),
+    prepTime: formData.get("prepTime"),
+    cookTime: formData.get("cookTime"),
+    steps: formData.get("steps"),
     categoryId: formData.get("categoryId"),
   });
 
@@ -62,6 +65,9 @@ export async function updateRecipeAction(
     title: formData.get("title"),
     description: formData.get("description"),
     servings: formData.get("servings"),
+    prepTime: formData.get("prepTime"),
+    cookTime: formData.get("cookTime"),
+    steps: formData.get("steps"),
     categoryId: formData.get("categoryId"),
   });
 

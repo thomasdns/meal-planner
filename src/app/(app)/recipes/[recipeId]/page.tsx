@@ -31,6 +31,7 @@ export default async function RecipeDetailPage({
     id: category.id,
     name: category.name,
   }));
+  const totalTime = (recipe.prepTime ?? 0) + (recipe.cookTime ?? 0);
 
   return (
     <div className="grid gap-8 lg:grid-cols-[1fr_360px]">
@@ -70,7 +71,15 @@ export default async function RecipeDetailPage({
           </div>
           <div className="rounded-lg border border-slate-200 bg-white p-5">
             <p className="text-sm font-medium text-slate-600">Temps total</p>
-            <p className="mt-3 text-3xl font-semibold">-</p>
+            <p className="mt-3 text-3xl font-semibold">
+              {totalTime > 0 ? `${totalTime} min` : "-"}
+            </p>
+            {totalTime > 0 ? (
+              <p className="mt-2 text-xs text-slate-500">
+                Preparation {recipe.prepTime ?? 0} min · Cuisson{" "}
+                {recipe.cookTime ?? 0} min
+              </p>
+            ) : null}
           </div>
         </section>
 
@@ -78,6 +87,15 @@ export default async function RecipeDetailPage({
           <h2 className="text-xl font-semibold">Ingredients</h2>
           <IngredientList ingredients={recipe.ingredients} />
         </section>
+
+        {recipe.steps ? (
+          <section className="space-y-3">
+            <h2 className="text-xl font-semibold">Preparation</h2>
+            <div className="whitespace-pre-line rounded-lg border border-slate-200 bg-white p-5 text-sm leading-6 text-slate-700">
+              {recipe.steps}
+            </div>
+          </section>
+        ) : null}
       </div>
 
       <aside className="space-y-6">

@@ -10,6 +10,9 @@ type EditRecipeFormProps = {
     title: string;
     description: string | null;
     servings: number;
+    prepTime: number | null;
+    cookTime: number | null;
+    steps: string | null;
     categoryId: string | null;
   };
   categories: {
@@ -92,6 +95,51 @@ export function EditRecipeForm({ recipe, categories }: EditRecipeFormProps) {
           max={20}
           defaultValue={recipe.servings}
           required
+          className="w-full rounded-md border border-slate-300 bg-transparent px-3 py-2 text-sm outline-none focus:border-emerald-600"
+        />
+      </div>
+
+      <div className="grid gap-4 sm:grid-cols-2">
+        <div className="space-y-1">
+          <label htmlFor="edit-prepTime" className="text-sm font-medium">
+            Preparation (min)
+          </label>
+          <input
+            id="edit-prepTime"
+            name="prepTime"
+            type="number"
+            min={0}
+            max={1440}
+            defaultValue={recipe.prepTime ?? ""}
+            className="w-full rounded-md border border-slate-300 bg-transparent px-3 py-2 text-sm outline-none focus:border-emerald-600"
+          />
+        </div>
+
+        <div className="space-y-1">
+          <label htmlFor="edit-cookTime" className="text-sm font-medium">
+            Cuisson (min)
+          </label>
+          <input
+            id="edit-cookTime"
+            name="cookTime"
+            type="number"
+            min={0}
+            max={1440}
+            defaultValue={recipe.cookTime ?? ""}
+            className="w-full rounded-md border border-slate-300 bg-transparent px-3 py-2 text-sm outline-none focus:border-emerald-600"
+          />
+        </div>
+      </div>
+
+      <div className="space-y-1">
+        <label htmlFor="edit-steps" className="text-sm font-medium">
+          Etapes de preparation
+        </label>
+        <textarea
+          id="edit-steps"
+          name="steps"
+          rows={6}
+          defaultValue={recipe.steps ?? ""}
           className="w-full rounded-md border border-slate-300 bg-transparent px-3 py-2 text-sm outline-none focus:border-emerald-600"
         />
       </div>
