@@ -108,6 +108,10 @@ npx prisma studio
 
 Voir [DEPLOYMENT.md](./DEPLOYMENT.md).
 
+## Ameliorations futures
+
+Voir [ROADMAP.md](./ROADMAP.md).
+
 ## Organisation du projet
 
 ```txt
