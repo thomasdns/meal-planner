@@ -4,6 +4,7 @@ import {
   mealTypeLabels,
   mealTypes,
 } from "@/features/meal-plans/meal-plan.constants";
+import { DeleteMealPlanForm } from "@/features/meal-plans/delete-meal-plan-form";
 import type { PlannedMeal, WeekDay } from "@/features/meal-plans/meal-plans.data";
 
 type WeeklyMealPlanProps = {
@@ -65,16 +66,19 @@ function Row({
             className="min-h-24 border-b border-r border-slate-200 p-3 last:border-r-0"
           >
             {meal ? (
-              <div className="space-y-1">
-                <Link
-                  href={`/recipes/${meal.recipe.id}`}
-                  className="text-sm font-semibold text-slate-950 hover:text-emerald-700"
-                >
-                  {meal.recipe.title}
-                </Link>
-                <p className="text-xs text-slate-500">
-                  {meal.recipe.categoryName ?? "Sans categorie"}
-                </p>
+              <div className="flex items-start justify-between gap-2">
+                <div className="space-y-1">
+                  <Link
+                    href={`/recipes/${meal.recipe.id}`}
+                    className="text-sm font-semibold text-slate-950 hover:text-emerald-700"
+                  >
+                    {meal.recipe.title}
+                  </Link>
+                  <p className="text-xs text-slate-500">
+                    {meal.recipe.categoryName ?? "Sans categorie"}
+                  </p>
+                </div>
+                <DeleteMealPlanForm mealPlanId={meal.id} />
               </div>
             ) : (
               <p className="text-sm text-slate-400">Libre</p>

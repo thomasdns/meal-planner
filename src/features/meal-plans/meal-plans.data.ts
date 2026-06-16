@@ -28,6 +28,11 @@ export type PlannedMeal = {
 export type WeeklyMealPlan = {
   days: WeekDay[];
   meals: PlannedMeal[];
+  startDate: string;
+  endDate: string;
+  previousWeekStartDate: string;
+  nextWeekStartDate: string;
+  currentWeekStartDate: string;
 };
 
 export async function getCurrentUserRecipeOptions(): Promise<
@@ -49,12 +54,18 @@ export async function getCurrentUserRecipeOptions(): Promise<
   });
 }
 
-export async function getCurrentUserWeeklyMealPlan(): Promise<WeeklyMealPlan> {
+export async function getCurrentUserWeeklyMealPlan(
+  referenceDate?: string,
+): Promise<WeeklyMealPlan> {
   const user = await requireUser();
-  const days = getCurrentWeekDays();
+  const days = getWeekDays(referenceDate);
   const startDate = dateStringToUtcDate(days[0].date);
   const endDate = dateStringToUtcDate(days[days.length - 1].date);
   endDate.setUTCDate(endDate.getUTCDate() + 1);
+  const previousWeekStart = new Date(startDate);
+  previousWeekStart.setUTCDate(previousWeekStart.getUTCDate() - 7);
+  const nextWeekStart = new Date(startDate);
+  nextWeekStart.setUTCDate(nextWeekStart.getUTCDate() + 7);
 
   const mealPlans = await prisma.mealPlan.findMany({
     where: {
@@ -85,6 +96,11 @@ export async function getCurrentUserWeeklyMealPlan(): Promise<WeeklyMealPlan> {
 
   return {
     days,
+    startDate: days[0].date,
+    endDate: days[days.length - 1].date,
+    previousWeekStartDate: dateToDateInputValue(previousWeekStart),
+    nextWeekStartDate: dateToDateInputValue(nextWeekStart),
+    currentWeekStartDate: getCurrentWeekDays()[0].date,
     meals: mealPlans.map((mealPlan) => ({
       id: mealPlan.id,
       date: dateToDateInputValue(mealPlan.date),
@@ -140,15 +156,43 @@ export async function upsertMealPlanForCurrentUser(input: {
   });
 }
 
+export async function deleteMealPlanForCurrentUser(mealPlanId: string) {
+  const user = await requireUser();
+
+  const mealPlan = await prisma.mealPlan.findFirst({
+    where: {
+      id: mealPlanId,
+      userId: user.id,
+    },
+    select: {
+      id: true,
+    },
+  });
+
+  if (!mealPlan) {
+    throw new Error("Meal plan not found");
+  }
+
+  await prisma.mealPlan.delete({
+    where: {
+      id: mealPlan.id,
+    },
+  });
+}
+
 export function getCurrentWeekDays(): WeekDay[] {
+  return getWeekDays();
+}
+
+export function getWeekDays(referenceDate?: string): WeekDay[] {
   const today = new Date();
-  const utcToday = new Date(
-    Date.UTC(today.getFullYear(), today.getMonth(), today.getDate()),
-  );
-  const day = utcToday.getUTCDay();
+  const reference = referenceDate
+    ? dateStringToUtcDate(referenceDate)
+    : new Date(Date.UTC(today.getFullYear(), today.getMonth(), today.getDate()));
+  const day = reference.getUTCDay();
   const daysSinceMonday = day === 0 ? 6 : day - 1;
-  const monday = new Date(utcToday);
-  monday.setUTCDate(utcToday.getUTCDate() - daysSinceMonday);
+  const monday = new Date(reference);
+  monday.setUTCDate(reference.getUTCDate() - daysSinceMonday);
 
   return Array.from({ length: 7 }, (_, index) => {
     const date = new Date(monday);

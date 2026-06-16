@@ -3,7 +3,10 @@
 import { revalidatePath } from "next/cache";
 
 import { upsertMealPlanSchema } from "@/features/meal-plans/meal-plan.validation";
-import { upsertMealPlanForCurrentUser } from "@/features/meal-plans/meal-plans.data";
+import {
+  deleteMealPlanForCurrentUser,
+  upsertMealPlanForCurrentUser,
+} from "@/features/meal-plans/meal-plans.data";
 
 export type UpsertMealPlanState = {
   error?: string;
@@ -34,6 +37,20 @@ export async function upsertMealPlanAction(
   }
 
   revalidatePath("/meal-plan");
+  revalidatePath("/shopping-list");
+  revalidatePath("/dashboard");
 
   return {};
+}
+
+export async function deleteMealPlanAction(mealPlanId: string) {
+  try {
+    await deleteMealPlanForCurrentUser(mealPlanId);
+  } catch {
+    return;
+  }
+
+  revalidatePath("/meal-plan");
+  revalidatePath("/shopping-list");
+  revalidatePath("/dashboard");
 }
