@@ -7,14 +7,10 @@ import {
   dateToDateInputValue,
   getCurrentWeekDays,
 } from "@/features/meal-plans/meal-plans.data";
-
-export type ShoppingListItemView = {
-  key: string;
-  name: string;
-  quantity: number | null;
-  unit: string | null;
-  recipeTitles: string[];
-};
+import {
+  aggregateShoppingListItems,
+  type ShoppingListItemView,
+} from "@/features/shopping-list/shopping-list.utils";
 
 export type WeeklyShoppingList = {
   startDate: string;
@@ -53,51 +49,18 @@ export async function getCurrentUserWeeklyShoppingList(): Promise<WeeklyShopping
     },
   });
 
-  const groupedItems = new Map<string, ShoppingListItemView>();
-
-  for (const meal of plannedMeals) {
-    for (const ingredient of meal.recipe.ingredients) {
-      const key = getIngredientKey(ingredient.name, ingredient.unit);
-      const existingItem = groupedItems.get(key);
-
-      if (existingItem) {
-        existingItem.quantity = addQuantities(
-          existingItem.quantity,
-          ingredient.quantity,
-        );
-        if (!existingItem.recipeTitles.includes(meal.recipe.title)) {
-          existingItem.recipeTitles.push(meal.recipe.title);
-        }
-        continue;
-      }
-
-      groupedItems.set(key, {
-        key,
-        name: ingredient.name,
-        quantity: ingredient.quantity,
-        unit: ingredient.unit,
-        recipeTitles: [meal.recipe.title],
-      });
-    }
-  }
+  const items = aggregateShoppingListItems(
+    plannedMeals.flatMap((meal) =>
+      meal.recipe.ingredients.map((ingredient) => ({
+        recipeTitle: meal.recipe.title,
+        ingredient,
+      })),
+    ),
+  );
 
   return {
     startDate: days[0].date,
     endDate: dateToDateInputValue(new Date(endDate.getTime() - 1)),
-    items: Array.from(groupedItems.values()).sort((left, right) =>
-      left.name.localeCompare(right.name, "fr-FR"),
-    ),
+    items,
   };
-}
-
-function getIngredientKey(name: string, unit: string | null) {
-  return `${name.trim().toLowerCase()}::${unit?.trim().toLowerCase() ?? ""}`;
-}
-
-function addQuantities(left: number | null, right: number | null) {
-  if (left === null || right === null) {
-    return left ?? right;
-  }
-
-  return left + right;
 }
