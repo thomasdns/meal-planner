@@ -1,9 +1,20 @@
+import { CategoryList } from "@/features/categories/category-list";
+import { CreateCategoryForm } from "@/features/categories/create-category-form";
+import { getCurrentUserCategories } from "@/features/categories/categories.data";
 import { CreateRecipeForm } from "@/features/recipes/create-recipe-form";
 import { RecipeList } from "@/features/recipes/recipe-list";
 import { getCurrentUserRecipes } from "@/features/recipes/recipes.data";
 
 export default async function RecipesPage() {
-  const recipes = await getCurrentUserRecipes();
+  const [recipes, categories] = await Promise.all([
+    getCurrentUserRecipes(),
+    getCurrentUserCategories(),
+  ]);
+
+  const categoryOptions = categories.map((category) => ({
+    id: category.id,
+    name: category.name,
+  }));
 
   return (
     <div className="grid gap-8 lg:grid-cols-[1fr_360px]">
@@ -20,8 +31,10 @@ export default async function RecipesPage() {
         <RecipeList recipes={recipes} />
       </div>
 
-      <aside>
-        <CreateRecipeForm />
+      <aside className="space-y-6">
+        <CreateRecipeForm categories={categoryOptions} />
+        <CreateCategoryForm />
+        <CategoryList categories={categories} />
       </aside>
     </div>
   );

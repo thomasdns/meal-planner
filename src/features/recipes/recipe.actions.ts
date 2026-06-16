@@ -17,6 +17,7 @@ export async function createRecipeAction(
     title: formData.get("title"),
     description: formData.get("description"),
     servings: formData.get("servings"),
+    categoryId: formData.get("categoryId"),
   });
 
   if (!parsed.success) {
@@ -25,7 +26,14 @@ export async function createRecipeAction(
     };
   }
 
-  await createRecipeForCurrentUser(parsed.data);
+  try {
+    await createRecipeForCurrentUser(parsed.data);
+  } catch {
+    return {
+      error: "Impossible de creer la recette avec cette categorie.",
+    };
+  }
+
   revalidatePath("/recipes");
 
   return {};

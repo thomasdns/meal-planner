@@ -57,8 +57,25 @@ export async function createRecipeForCurrentUser(input: {
   title: string;
   description?: string;
   servings: number;
+  categoryId?: string;
 }) {
   const user = await requireUser();
+
+  const category = input.categoryId
+    ? await prisma.category.findFirst({
+        where: {
+          id: input.categoryId,
+          userId: user.id,
+        },
+        select: {
+          id: true,
+        },
+      })
+    : null;
+
+  if (input.categoryId && !category) {
+    throw new Error("Forbidden category");
+  }
 
   await prisma.recipe.create({
     data: {
@@ -66,6 +83,7 @@ export async function createRecipeForCurrentUser(input: {
       description: input.description,
       servings: input.servings,
       userId: user.id,
+      categoryId: category?.id,
     },
   });
 }

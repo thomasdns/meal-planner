@@ -8,19 +8,29 @@ const initialState = {
   error: undefined,
 };
 
-export function CreateRecipeForm() {
+type CreateRecipeFormProps = {
+  categories: {
+    id: string;
+    name: string;
+  }[];
+};
+
+export function CreateRecipeForm({ categories }: CreateRecipeFormProps) {
   const [state, formAction, isPending] = useActionState(
     createRecipeAction,
     initialState,
   );
 
   return (
-    <form action={formAction} className="space-y-4 rounded-lg border border-slate-200 bg-white p-5">
+    <form
+      action={formAction}
+      className="space-y-4 rounded-lg border border-slate-200 bg-white p-5"
+    >
       <div>
         <h2 className="text-lg font-semibold">Nouvelle recette</h2>
         <p className="text-sm text-slate-600">
-          Commence avec les informations essentielles. Les ingredients et les
-          categories seront ajoutes dans les prochaines etapes.
+          Commence avec les informations essentielles. Les ingredients seront
+          ajoutes dans une prochaine etape.
         </p>
       </div>
 
@@ -69,6 +79,24 @@ export function CreateRecipeForm() {
           required
           className="w-full rounded-md border border-slate-300 bg-transparent px-3 py-2 text-sm outline-none focus:border-emerald-600"
         />
+      </div>
+
+      <div className="space-y-1">
+        <label htmlFor="categoryId" className="text-sm font-medium">
+          Categorie
+        </label>
+        <select
+          id="categoryId"
+          name="categoryId"
+          className="w-full rounded-md border border-slate-300 bg-transparent px-3 py-2 text-sm outline-none focus:border-emerald-600"
+        >
+          <option value="">Sans categorie</option>
+          {categories.map((category) => (
+            <option key={category.id} value={category.id}>
+              {category.name}
+            </option>
+          ))}
+        </select>
       </div>
 
       <button

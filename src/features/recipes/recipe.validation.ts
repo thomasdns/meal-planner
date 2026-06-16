@@ -17,6 +17,11 @@ export const createRecipeSchema = z.object({
     .int("Le nombre de portions doit etre un entier.")
     .min(1, "Il faut au moins 1 portion.")
     .max(20, "Le nombre de portions ne doit pas depasser 20."),
+  categoryId: z
+    .string()
+    .trim()
+    .optional()
+    .transform((value) => (value ? value : undefined)),
 });
 
 export type CreateRecipeInput = z.infer<typeof createRecipeSchema>;
