@@ -1,8 +1,16 @@
-export default function DashboardPage() {
+import { getCurrentUserDashboardData } from "@/features/dashboard/dashboard.data";
+import { SummaryCard } from "@/features/dashboard/summary-card";
+import { UpcomingMeals } from "@/features/dashboard/upcoming-meals";
+
+export default async function DashboardPage() {
+  const dashboard = await getCurrentUserDashboardData();
+
   return (
     <div className="space-y-6">
       <div className="space-y-2">
-        <p className="text-sm font-medium text-emerald-700">Vue d&apos;ensemble</p>
+        <p className="text-sm font-medium text-emerald-700">
+          Vue d&apos;ensemble
+        </p>
         <h1 className="text-3xl font-semibold tracking-tight">
           Tableau de bord
         </h1>
@@ -12,22 +20,30 @@ export default function DashboardPage() {
         </p>
       </div>
 
-      <section className="grid gap-4 md:grid-cols-3">
-        <div className="rounded-lg border border-slate-200 bg-white p-5">
-          <p className="text-sm font-medium text-slate-600">Repas planifies</p>
-          <p className="mt-3 text-3xl font-semibold">0</p>
-        </div>
-        <div className="rounded-lg border border-slate-200 bg-white p-5">
-          <p className="text-sm font-medium text-slate-600">Recettes</p>
-          <p className="mt-3 text-3xl font-semibold">0</p>
-        </div>
-        <div className="rounded-lg border border-slate-200 bg-white p-5">
-          <p className="text-sm font-medium text-slate-600">
-            Articles de courses
-          </p>
-          <p className="mt-3 text-3xl font-semibold">0</p>
-        </div>
+      <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        <SummaryCard
+          label="Repas planifies"
+          value={dashboard.summary.plannedMealsCount}
+          helper="Cette semaine"
+        />
+        <SummaryCard
+          label="Recettes"
+          value={dashboard.summary.recipesCount}
+          helper="Dans ta bibliotheque"
+        />
+        <SummaryCard
+          label="Categories"
+          value={dashboard.summary.categoriesCount}
+          helper="Pour organiser tes recettes"
+        />
+        <SummaryCard
+          label="Articles de courses"
+          value={dashboard.summary.shoppingItemsCount}
+          helper="Generes depuis le planning"
+        />
       </section>
+
+      <UpcomingMeals meals={dashboard.upcomingMeals} />
     </div>
   );
 }
