@@ -65,7 +65,48 @@ http://localhost:3000
 npm run dev
 npm run build
 npm run lint
+npm run test
+npm run audit
+npm run vercel-build
 ```
+
+## Variables d'environnement
+
+Copier `.env.example` vers `.env.local`, puis renseigner les valeurs locales.
+
+```bash
+cp .env.example .env.local
+```
+
+Sous Windows PowerShell :
+
+```powershell
+Copy-Item .env.example .env.local
+```
+
+## Base de donnees locale
+
+Demarrer PostgreSQL avec Docker :
+
+```bash
+docker compose up -d
+```
+
+Appliquer les migrations :
+
+```bash
+npx prisma migrate deploy
+```
+
+Ouvrir Prisma Studio :
+
+```bash
+npx prisma studio
+```
+
+## Deploiement
+
+Voir [DEPLOYMENT.md](./DEPLOYMENT.md).
 
 ## Organisation du projet
 
