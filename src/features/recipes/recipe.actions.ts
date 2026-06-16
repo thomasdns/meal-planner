@@ -1,12 +1,26 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 
-import { createRecipeSchema } from "@/features/recipes/recipe.validation";
-import { createRecipeForCurrentUser } from "@/features/recipes/recipes.data";
+import {
+  createRecipeSchema,
+  updateRecipeSchema,
+} from "@/features/recipes/recipe.validation";
+import {
+  createRecipeForCurrentUser,
+  deleteRecipeForCurrentUser,
+  updateRecipeForCurrentUser,
+} from "@/features/recipes/recipes.data";
 
 export type CreateRecipeState = {
   error?: string;
+  success?: string;
+};
+
+export type UpdateRecipeState = {
+  error?: string;
+  success?: string;
 };
 
 export async function createRecipeAction(
@@ -37,4 +51,53 @@ export async function createRecipeAction(
   revalidatePath("/recipes");
 
   return {};
+}
+
+export async function updateRecipeAction(
+  recipeId: string,
+  _previousState: UpdateRecipeState,
+  formData: FormData,
+): Promise<UpdateRecipeState> {
+  const parsed = updateRecipeSchema.safeParse({
+    title: formData.get("title"),
+    description: formData.get("description"),
+    servings: formData.get("servings"),
+    categoryId: formData.get("categoryId"),
+  });
+
+  if (!parsed.success) {
+    return {
+      error: parsed.error.issues[0]?.message ?? "Donnees invalides.",
+    };
+  }
+
+  try {
+    await updateRecipeForCurrentUser(recipeId, parsed.data);
+  } catch {
+    return {
+      error: "Impossible de modifier cette recette.",
+    };
+  }
+
+  revalidatePath("/recipes");
+  revalidatePath(`/recipes/${recipeId}`);
+
+  return {
+    success: "Recette mise a jour.",
+  };
+}
+
+export async function deleteRecipeAction(recipeId: string) {
+  try {
+    await deleteRecipeForCurrentUser(recipeId);
+  } catch {
+    return;
+  }
+
+  revalidatePath("/recipes");
+  revalidatePath("/meal-plan");
+  revalidatePath("/shopping-list");
+  revalidatePath("/dashboard");
+
+  redirect("/recipes");
 }

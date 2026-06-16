@@ -1,7 +1,10 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { getCurrentUserCategories } from "@/features/categories/categories.data";
 import { CreateIngredientForm } from "@/features/recipes/create-ingredient-form";
+import { DeleteRecipeForm } from "@/features/recipes/delete-recipe-form";
+import { EditRecipeForm } from "@/features/recipes/edit-recipe-form";
 import { IngredientList } from "@/features/recipes/ingredient-list";
 import { getCurrentUserRecipeDetail } from "@/features/recipes/recipes.data";
 
@@ -15,11 +18,19 @@ export default async function RecipeDetailPage({
   params,
 }: RecipeDetailPageProps) {
   const { recipeId } = await params;
-  const recipe = await getCurrentUserRecipeDetail(recipeId);
+  const [recipe, categories] = await Promise.all([
+    getCurrentUserRecipeDetail(recipeId),
+    getCurrentUserCategories(),
+  ]);
 
   if (!recipe) {
     notFound();
   }
+
+  const categoryOptions = categories.map((category) => ({
+    id: category.id,
+    name: category.name,
+  }));
 
   return (
     <div className="grid gap-8 lg:grid-cols-[1fr_360px]">
@@ -69,8 +80,10 @@ export default async function RecipeDetailPage({
         </section>
       </div>
 
-      <aside>
+      <aside className="space-y-6">
+        <EditRecipeForm recipe={recipe} categories={categoryOptions} />
         <CreateIngredientForm recipeId={recipe.id} />
+        <DeleteRecipeForm recipeId={recipe.id} />
       </aside>
     </div>
   );

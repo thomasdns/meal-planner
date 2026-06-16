@@ -1,7 +1,10 @@
 import { describe, expect, it } from "vitest";
 
 import { createIngredientSchema } from "@/features/recipes/ingredient.validation";
-import { createRecipeSchema } from "@/features/recipes/recipe.validation";
+import {
+  createRecipeSchema,
+  updateRecipeSchema,
+} from "@/features/recipes/recipe.validation";
 
 describe("recipe validation", () => {
   it("accepts a valid recipe payload", () => {
@@ -31,6 +34,26 @@ describe("recipe validation", () => {
     });
 
     expect(result.success).toBe(false);
+  });
+
+  it("accepts a valid update payload", () => {
+    const result = updateRecipeSchema.safeParse({
+      title: "Pates au pesto rosso",
+      description: "Version mise a jour",
+      servings: "3",
+      categoryId: "",
+    });
+
+    expect(result.success).toBe(true);
+
+    if (result.success) {
+      expect(result.data).toEqual({
+        title: "Pates au pesto rosso",
+        description: "Version mise a jour",
+        servings: 3,
+        categoryId: undefined,
+      });
+    }
   });
 });
 

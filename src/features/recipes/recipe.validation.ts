@@ -25,3 +25,7 @@ export const createRecipeSchema = z.object({
 });
 
 export type CreateRecipeInput = z.infer<typeof createRecipeSchema>;
+
+export const updateRecipeSchema = createRecipeSchema;
+
+export type UpdateRecipeInput = z.infer<typeof updateRecipeSchema>;

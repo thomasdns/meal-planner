@@ -25,6 +25,7 @@ export type RecipeDetail = {
   title: string;
   description: string | null;
   servings: number;
+  categoryId: string | null;
   categoryName: string | null;
   ingredients: RecipeIngredientItem[];
 };
@@ -84,6 +85,7 @@ export async function getCurrentUserRecipeDetail(
       title: true,
       description: true,
       servings: true,
+      categoryId: true,
       category: {
         select: {
           name: true,
@@ -112,6 +114,7 @@ export async function getCurrentUserRecipeDetail(
     title: recipe.title,
     description: recipe.description,
     servings: recipe.servings,
+    categoryId: recipe.categoryId,
     categoryName: recipe.category?.name ?? null,
     ingredients: recipe.ingredients,
   };
@@ -148,6 +151,84 @@ export async function createRecipeForCurrentUser(input: {
       servings: input.servings,
       userId: user.id,
       categoryId: category?.id,
+    },
+  });
+}
+
+export async function updateRecipeForCurrentUser(
+  recipeId: string,
+  input: {
+    title: string;
+    description?: string;
+    servings: number;
+    categoryId?: string;
+  },
+) {
+  const user = await requireUser();
+
+  const recipe = await prisma.recipe.findFirst({
+    where: {
+      id: recipeId,
+      userId: user.id,
+    },
+    select: {
+      id: true,
+    },
+  });
+
+  if (!recipe) {
+    throw new Error("Recipe not found");
+  }
+
+  const category = input.categoryId
+    ? await prisma.category.findFirst({
+        where: {
+          id: input.categoryId,
+          userId: user.id,
+        },
+        select: {
+          id: true,
+        },
+      })
+    : null;
+
+  if (input.categoryId && !category) {
+    throw new Error("Forbidden category");
+  }
+
+  await prisma.recipe.update({
+    where: {
+      id: recipe.id,
+    },
+    data: {
+      title: input.title,
+      description: input.description,
+      servings: input.servings,
+      categoryId: category?.id ?? null,
+    },
+  });
+}
+
+export async function deleteRecipeForCurrentUser(recipeId: string) {
+  const user = await requireUser();
+
+  const recipe = await prisma.recipe.findFirst({
+    where: {
+      id: recipeId,
+      userId: user.id,
+    },
+    select: {
+      id: true,
+    },
+  });
+
+  if (!recipe) {
+    throw new Error("Recipe not found");
+  }
+
+  await prisma.recipe.delete({
+    where: {
+      id: recipe.id,
     },
   });
 }
