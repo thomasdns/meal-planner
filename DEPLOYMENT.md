@@ -74,6 +74,74 @@ Pour une premiere mise en production :
 4. Lancer un premier deploiement.
 5. Verifier que les migrations sont appliquees.
 
+## Creation de la base PostgreSQL en ligne
+
+Vercel Postgres n'est plus disponible pour les nouveaux projets. Pour un
+nouveau projet, utiliser une integration PostgreSQL du Marketplace Vercel,
+par exemple Neon.
+
+Etapes recommandees :
+
+1. Ouvrir le projet dans Vercel.
+2. Aller dans l'onglet Storage ou Marketplace.
+3. Ajouter une integration PostgreSQL.
+4. Choisir Neon ou un fournisseur PostgreSQL equivalent.
+5. Creer une base pour la production.
+6. Verifier que `DATABASE_URL` est ajoutee aux variables d'environnement.
+
+Bonne pratique :
+
+- utiliser une base de production pour l'environnement Production ;
+- utiliser une base separee pour les environnements Preview si les previews
+  appliquent des migrations ;
+- ne jamais utiliser la base Docker locale pour la production.
+
+## Variables a configurer dans Vercel
+
+Configurer ces variables dans l'environnement Production :
+
+```txt
+DATABASE_URL
+NEXTAUTH_URL
+NEXTAUTH_SECRET
+NEXT_SERVER_ACTIONS_ENCRYPTION_KEY
+```
+
+`NEXTAUTH_URL` doit correspondre a l'URL publique exacte de l'application.
+
+Exemple :
+
+```txt
+https://meal-planner.vercel.app
+```
+
+Pour generer des secrets localement :
+
+```bash
+node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"
+```
+
+Generer une valeur differente pour `NEXTAUTH_SECRET` et pour
+`NEXT_SERVER_ACTIONS_ENCRYPTION_KEY`.
+
+## Configuration du build Vercel
+
+Dans Vercel, configurer la commande de build :
+
+```bash
+npm run vercel-build
+```
+
+Cette commande :
+
+- regenere le client Prisma ;
+- applique les migrations Prisma existantes ;
+- compile l'application Next.js.
+
+Le script `postinstall` execute aussi `prisma generate` apres l'installation
+des dependances. Cela evite un client Prisma obsolete lorsque Vercel reutilise
+son cache d'installation.
+
 ## Attention
 
 Ne jamais commiter :
