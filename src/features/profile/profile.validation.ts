@@ -9,4 +9,11 @@ export const updateProfileSchema = z.object({
   email: z.string().trim().email("Adresse email invalide.").toLowerCase(),
 });
 
+export const deleteAccountSchema = z.object({
+  confirmation: z.literal("SUPPRIMER", {
+    error: "Tape SUPPRIMER pour confirmer la suppression du compte.",
+  }),
+});
+
 export type UpdateProfileInput = z.infer<typeof updateProfileSchema>;
+export type DeleteAccountInput = z.infer<typeof deleteAccountSchema>;

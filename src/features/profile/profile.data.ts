@@ -90,3 +90,13 @@ export async function updateCurrentUserProfile(input: {
     },
   });
 }
+
+export async function deleteCurrentUserAccount() {
+  const user = await requireUser();
+
+  await prisma.user.delete({
+    where: {
+      id: user.id,
+    },
+  });
+}

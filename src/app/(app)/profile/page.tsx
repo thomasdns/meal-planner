@@ -1,3 +1,4 @@
+import { DeleteAccountForm } from "@/features/profile/delete-account-form";
 import { ProfileForm } from "@/features/profile/profile-form";
 import { ProfileSummary } from "@/features/profile/profile-summary";
 import { getCurrentUserProfile } from "@/features/profile/profile.data";
@@ -18,6 +19,7 @@ export default async function ProfilePage() {
         </div>
 
         <ProfileForm name={profile.name} email={profile.email} />
+        <DeleteAccountForm />
       </div>
 
       <aside>

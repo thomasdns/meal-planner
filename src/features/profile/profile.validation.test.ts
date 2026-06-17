@@ -1,6 +1,9 @@
 import { describe, expect, it } from "vitest";
 
-import { updateProfileSchema } from "@/features/profile/profile.validation";
+import {
+  deleteAccountSchema,
+  updateProfileSchema,
+} from "@/features/profile/profile.validation";
 
 describe("profile validation", () => {
   it("accepts a valid profile update", () => {
@@ -23,6 +26,22 @@ describe("profile validation", () => {
     const result = updateProfileSchema.safeParse({
       name: "Utilisateur Test",
       email: "pas-un-email",
+    });
+
+    expect(result.success).toBe(false);
+  });
+
+  it("accepts account deletion confirmation", () => {
+    const result = deleteAccountSchema.safeParse({
+      confirmation: "SUPPRIMER",
+    });
+
+    expect(result.success).toBe(true);
+  });
+
+  it("rejects invalid account deletion confirmation", () => {
+    const result = deleteAccountSchema.safeParse({
+      confirmation: "supprimer",
     });
 
     expect(result.success).toBe(false);

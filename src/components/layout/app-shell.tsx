@@ -1,5 +1,7 @@
 import Link from "next/link";
 
+import { SignOutButton } from "@/features/auth/sign-out-button";
+
 const navigationItems = [
   { href: "/dashboard", label: "Tableau de bord" },
   { href: "/recipes", label: "Recettes" },
@@ -29,7 +31,7 @@ export function AppShell({ children, showAdminNav = false }: AppShellProps) {
           </div>
 
           <nav aria-label="Navigation principale">
-            <ul className="flex flex-wrap gap-2">
+            <ul className="flex flex-wrap items-center gap-2">
               {items.map((item) => (
                 <li key={item.href}>
                   <Link
@@ -40,6 +42,9 @@ export function AppShell({ children, showAdminNav = false }: AppShellProps) {
                   </Link>
                 </li>
               ))}
+              <li>
+                <SignOutButton />
+              </li>
             </ul>
           </nav>
         </div>

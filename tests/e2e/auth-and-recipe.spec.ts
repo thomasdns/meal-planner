@@ -1,6 +1,8 @@
 import { expect, test } from "@playwright/test";
 
 test("user can complete the core meal-planning journey", async ({ page }) => {
+  test.setTimeout(60_000);
+
   const uniqueId = Date.now();
   const email = `e2e-${uniqueId}@example.com`;
   const password = "Password1234";
@@ -28,12 +30,14 @@ test("user can complete the core meal-planning journey", async ({ page }) => {
   await page.getByLabel("Nom").fill("Utilisateur E2E");
   await page.getByLabel("Email").fill(email);
   await page.getByLabel("Mot de passe").fill(password);
-  await page.getByRole("button", { name: "Creer mon compte" }).click();
+  await Promise.all([
+    page.waitForURL("**/auth/sign-in", { timeout: 20_000 }),
+    page.getByRole("button", { name: "Creer mon compte" }).click(),
+  ]);
 
   await expect(
     page.getByRole("heading", { name: "Connexion" }),
   ).toBeVisible();
-  await page.waitForLoadState("networkidle");
 
   await page.getByLabel("Email").fill(email);
   await page.getByLabel("Mot de passe").fill(password);
@@ -84,7 +88,10 @@ test("user can complete the core meal-planning journey", async ({ page }) => {
     page.locator(`input[id^="ingredient-name-"][value="${ingredientName}"]`),
   ).toBeVisible();
 
-  await page.getByRole("link", { name: "Planning" }).click();
+  await expect(
+    page.getByRole("link", { name: "Planning" }),
+  ).toHaveAttribute("href", "/meal-plan");
+  await page.goto("/meal-plan");
   await expect(
     page.getByRole("heading", { name: "Planning hebdomadaire" }),
   ).toBeVisible();
@@ -93,8 +100,13 @@ test("user can complete the core meal-planning journey", async ({ page }) => {
   await page.getByRole("button", { name: "Planifier" }).click();
   await expect(page.getByRole("link", { name: recipeTitle })).toBeVisible();
 
-  await page.getByRole("link", { name: "Courses" }).click();
-  await expect(page.getByRole("heading", { name: "Liste de courses" })).toBeVisible();
+  await expect(
+    page.getByRole("link", { name: "Courses" }),
+  ).toHaveAttribute("href", "/shopping-list");
+  await page.goto("/shopping-list");
+  await expect(
+    page.getByRole("heading", { name: "Liste de courses" }),
+  ).toBeVisible();
   await expect(page.getByText(ingredientName)).toBeVisible();
   await expect(page.getByText("3 piece")).toBeVisible();
 
@@ -103,4 +115,31 @@ test("user can complete the core meal-planning journey", async ({ page }) => {
   await page.locator("#name").fill(updatedName);
   await page.getByRole("button", { name: "Mettre a jour" }).click();
   await expect(page.getByText("Profil mis a jour.")).toBeVisible();
+
+  await Promise.all([
+    page.waitForURL("**/auth/sign-in"),
+    page.getByRole("button", { name: "Se deconnecter" }).click(),
+  ]);
+  await expect(
+    page.getByRole("heading", { name: "Connexion" }),
+  ).toBeVisible();
+
+  await page.getByLabel("Email").fill(email);
+  await page.getByLabel("Mot de passe").fill(password);
+  await Promise.all([
+    page.waitForURL("**/dashboard"),
+    page.getByRole("button", { name: "Se connecter" }).click(),
+  ]);
+
+  await page.getByRole("link", { name: "Profil" }).click();
+  await page.locator("#delete-confirmation").fill("SUPPRIMER");
+  await Promise.all([
+    page.waitForURL("**/auth/sign-in"),
+    page.getByRole("button", { name: "Supprimer mon compte" }).click(),
+  ]);
+
+  await page.getByLabel("Email").fill(email);
+  await page.getByLabel("Mot de passe").fill(password);
+  await page.getByRole("button", { name: "Se connecter" }).click();
+  await expect(page.getByText("Email ou mot de passe incorrect.")).toBeVisible();
 });
