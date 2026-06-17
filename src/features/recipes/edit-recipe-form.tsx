@@ -13,6 +13,7 @@ type EditRecipeFormProps = {
     prepTime: number | null;
     cookTime: number | null;
     steps: string | null;
+    imageUrl: string | null;
     categoryId: string | null;
   };
   categories: {
@@ -140,6 +141,20 @@ export function EditRecipeForm({ recipe, categories }: EditRecipeFormProps) {
           name="steps"
           rows={6}
           defaultValue={recipe.steps ?? ""}
+          className="w-full rounded-md border border-slate-300 bg-transparent px-3 py-2 text-sm outline-none focus:border-emerald-600"
+        />
+      </div>
+
+      <div className="space-y-1">
+        <label htmlFor="edit-imageUrl" className="text-sm font-medium">
+          Image URL
+        </label>
+        <input
+          id="edit-imageUrl"
+          name="imageUrl"
+          type="url"
+          defaultValue={recipe.imageUrl ?? ""}
+          placeholder="https://example.com/recette.jpg"
           className="w-full rounded-md border border-slate-300 bg-transparent px-3 py-2 text-sm outline-none focus:border-emerald-600"
         />
       </div>

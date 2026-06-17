@@ -42,6 +42,16 @@ export function RecipeList({ recipes }: RecipeListProps) {
             {recipe.description ? (
               <p className="text-sm text-slate-600">{recipe.description}</p>
             ) : null}
+            {recipe.imageUrl ? (
+              <Link
+                href={recipe.imageUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex text-sm font-medium text-emerald-700 hover:text-emerald-800"
+              >
+                Image de la recette
+              </Link>
+            ) : null}
           </div>
 
           <dl className="mt-4 grid grid-cols-2 gap-3 text-sm">

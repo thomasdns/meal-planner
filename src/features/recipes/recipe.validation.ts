@@ -37,6 +37,14 @@ export const createRecipeSchema = z.object({
     .max(3000, "Les etapes ne doivent pas depasser 3000 caracteres.")
     .optional()
     .transform((value) => (value ? value : undefined)),
+  imageUrl: z
+    .string()
+    .trim()
+    .url("L'URL de l'image est invalide.")
+    .max(1000, "L'URL de l'image est trop longue.")
+    .optional()
+    .or(z.literal(""))
+    .transform((value) => (value ? value : undefined)),
   categoryId: z
     .string()
     .trim()

@@ -9,6 +9,7 @@ export type RecipeListItem = {
   description: string | null;
   servings: number;
   totalTime: number | null;
+  imageUrl: string | null;
   categoryId: string | null;
   categoryName: string | null;
   ingredientsCount: number;
@@ -30,6 +31,7 @@ export type RecipeDetail = {
   prepTime: number | null;
   cookTime: number | null;
   steps: string | null;
+  imageUrl: string | null;
   categoryId: string | null;
   categoryName: string | null;
   ingredients: RecipeIngredientItem[];
@@ -80,6 +82,7 @@ export async function getCurrentUserRecipes(
       servings: true,
       prepTime: true,
       cookTime: true,
+      imageUrl: true,
       categoryId: true,
       createdAt: true,
       category: {
@@ -108,6 +111,7 @@ export async function getCurrentUserRecipes(
         description: recipe.description,
         servings: recipe.servings,
         totalTime,
+        imageUrl: recipe.imageUrl,
         categoryId: recipe.categoryId,
         categoryName: recipe.category?.name ?? null,
         ingredientsCount: recipe._count.ingredients,
@@ -137,6 +141,7 @@ export async function getCurrentUserRecipeDetail(
       prepTime: true,
       cookTime: true,
       steps: true,
+      imageUrl: true,
       categoryId: true,
       category: {
         select: {
@@ -169,6 +174,7 @@ export async function getCurrentUserRecipeDetail(
     prepTime: recipe.prepTime,
     cookTime: recipe.cookTime,
     steps: recipe.steps,
+    imageUrl: recipe.imageUrl,
     categoryId: recipe.categoryId,
     categoryName: recipe.category?.name ?? null,
     ingredients: recipe.ingredients,
@@ -182,6 +188,7 @@ export async function createRecipeForCurrentUser(input: {
   prepTime?: number;
   cookTime?: number;
   steps?: string;
+  imageUrl?: string;
   categoryId?: string;
 }) {
   const user = await requireUser();
@@ -210,6 +217,7 @@ export async function createRecipeForCurrentUser(input: {
       prepTime: input.prepTime,
       cookTime: input.cookTime,
       steps: input.steps,
+      imageUrl: input.imageUrl,
       userId: user.id,
       categoryId: category?.id,
     },
@@ -225,6 +233,7 @@ export async function updateRecipeForCurrentUser(
     prepTime?: number;
     cookTime?: number;
     steps?: string;
+    imageUrl?: string;
     categoryId?: string;
   },
 ) {
@@ -271,6 +280,7 @@ export async function updateRecipeForCurrentUser(
       prepTime: input.prepTime ?? null,
       cookTime: input.cookTime ?? null,
       steps: input.steps ?? null,
+      imageUrl: input.imageUrl ?? null,
       categoryId: category?.id ?? null,
     },
   });

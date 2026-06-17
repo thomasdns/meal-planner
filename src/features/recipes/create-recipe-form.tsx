@@ -127,6 +127,19 @@ export function CreateRecipeForm({ categories }: CreateRecipeFormProps) {
       </div>
 
       <div className="space-y-1">
+        <label htmlFor="imageUrl" className="text-sm font-medium">
+          Image URL
+        </label>
+        <input
+          id="imageUrl"
+          name="imageUrl"
+          type="url"
+          placeholder="https://example.com/recette.jpg"
+          className="w-full rounded-md border border-slate-300 bg-transparent px-3 py-2 text-sm outline-none focus:border-emerald-600"
+        />
+      </div>
+
+      <div className="space-y-1">
         <label htmlFor="categoryId" className="text-sm font-medium">
           Categorie
         </label>

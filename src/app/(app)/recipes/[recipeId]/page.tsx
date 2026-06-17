@@ -55,6 +55,16 @@ export default async function RecipeDetailPage({
                 {recipe.description}
               </p>
             ) : null}
+            {recipe.imageUrl ? (
+              <Link
+                href={recipe.imageUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="mt-3 inline-flex text-sm font-medium text-emerald-700 hover:text-emerald-800"
+              >
+                Voir l&apos;image de la recette
+              </Link>
+            ) : null}
           </div>
         </div>
 

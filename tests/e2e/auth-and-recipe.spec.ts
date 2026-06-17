@@ -132,10 +132,11 @@ test("user can complete the core meal-planning journey", async ({ page }) => {
   ]);
 
   await page.getByRole("link", { name: "Profil" }).click();
+  await page.getByRole("button", { name: "Supprimer mon compte" }).click();
   await page.locator("#delete-confirmation").fill("SUPPRIMER");
   await Promise.all([
     page.waitForURL("**/auth/sign-in"),
-    page.getByRole("button", { name: "Supprimer mon compte" }).click(),
+    page.getByRole("button", { name: "Confirmer" }).click(),
   ]);
 
   await page.getByLabel("Email").fill(email);

@@ -97,6 +97,16 @@ export function SignInForm() {
           Creer un compte
         </Link>
       </p>
+
+      <p className="text-sm text-gray-600">
+        Mot de passe oublie ?{" "}
+        <Link
+          href="/auth/forgot-password"
+          className="font-medium text-emerald-700"
+        >
+          Reinitialiser
+        </Link>
+      </p>
     </form>
   );
 }

@@ -34,6 +34,7 @@ export async function createRecipeAction(
     prepTime: formData.get("prepTime"),
     cookTime: formData.get("cookTime"),
     steps: formData.get("steps"),
+    imageUrl: formData.get("imageUrl"),
     categoryId: formData.get("categoryId"),
   });
 
@@ -68,6 +69,7 @@ export async function updateRecipeAction(
     prepTime: formData.get("prepTime"),
     cookTime: formData.get("cookTime"),
     steps: formData.get("steps"),
+    imageUrl: formData.get("imageUrl"),
     categoryId: formData.get("categoryId"),
   });
 

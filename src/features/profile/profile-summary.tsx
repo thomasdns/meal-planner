@@ -18,6 +18,13 @@ export function ProfileSummary({ profile }: ProfileSummaryProps) {
         </p>
       </div>
 
+      <div className="rounded-lg border border-slate-200 bg-white p-5">
+        <p className="text-sm font-medium text-slate-600">Email</p>
+        <p className="mt-2 text-lg font-semibold">
+          {profile.emailVerified ? "Verifie" : "Non verifie"}
+        </p>
+      </div>
+
       <div className="grid gap-4 sm:grid-cols-3 lg:grid-cols-1">
         <Stat label="Recettes" value={profile.stats.recipesCount} />
         <Stat label="Categories" value={profile.stats.categoriesCount} />

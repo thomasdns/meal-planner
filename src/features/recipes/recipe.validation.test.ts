@@ -16,6 +16,7 @@ describe("recipe validation", () => {
       description: "",
       servings: "4",
       categoryId: "",
+      imageUrl: "",
     });
 
     expect(result.success).toBe(true);
@@ -28,6 +29,7 @@ describe("recipe validation", () => {
         prepTime: undefined,
         cookTime: undefined,
         steps: undefined,
+        imageUrl: undefined,
         categoryId: undefined,
       });
     }
@@ -50,6 +52,7 @@ describe("recipe validation", () => {
       prepTime: "10",
       cookTime: "15",
       steps: "Melanger puis servir.",
+      imageUrl: "https://example.com/pates.jpg",
       categoryId: "",
     });
 
@@ -63,6 +66,7 @@ describe("recipe validation", () => {
         prepTime: 10,
         cookTime: 15,
         steps: "Melanger puis servir.",
+        imageUrl: "https://example.com/pates.jpg",
         categoryId: undefined,
       });
     }

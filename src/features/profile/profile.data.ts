@@ -7,6 +7,7 @@ export type CurrentUserProfile = {
   id: string;
   name: string | null;
   email: string | null;
+  emailVerified: Date | null;
   createdAt: Date;
   stats: {
     recipesCount: number;
@@ -28,6 +29,7 @@ export async function getCurrentUserProfile(): Promise<CurrentUserProfile> {
           id: true,
           name: true,
           email: true,
+          emailVerified: true,
           createdAt: true,
         },
       }),
@@ -80,6 +82,16 @@ export async function updateCurrentUserProfile(input: {
     throw new Error("Email already used");
   }
 
+  const currentUser = await prisma.user.findUniqueOrThrow({
+    where: {
+      id: user.id,
+    },
+    select: {
+      email: true,
+    },
+  });
+  const hasEmailChanged = currentUser.email !== input.email;
+
   await prisma.user.update({
     where: {
       id: user.id,
@@ -87,6 +99,7 @@ export async function updateCurrentUserProfile(input: {
     data: {
       name: input.name,
       email: input.email,
+      ...(hasEmailChanged ? { emailVerified: null } : {}),
     },
   });
 }
