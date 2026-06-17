@@ -13,8 +13,8 @@ export default async function ProfilePage() {
           <p className="text-sm font-medium text-emerald-700">Compte</p>
           <h1 className="text-3xl font-semibold tracking-tight">Profil</h1>
           <p className="max-w-2xl text-sm text-slate-600">
-            Consulte les informations de ton compte et mets a jour ton nom
-            affiche.
+            Consulte les informations de ton compte, mets a jour ton nom ou ton
+            email, et suis le statut de verification.
           </p>
         </div>
 

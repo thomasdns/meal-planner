@@ -28,7 +28,7 @@ export function UpcomingMeals({ meals }: UpcomingMealsProps) {
           <li key={meal.id} className="flex items-center justify-between gap-4 p-5">
             <div>
               <p className="text-sm font-medium text-slate-950">
-                {meal.dateLabel} · {meal.mealTypeLabel}
+                {meal.dateLabel} - {meal.mealTypeLabel}
               </p>
               <Link
                 href={`/recipes/${meal.recipe.id}`}

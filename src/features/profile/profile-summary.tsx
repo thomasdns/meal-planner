@@ -1,4 +1,5 @@
 import type { CurrentUserProfile } from "@/features/profile/profile.data";
+import { ResendVerificationEmailForm } from "@/features/profile/resend-verification-email-form";
 
 type ProfileSummaryProps = {
   profile: CurrentUserProfile;
@@ -20,9 +21,22 @@ export function ProfileSummary({ profile }: ProfileSummaryProps) {
 
       <div className="rounded-lg border border-slate-200 bg-white p-5">
         <p className="text-sm font-medium text-slate-600">Email</p>
-        <p className="mt-2 text-lg font-semibold">
+        <p
+          className={`mt-2 text-lg font-semibold ${
+            profile.emailVerified ? "text-emerald-700" : "text-amber-700"
+          }`}
+        >
           {profile.emailVerified ? "Verifie" : "Non verifie"}
         </p>
+        {!profile.emailVerified ? (
+          <>
+            <p className="mt-2 text-sm text-slate-600">
+              Verifie ton adresse pour securiser le compte et conserver l&apos;acces
+              a la connexion.
+            </p>
+            <ResendVerificationEmailForm />
+          </>
+        ) : null}
       </div>
 
       <div className="grid gap-4 sm:grid-cols-3 lg:grid-cols-1">

@@ -80,5 +80,5 @@ export async function signUpAction(
     };
   }
 
-  redirect("/auth/sign-in");
+  redirect("/auth/sign-in?registered=1");
 }
