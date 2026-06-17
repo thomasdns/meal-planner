@@ -92,7 +92,11 @@ DATABASE_URL
 NEXTAUTH_URL
 NEXTAUTH_SECRET
 NEXT_SERVER_ACTIONS_ENCRYPTION_KEY
-RESEND_API_KEY
+SMTP_HOST
+SMTP_PORT
+SMTP_SECURE
+SMTP_USER
+SMTP_PASSWORD
 EMAIL_FROM
 ```
 
@@ -102,13 +106,16 @@ Notes :
 - `NEXTAUTH_URL` vaut `http://localhost:3000` en local.
 - `NEXTAUTH_SECRET` doit etre une valeur secrete robuste.
 - `NEXT_SERVER_ACTIONS_ENCRYPTION_KEY` doit etre une cle base64 de 32 octets.
-- `RESEND_API_KEY` permet l'envoi des emails transactionnels.
-- `EMAIL_FROM` est l'expediteur utilise pour les emails.
+- `SMTP_HOST`, `SMTP_PORT` et `SMTP_SECURE` configurent le serveur SMTP.
+- `SMTP_USER` et `SMTP_PASSWORD` identifient le compte email technique.
+- `EMAIL_FROM` est l'expediteur utilise pour les emails transactionnels.
 - L'acces admin est stocke en base via `User.role`, pas dans les variables d'environnement.
 
-Sans `RESEND_API_KEY` et `EMAIL_FROM`, les liens de verification email et de
-reinitialisation de mot de passe sont seulement journalises cote serveur. Aucun
-vrai email ne peut etre envoye sans provider email.
+Sans configuration SMTP complete, les liens de verification email et de
+reinitialisation de mot de passe sont seulement journalises cote serveur.
+
+Pour un projet sans nom de domaine personnalise, Gmail SMTP peut etre utilise
+avec une adresse Gmail technique et un mot de passe d'application Google.
 
 ## Admin
 

@@ -17,6 +17,12 @@ DATABASE_URL
 NEXTAUTH_URL
 NEXTAUTH_SECRET
 NEXT_SERVER_ACTIONS_ENCRYPTION_KEY
+SMTP_HOST
+SMTP_PORT
+SMTP_SECURE
+SMTP_USER
+SMTP_PASSWORD
+EMAIL_FROM
 ```
 
 `DATABASE_URL` doit pointer vers la base PostgreSQL en ligne.
@@ -32,6 +38,10 @@ https://meal-planner.example.com
 `NEXT_SERVER_ACTIONS_ENCRYPTION_KEY` doit etre une valeur base64 de 32 octets.
 
 L'acces admin est gere en base de donnees via le champ `User.role`.
+
+Les variables SMTP permettent d'envoyer les emails de verification et de
+reinitialisation de mot de passe. Sans nom de domaine personnalise, utiliser un
+compte Gmail technique avec un mot de passe d'application Google.
 
 ## Commande de build Vercel
 
@@ -107,6 +117,12 @@ DATABASE_URL
 NEXTAUTH_URL
 NEXTAUTH_SECRET
 NEXT_SERVER_ACTIONS_ENCRYPTION_KEY
+SMTP_HOST
+SMTP_PORT
+SMTP_SECURE
+SMTP_USER
+SMTP_PASSWORD
+EMAIL_FROM
 ```
 
 `NEXTAUTH_URL` doit correspondre a l'URL publique exacte de l'application.
