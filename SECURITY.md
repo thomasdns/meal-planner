@@ -10,7 +10,7 @@ surveiller avant une exploitation plus large.
 - Validation serveur avec Zod sur les formulaires sensibles.
 - Verification d'autorisation dans les Server Actions.
 - Isolation des donnees par utilisateur avec `userId`.
-- Interface admin protegee par `ADMIN_EMAILS`.
+- Interface admin protegee par le role `ADMIN` stocke en base de donnees.
 - Protection anti-auto-suppression du compte admin courant.
 - Headers HTTP de securite configures dans `next.config.ts`.
 - Rate limiting applicatif sur :
@@ -56,6 +56,6 @@ Decision :
 - Ne jamais commiter `.env` ou `.env.local`.
 - Garder `NEXTAUTH_SECRET` et `NEXT_SERVER_ACTIONS_ENCRYPTION_KEY` forts et
   differents.
-- Restreindre `ADMIN_EMAILS` au minimum.
+- Limiter le nombre de comptes avec le role `ADMIN`.
 - Verifier regulierement les logs de deploiement et les echecs de connexion.
 - Tester les parcours critiques apres chaque mise a jour majeure.

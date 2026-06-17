@@ -98,7 +98,7 @@ Notes :
 - `NEXTAUTH_URL` vaut `http://localhost:3000` en local.
 - `NEXTAUTH_SECRET` doit etre une valeur secrete robuste.
 - `NEXT_SERVER_ACTIONS_ENCRYPTION_KEY` doit etre une cle base64 de 32 octets.
-- L'acces admin ne depend plus d'une variable `ADMIN_EMAILS` : il est stocke en base via `User.role`.
+- L'acces admin est stocke en base via `User.role`, pas dans les variables d'environnement.
 
 ## Admin
 
