@@ -21,6 +21,7 @@ export function AdminUserList({ users }: AdminUserListProps) {
         <thead className="border-b border-slate-200 bg-slate-50 text-slate-600">
           <tr>
             <th className="px-4 py-3 font-medium">Utilisateur</th>
+            <th className="px-4 py-3 font-medium">Role</th>
             <th className="px-4 py-3 font-medium">Recettes</th>
             <th className="px-4 py-3 font-medium">Repas planifies</th>
             <th className="px-4 py-3 font-medium">Inscription</th>
@@ -33,6 +34,11 @@ export function AdminUserList({ users }: AdminUserListProps) {
               <td className="px-4 py-3">
                 <p className="font-medium">{user.name ?? "Sans nom"}</p>
                 <p className="text-slate-600">{user.email}</p>
+              </td>
+              <td className="px-4 py-3">
+                <span className="rounded-full bg-slate-100 px-2 py-1 text-xs font-medium text-slate-700">
+                  {user.role}
+                </span>
               </td>
               <td className="px-4 py-3">{user.recipesCount}</td>
               <td className="px-4 py-3">{user.plannedMealsCount}</td>

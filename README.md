@@ -4,25 +4,25 @@ Application web de planification de repas hebdomadaire.
 
 ## Objectif
 
-Ce projet a pour but de pratiquer le developpement full stack avec une approche
-professionnelle, de l'initialisation du depot jusqu'au deploiement et a la
-securisation.
+Ce projet permet de pratiquer le developpement full stack avec une approche
+professionnelle : architecture, base de donnees, authentification, tests,
+securite, Git/GitHub et deploiement.
 
 ## Fonctionnalites
 
-- Inscription et connexion.
+- Inscription et connexion par email / mot de passe.
 - Gestion des recettes.
-- Ingredients modifiables et supprimables.
-- Categories modifiables, supprimables et colorees.
-- Planning hebdomadaire avec navigation entre semaines.
+- Gestion des ingredients.
+- Categories de recettes colorees.
+- Recherche et filtres de recettes.
+- Planning hebdomadaire.
 - Association recette, jour et type de repas.
 - Suppression d'un repas planifie.
 - Generation automatique de liste de courses.
 - Liste de courses cochable, imprimable et exportable en CSV.
-- Recherche et filtres de recettes.
 - Tableau de bord utilisateur.
 - Profil utilisateur avec modification du nom et de l'email.
-- Interface admin protegee.
+- Interface admin protegee par role en base de donnees.
 
 ## Stack technique
 
@@ -33,7 +33,7 @@ securisation.
 - Prisma
 - NextAuth
 - Docker
-- GitHub Actions
+- Vitest
 - Playwright
 - Vercel
 
@@ -57,6 +57,12 @@ Appliquer les migrations :
 npx prisma migrate deploy
 ```
 
+Generer le client Prisma si necessaire :
+
+```bash
+npx prisma generate
+```
+
 Lancer le serveur de developpement :
 
 ```bash
@@ -69,74 +75,42 @@ Ouvrir l'application :
 http://localhost:3000
 ```
 
-## Variables d'environnement
+## Variables D'environnement
 
-Copier `.env.example` vers `.env.local`, puis renseigner les valeurs locales.
-
-```bash
-cp .env.example .env.local
-```
-
-Sous Windows PowerShell :
+Copier `.env.example` vers `.env`, puis renseigner les valeurs locales.
 
 ```powershell
-Copy-Item .env.example .env.local
+Copy-Item .env.example .env
 ```
 
-Variables principales :
+Variables attendues :
 
 ```txt
 DATABASE_URL
 NEXTAUTH_URL
 NEXTAUTH_SECRET
 NEXT_SERVER_ACTIONS_ENCRYPTION_KEY
-ADMIN_EMAILS
 ```
 
-## Scripts utiles
+Notes :
 
-```bash
-npm run dev
-npm run lint
-npm run test
-npm run test:e2e
-npm run build
-npm run audit
-npm run vercel-build
+- `DATABASE_URL` pointe vers PostgreSQL.
+- `NEXTAUTH_URL` vaut `http://localhost:3000` en local.
+- `NEXTAUTH_SECRET` doit etre une valeur secrete robuste.
+- `NEXT_SERVER_ACTIONS_ENCRYPTION_KEY` doit etre une cle base64 de 32 octets.
+- L'acces admin ne depend plus d'une variable `ADMIN_EMAILS` : il est stocke en base via `User.role`.
+
+## Admin
+
+Les roles utilisateur sont stockes en base :
+
+```txt
+USER
+ADMIN
 ```
 
-## Qualite
-
-Le projet contient :
-
-- tests unitaires avec Vitest ;
-- tests end-to-end avec Playwright ;
-- pipeline GitHub Actions ;
-- build de production verifie ;
-- audit dependances via npm.
-
-La pipeline GitHub Actions lance :
-
-```bash
-npm run lint
-npm run test
-npm run build
-npm run test:e2e
-```
-
-## Securite
-
-Voir [SECURITY.md](./SECURITY.md).
-
-Points principaux :
-
-- validations serveur ;
-- controles d'autorisation dans les actions sensibles ;
-- headers HTTP de securite ;
-- rate limiting sur inscription et connexion ;
-- acces admin limite par `ADMIN_EMAILS`.
-
-## Base de donnees
+Pour donner l'acces admin a un utilisateur local, mettre son champ `role` a
+`ADMIN` via Prisma Studio ou une requete SQL.
 
 Ouvrir Prisma Studio :
 
@@ -144,23 +118,91 @@ Ouvrir Prisma Studio :
 npx prisma studio
 ```
 
+## Scripts Utiles
+
+```bash
+npm run dev
+npm run lint
+npm test
+npm run test:e2e
+npm run build
+npm run audit
+npm run vercel-build
+```
+
+## Tests
+
+Tests unitaires :
+
+```bash
+npm test
+```
+
+Tests end-to-end :
+
+```bash
+npx playwright install chromium
+npm run test:e2e
+```
+
+Le test e2e couvre le parcours principal :
+
+- inscription ;
+- connexion ;
+- creation de categorie ;
+- creation de recette ;
+- ajout d'ingredient ;
+- planification d'un repas ;
+- generation de liste de courses ;
+- modification du profil.
+
+## Base De Donnees
+
 Les migrations Prisma sont dans :
 
 ```txt
 prisma/migrations
 ```
 
-## Deploiement
+Verifier l'etat des migrations :
 
-Voir [DEPLOYMENT.md](./DEPLOYMENT.md).
+```bash
+npx prisma migrate status
+```
+
+## Qualite Et Securite
+
+Controles recommandes avant commit :
+
+```bash
+npm run lint
+npm run build
+npm test
+npm run test:e2e
+npm run audit
+```
+
+Points de securite deja en place :
+
+- validation serveur avec Zod ;
+- hash des mots de passe avec bcrypt ;
+- protection des pages privees par session ;
+- controles d'autorisation cote serveur ;
+- role admin en base de donnees ;
+- rate limiting sur inscription et connexion ;
+- absence de SQL brut applicatif ;
+- `.env` ignore par Git.
+
+## Deploiement
 
 Le deploiement cible utilise :
 
 - Vercel pour l'application ;
-- PostgreSQL en ligne, par exemple Neon ;
-- variables d'environnement configurees dans Vercel.
+- PostgreSQL heberge, par exemple Neon ;
+- variables d'environnement configurees dans Vercel ;
+- migrations Prisma via `npm run vercel-build`.
 
-## Organisation du projet
+## Organisation Du Projet
 
 ```txt
 src/
@@ -172,16 +214,6 @@ src/
 +-- types/
 ```
 
-## Documentation projet
-
-- [DEPLOYMENT.md](./DEPLOYMENT.md)
-- [SECURITY.md](./SECURITY.md)
-- [ROADMAP.md](./ROADMAP.md)
-
 ## Statut
 
-Projet en cours d'amelioration continue.
-
-## Auteur
-
-Thomas
+Projet en phase de stabilisation avant deploiement.

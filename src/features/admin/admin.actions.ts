@@ -23,6 +23,7 @@ export async function updateAdminUserAction(
   const parsed = updateAdminUserSchema.safeParse({
     name: formData.get("name"),
     email: formData.get("email"),
+    role: formData.get("role"),
   });
 
   if (!parsed.success) {

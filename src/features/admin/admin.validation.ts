@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { userRoles } from "@/lib/roles";
+
 export const updateAdminUserSchema = z.object({
   name: z
     .string()
@@ -8,6 +10,7 @@ export const updateAdminUserSchema = z.object({
     .optional()
     .transform((value) => (value ? value : undefined)),
   email: z.string().trim().email("Adresse email invalide.").toLowerCase(),
+  role: z.enum(userRoles),
 });
 
 export type UpdateAdminUserInput = z.infer<typeof updateAdminUserSchema>;

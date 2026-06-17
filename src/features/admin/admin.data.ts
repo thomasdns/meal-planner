@@ -3,11 +3,13 @@ import "server-only";
 import { updateAdminUserSchema } from "@/features/admin/admin.validation";
 import { requireAdmin } from "@/lib/admin";
 import { prisma } from "@/lib/prisma";
+import type { UserRole } from "@/lib/roles";
 
 export type AdminUserListItem = {
   id: string;
   name: string | null;
   email: string;
+  role: UserRole;
   createdAt: Date;
   recipesCount: number;
   categoriesCount: number;
@@ -60,6 +62,7 @@ export async function getAdminDashboardData() {
         id: true,
         name: true,
         email: true,
+        role: true,
         createdAt: true,
         _count: {
           select: {
@@ -135,6 +138,7 @@ export async function getAdminDashboardData() {
       id: user.id,
       name: user.name,
       email: user.email,
+      role: user.role,
       createdAt: user.createdAt,
       recipesCount: user._count.recipes,
       categoriesCount: user._count.categories,
@@ -165,6 +169,7 @@ export async function getAdminUserDetail(userId: string) {
       id: true,
       name: true,
       email: true,
+      role: true,
       createdAt: true,
       recipes: {
         orderBy: {
@@ -240,6 +245,7 @@ export async function updateUserAsAdmin(
     data: {
       name: parsed.name ?? null,
       email: parsed.email,
+      role: parsed.role,
     },
   });
 }

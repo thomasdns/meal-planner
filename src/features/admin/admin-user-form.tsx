@@ -3,12 +3,14 @@
 import { useActionState } from "react";
 
 import { updateAdminUserAction } from "@/features/admin/admin.actions";
+import { UserRole } from "@/lib/roles";
 
 type AdminUserFormProps = {
   user: {
     id: string;
     name: string | null;
     email: string;
+    role: UserRole;
   };
 };
 
@@ -73,6 +75,22 @@ export function AdminUserForm({ user }: AdminUserFormProps) {
           defaultValue={user.email}
           className="w-full rounded-md border border-slate-300 bg-transparent px-3 py-2 text-sm outline-none focus:border-emerald-600"
         />
+      </div>
+
+      <div className="space-y-1">
+        <label htmlFor="admin-user-role" className="text-sm font-medium">
+          Role
+        </label>
+        <select
+          id="admin-user-role"
+          name="role"
+          required
+          defaultValue={user.role}
+          className="w-full rounded-md border border-slate-300 bg-transparent px-3 py-2 text-sm outline-none focus:border-emerald-600"
+        >
+          <option value={UserRole.USER}>Utilisateur</option>
+          <option value={UserRole.ADMIN}>Administrateur</option>
+        </select>
       </div>
 
       <button
