@@ -41,6 +41,11 @@ export function SignInForm() {
     setIsPending(false);
 
     if (!result?.ok) {
+      if (result?.error === "EMAIL_NOT_VERIFIED") {
+        setError("Verifie ton adresse email avant de te connecter.");
+        return;
+      }
+
       setError("Email ou mot de passe incorrect.");
       return;
     }
