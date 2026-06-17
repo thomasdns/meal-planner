@@ -14,6 +14,7 @@ import {
   createAuthToken,
   createAuthTokenIdentifier,
 } from "@/lib/auth-tokens";
+import { sendPasswordResetEmail } from "@/lib/email";
 import { prisma } from "@/lib/prisma";
 import { checkRateLimit } from "@/lib/rate-limit";
 
@@ -73,7 +74,7 @@ export async function requestPasswordResetAction(
     );
 
     resetLink = createAppUrl(`/auth/reset-password?token=${token}`);
-    console.info(`Password reset link for ${user.email}: ${resetLink}`);
+    await sendPasswordResetEmail(user.email, resetLink);
   }
 
   return {

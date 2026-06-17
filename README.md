@@ -11,6 +11,8 @@ securite, Git/GitHub et deploiement.
 ## Fonctionnalites
 
 - Inscription et connexion par email / mot de passe.
+- Verification email automatique apres inscription.
+- Reinitialisation du mot de passe par lien securise.
 - Gestion des recettes.
 - Gestion des ingredients.
 - Categories de recettes colorees.
@@ -90,6 +92,8 @@ DATABASE_URL
 NEXTAUTH_URL
 NEXTAUTH_SECRET
 NEXT_SERVER_ACTIONS_ENCRYPTION_KEY
+RESEND_API_KEY
+EMAIL_FROM
 ```
 
 Notes :
@@ -98,7 +102,13 @@ Notes :
 - `NEXTAUTH_URL` vaut `http://localhost:3000` en local.
 - `NEXTAUTH_SECRET` doit etre une valeur secrete robuste.
 - `NEXT_SERVER_ACTIONS_ENCRYPTION_KEY` doit etre une cle base64 de 32 octets.
+- `RESEND_API_KEY` permet l'envoi des emails transactionnels.
+- `EMAIL_FROM` est l'expediteur utilise pour les emails.
 - L'acces admin est stocke en base via `User.role`, pas dans les variables d'environnement.
+
+Sans `RESEND_API_KEY` et `EMAIL_FROM`, les liens de verification email et de
+reinitialisation de mot de passe sont seulement journalises cote serveur. Aucun
+vrai email ne peut etre envoye sans provider email.
 
 ## Admin
 
@@ -155,6 +165,8 @@ Le test e2e couvre le parcours principal :
 - planification d'un repas ;
 - generation de liste de courses ;
 - modification du profil.
+- deconnexion ;
+- suppression du compte.
 
 ## Base De Donnees
 
