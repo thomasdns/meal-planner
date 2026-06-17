@@ -68,7 +68,17 @@ export async function signUpAction(
   });
 
   const verificationLink = await createEmailVerificationLink(user.email);
-  await sendEmailVerificationEmail(user.email, verificationLink);
+  const emailResult = await sendEmailVerificationEmail(
+    user.email,
+    verificationLink,
+  );
+
+  if (!emailResult.delivered) {
+    return {
+      error:
+        "Compte cree, mais l'email de verification n'a pas pu etre envoye.",
+    };
+  }
 
   redirect("/auth/sign-in");
 }

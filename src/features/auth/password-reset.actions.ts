@@ -74,7 +74,14 @@ export async function requestPasswordResetAction(
     );
 
     resetLink = createAppUrl(`/auth/reset-password?token=${token}`);
-    await sendPasswordResetEmail(user.email, resetLink);
+    const emailResult = await sendPasswordResetEmail(user.email, resetLink);
+
+    if (!emailResult.delivered) {
+      return {
+        error:
+          "Impossible d'envoyer l'email de reinitialisation pour le moment.",
+      };
+    }
   }
 
   return {

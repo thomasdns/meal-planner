@@ -15,7 +15,7 @@ export async function sendEmail({ to, subject, text, html }: SendEmailInput) {
   const port = Number(process.env.SMTP_PORT ?? 465);
   const secure = process.env.SMTP_SECURE !== "false";
   const user = process.env.SMTP_USER;
-  const password = process.env.SMTP_PASSWORD;
+  const password = process.env.SMTP_PASSWORD?.replace(/\s/g, "");
 
   if (!from || !host || !user || !password) {
     console.info(
@@ -60,6 +60,8 @@ export async function sendEmail({ to, subject, text, html }: SendEmailInput) {
       delivered: false,
     };
   }
+
+  console.info(`Email delivered to ${to} with subject "${subject}".`);
 
   return {
     delivered: true,
