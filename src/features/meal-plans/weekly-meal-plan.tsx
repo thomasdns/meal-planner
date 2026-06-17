@@ -14,29 +14,91 @@ type WeeklyMealPlanProps = {
 
 export function WeeklyMealPlan({ days, meals }: WeeklyMealPlanProps) {
   return (
-    <div className="overflow-hidden rounded-lg border border-slate-200 bg-white">
-      <div className="grid min-w-[760px] grid-cols-[150px_repeat(7,minmax(120px,1fr))]">
-        <div className="border-b border-r border-slate-200 bg-slate-50 p-3 text-sm font-semibold text-slate-600">
-          Repas
-        </div>
+    <>
+      <div className="space-y-3 md:hidden">
         {days.map((day) => (
-          <div
+          <section
             key={day.date}
-            className="border-b border-r border-slate-200 bg-slate-50 p-3 text-sm font-semibold text-slate-700 last:border-r-0"
+            className="overflow-hidden rounded-lg border border-slate-200 bg-white"
           >
-            {day.label}
-          </div>
-        ))}
+            <h2 className="border-b border-slate-200 bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-800">
+              {day.label}
+            </h2>
+            <div className="divide-y divide-slate-200">
+              {mealTypes.map((mealType) => {
+                const meal = findMeal(meals, day.date, mealType);
 
-        {mealTypes.map((mealType) => (
-          <Row
-            key={mealType}
-            mealType={mealType}
-            days={days}
-            meals={meals}
-          />
+                return (
+                  <MobileMeal
+                    key={`${day.date}-${mealType}`}
+                    mealType={mealType}
+                    meal={meal}
+                  />
+                );
+              })}
+            </div>
+          </section>
         ))}
       </div>
+
+      <div className="hidden overflow-hidden rounded-lg border border-slate-200 bg-white md:block">
+        <div className="grid min-w-[760px] grid-cols-[150px_repeat(7,minmax(120px,1fr))]">
+          <div className="border-b border-r border-slate-200 bg-slate-50 p-3 text-sm font-semibold text-slate-600">
+            Repas
+          </div>
+          {days.map((day) => (
+            <div
+              key={day.date}
+              className="border-b border-r border-slate-200 bg-slate-50 p-3 text-sm font-semibold text-slate-700 last:border-r-0"
+            >
+              {day.label}
+            </div>
+          ))}
+
+          {mealTypes.map((mealType) => (
+            <Row
+              key={mealType}
+              mealType={mealType}
+              days={days}
+              meals={meals}
+            />
+          ))}
+        </div>
+      </div>
+    </>
+  );
+}
+
+function MobileMeal({
+  mealType,
+  meal,
+}: {
+  mealType: PlannedMeal["mealType"];
+  meal?: PlannedMeal;
+}) {
+  return (
+    <div className="grid grid-cols-[110px_1fr] gap-3 px-4 py-3">
+      <p className="text-sm font-semibold text-slate-700">
+        {mealTypeLabels[mealType]}
+      </p>
+      {meal ? (
+        <div className="flex min-w-0 items-start justify-between gap-3">
+          <div className="min-w-0 space-y-1">
+            <Link
+              href={`/recipes/${meal.recipe.id}`}
+              className="block truncate text-sm font-semibold text-slate-950 hover:text-emerald-700"
+            >
+              {meal.recipe.title}
+            </Link>
+            <p className="truncate text-xs text-slate-500">
+              {meal.recipe.categoryName ?? "Sans categorie"}
+            </p>
+          </div>
+          <DeleteMealPlanForm mealPlanId={meal.id} />
+        </div>
+      ) : (
+        <p className="text-sm text-slate-400">Libre</p>
+      )}
     </div>
   );
 }
@@ -56,9 +118,7 @@ function Row({
         {mealTypeLabels[mealType]}
       </div>
       {days.map((day) => {
-        const meal = meals.find(
-          (item) => item.date === day.date && item.mealType === mealType,
-        );
+        const meal = findMeal(meals, day.date, mealType);
 
         return (
           <div
@@ -88,4 +148,12 @@ function Row({
       })}
     </>
   );
+}
+
+function findMeal(
+  meals: PlannedMeal[],
+  date: string,
+  mealType: PlannedMeal["mealType"],
+) {
+  return meals.find((item) => item.date === date && item.mealType === mealType);
 }

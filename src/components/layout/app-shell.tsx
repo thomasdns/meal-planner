@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-import { SignOutButton } from "@/features/auth/sign-out-button";
+import { AppNavigation } from "@/components/layout/app-navigation";
 
 const navigationItems = [
   { href: "/dashboard", label: "Tableau de bord" },
@@ -23,34 +23,20 @@ export function AppShell({ children, showAdminNav = false }: AppShellProps) {
   return (
     <div className="min-h-screen bg-slate-50 text-slate-950">
       <header className="border-b border-slate-200 bg-white">
-        <div className="mx-auto flex max-w-6xl flex-col gap-4 px-6 py-4 md:flex-row md:items-center md:justify-between">
+        <div className="relative mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-4 sm:px-6">
           <div>
             <Link href="/dashboard" className="text-lg font-semibold">
               Meal Planner
             </Link>
           </div>
 
-          <nav aria-label="Navigation principale">
-            <ul className="flex flex-wrap items-center gap-2">
-              {items.map((item) => (
-                <li key={item.href}>
-                  <Link
-                    href={item.href}
-                    className="inline-flex rounded-md px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-slate-950"
-                  >
-                    {item.label}
-                  </Link>
-                </li>
-              ))}
-              <li>
-                <SignOutButton />
-              </li>
-            </ul>
-          </nav>
+          <AppNavigation items={items} />
         </div>
       </header>
 
-      <main className="mx-auto w-full max-w-6xl px-6 py-8">{children}</main>
+      <main className="mx-auto w-full max-w-6xl px-4 py-6 sm:px-6 sm:py-8">
+        {children}
+      </main>
     </div>
   );
 }
