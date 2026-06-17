@@ -1,7 +1,5 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
-
 import {
   authTokenPurpose,
   consumeAuthToken,
@@ -19,7 +17,7 @@ export async function createEmailVerificationLink(email: string) {
     emailVerificationTokenTtlMs,
   );
 
-  return createAppUrl(`/auth/verify-email?token=${token}`);
+  return createAppUrl(`/auth/verify-email/confirm?token=${token}`);
 }
 
 export async function verifyEmailToken(token: string) {
@@ -40,8 +38,6 @@ export async function verifyEmailToken(token: string) {
       emailVerified: new Date(),
     },
   });
-
-  revalidatePath("/profile");
 
   return {
     success: true,

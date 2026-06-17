@@ -1,9 +1,9 @@
 import Link from "next/link";
-
-import { verifyEmailToken } from "@/features/auth/email-verification.actions";
+import { redirect } from "next/navigation";
 
 type VerifyEmailPageProps = {
   searchParams: Promise<{
+    status?: string;
     token?: string;
   }>;
 };
@@ -11,13 +11,25 @@ type VerifyEmailPageProps = {
 export default async function VerifyEmailPage({
   searchParams,
 }: VerifyEmailPageProps) {
-  const { token } = await searchParams;
-  const result = token
-    ? await verifyEmailToken(token)
-    : {
-        success: false,
-        message: "Lien de verification manquant.",
-      };
+  const { status, token } = await searchParams;
+
+  if (token) {
+    redirect(`/auth/verify-email/confirm?token=${encodeURIComponent(token)}`);
+  }
+
+  const result =
+    status === "success"
+      ? {
+          success: true,
+          message: "Email verifie avec succes.",
+        }
+      : {
+          success: false,
+          message:
+            status === "invalid"
+              ? "Ce lien de verification est invalide ou expire."
+              : "Lien de verification manquant.",
+        };
 
   return (
     <main className="mx-auto flex min-h-screen max-w-md flex-col justify-center px-6">
