@@ -1,4 +1,5 @@
 import { spawnSync } from "node:child_process";
+import { setTimeout } from "node:timers/promises";
 
 const commands = [
   {
@@ -10,7 +11,7 @@ const commands = [
     label: "Deploy Prisma migrations",
     command: "npx",
     args: ["prisma", "migrate", "deploy"],
-    retries: 2,
+    retries: 5,
   },
   {
     label: "Build Next.js application",
@@ -19,7 +20,7 @@ const commands = [
   },
 ];
 
-function runCommand({ label, command, args, retries = 0 }) {
+async function runCommand({ label, command, args, retries = 0 }) {
   for (let attempt = 0; attempt <= retries; attempt += 1) {
     console.log(`\n${label}${attempt > 0 ? ` - retry ${attempt}` : ""}`);
 
@@ -48,13 +49,10 @@ function runCommand({ label, command, args, retries = 0 }) {
     }
 
     console.log("Migration lock timeout detected. Waiting before retrying...");
-    spawnSync("node", ["-e", "setTimeout(() => {}, 15000)"], {
-      shell: true,
-      stdio: "inherit",
-    });
+    await setTimeout(15_000);
   }
 }
 
 for (const command of commands) {
-  runCommand(command);
+  await runCommand(command);
 }
