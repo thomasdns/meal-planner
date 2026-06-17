@@ -1,146 +1,307 @@
-import { expect, test } from "@playwright/test";
+import { expect, type Page, test } from "@playwright/test";
 
-test("user can complete the core meal-planning journey", async ({ page }) => {
-  test.setTimeout(60_000);
+import {
+  createEmailVerificationToken,
+  createRecipeWithIngredient,
+  createTestUser,
+  deleteTestUsers,
+} from "./helpers/database";
 
+const password = "Password1234";
+
+test("email verification is required before sign in", async ({ page }) => {
   const uniqueId = Date.now();
-  const email = `e2e-${uniqueId}@example.com`;
-  const password = "Password1234";
-  const recipeTitle = `Recette E2E ${uniqueId}`;
-  const categoryName = `Categorie E2E ${uniqueId}`;
-  const ingredientName = `Ingredient E2E ${uniqueId}`;
-  const updatedName = `Utilisateur E2E ${uniqueId}`;
+  const email = `e2e-unverified-${uniqueId}@example.com`;
+  const verificationToken = `verify-${uniqueId}`;
 
-  await page.goto("/");
-  await expect(
-    page.getByRole("heading", {
-      name: /organise tes recettes, ton planning et tes courses/i,
-    }),
-  ).toBeVisible();
+  await deleteTestUsers(email);
 
-  await expect(
-    page.getByRole("link", { name: "Creer un compte" }),
-  ).toHaveAttribute("href", "/auth/sign-up");
+  try {
+    await createTestUser({
+      email,
+      password,
+      verified: false,
+    });
+    await createEmailVerificationToken(email, verificationToken);
 
-  await page.goto("/auth/sign-up");
-  await expect(
-    page.getByRole("heading", { name: "Creer un compte" }),
-  ).toBeVisible();
+    await signIn(page, email, password, {
+      expectedError: "Verifie ton adresse email avant de te connecter.",
+    });
 
-  await page.getByLabel("Nom").fill("Utilisateur E2E");
-  await page.getByLabel("Email").fill(email);
-  await page.getByLabel("Mot de passe").fill(password);
-  await Promise.all([
-    page.waitForURL("**/auth/sign-in", { timeout: 20_000 }),
-    page.getByRole("button", { name: "Creer mon compte" }).click(),
-  ]);
+    await page.goto(`/auth/verify-email/confirm?token=${verificationToken}`);
+    await expect(
+      page.getByRole("heading", { name: "Verification email" }),
+    ).toBeVisible();
+    await expect(page.getByText("Email verifie avec succes.")).toBeVisible();
 
-  await expect(
-    page.getByRole("heading", { name: "Connexion" }),
-  ).toBeVisible();
-
-  await page.getByLabel("Email").fill(email);
-  await page.getByLabel("Mot de passe").fill(password);
-  await Promise.all([
-    page.waitForURL("**/dashboard"),
-    page.getByRole("button", { name: "Se connecter" }).click(),
-  ]);
-
-  await expect(
-    page.getByRole("heading", { name: "Tableau de bord" }),
-  ).toBeVisible();
-
-  await page.getByRole("link", { name: "Recettes" }).click();
-  await expect(page.getByRole("heading", { name: "Recettes" })).toBeVisible();
-
-  await page.locator("#category-name").fill(categoryName);
-  await page.getByRole("button", { name: "Creer la categorie" }).click();
-  await expect(
-    page.locator(`input[id^="category-name-"][value="${categoryName}"]`),
-  ).toBeVisible();
-
-  await page.locator("#title").fill(recipeTitle);
-  await page.locator("#description").fill("Recette creee par Playwright.");
-  await page.locator("#servings").fill("2");
-  await page.locator("#prepTime").fill("10");
-  await page.locator("#cookTime").fill("20");
-  await page.locator("#steps")
-    .fill("1. Preparer\n2. Cuire\n3. Servir");
-  const createRecipeForm = page
-    .locator("form")
-    .filter({ has: page.getByRole("heading", { name: "Nouvelle recette" }) });
-  await createRecipeForm
-    .locator("#categoryId")
-    .selectOption({ label: categoryName });
-  await createRecipeForm
-    .getByRole("button", { name: "Creer la recette" })
-    .click();
-
-  await expect(page.getByRole("link", { name: recipeTitle })).toBeVisible();
-
-  await page.getByRole("link", { name: recipeTitle }).click();
-  await expect(page.getByRole("heading", { name: recipeTitle })).toBeVisible();
-  await page.locator("#ingredient-name").fill(ingredientName);
-  await page.locator("#ingredient-quantity").fill("3");
-  await page.locator("#ingredient-unit").fill("piece");
-  await page.getByRole("button", { name: "Ajouter l'ingredient" }).click();
-  await expect(
-    page.locator(`input[id^="ingredient-name-"][value="${ingredientName}"]`),
-  ).toBeVisible();
-
-  await expect(
-    page.getByRole("link", { name: "Planning" }),
-  ).toHaveAttribute("href", "/meal-plan");
-  await page.goto("/meal-plan");
-  await expect(
-    page.getByRole("heading", { name: "Planning hebdomadaire" }),
-  ).toBeVisible();
-  await page.locator("#recipeId").selectOption({ label: recipeTitle });
-  await page.locator("#mealType").selectOption("DINNER");
-  await page.getByRole("button", { name: "Planifier" }).click();
-  await expect(page.getByRole("link", { name: recipeTitle })).toBeVisible();
-
-  await expect(
-    page.getByRole("link", { name: "Courses" }),
-  ).toHaveAttribute("href", "/shopping-list");
-  await page.goto("/shopping-list");
-  await expect(
-    page.getByRole("heading", { name: "Liste de courses" }),
-  ).toBeVisible();
-  await expect(page.getByText(ingredientName)).toBeVisible();
-  await expect(page.getByText("3 piece")).toBeVisible();
-
-  await page.getByRole("link", { name: "Profil" }).click();
-  await expect(page.getByRole("heading", { name: "Profil" })).toBeVisible();
-  await page.locator("#name").fill(updatedName);
-  await page.getByRole("button", { name: "Mettre a jour" }).click();
-  await expect(page.getByText("Profil mis a jour.")).toBeVisible();
-
-  await Promise.all([
-    page.waitForURL("**/auth/sign-in"),
-    page.getByRole("button", { name: "Se deconnecter" }).click(),
-  ]);
-  await expect(
-    page.getByRole("heading", { name: "Connexion" }),
-  ).toBeVisible();
-
-  await page.getByLabel("Email").fill(email);
-  await page.getByLabel("Mot de passe").fill(password);
-  await Promise.all([
-    page.waitForURL("**/dashboard"),
-    page.getByRole("button", { name: "Se connecter" }).click(),
-  ]);
-
-  await page.getByRole("link", { name: "Profil" }).click();
-  await page.getByRole("button", { name: "Supprimer mon compte" }).click();
-  await page.locator("#delete-confirmation").fill("SUPPRIMER");
-  await Promise.all([
-    page.waitForURL("**/auth/sign-in"),
-    page.getByRole("button", { name: "Confirmer" }).click(),
-  ]);
-
-  await page.getByLabel("Email").fill(email);
-  await page.getByLabel("Mot de passe").fill(password);
-  await page.getByRole("button", { name: "Se connecter" }).click();
-  await expect(page.getByText("Email ou mot de passe incorrect.")).toBeVisible();
+    await signIn(page, email, password);
+    await expect(
+      page.getByRole("heading", { name: "Tableau de bord" }),
+    ).toBeVisible();
+  } finally {
+    await deleteTestUsers(email);
+  }
 });
+
+test("user can manage categories, recipes and ingredients", async ({ page }) => {
+  const uniqueId = Date.now();
+  const email = `e2e-recipes-${uniqueId}@example.com`;
+  const categoryName = `Categorie E2E ${uniqueId}`;
+  const updatedCategoryName = `Categorie modifiee ${uniqueId}`;
+  const recipeTitle = `Recette E2E ${uniqueId}`;
+  const updatedRecipeTitle = `Recette modifiee ${uniqueId}`;
+  const ingredientName = `Ingredient E2E ${uniqueId}`;
+  const updatedIngredientName = `Ingredient modifie ${uniqueId}`;
+
+  await deleteTestUsers(email);
+
+  try {
+    await createTestUser({ email, password });
+    await signIn(page, email, password);
+
+    await page.goto("/recipes");
+    await expect(page.getByRole("heading", { name: "Recettes" })).toBeVisible();
+
+    await page.locator("#category-name").fill(categoryName);
+    await page.getByRole("button", { name: "Creer la categorie" }).click();
+    const categoryInput = page.locator(
+      `input[id^="category-name-"][value="${categoryName}"]`,
+    );
+    await expect(categoryInput).toBeVisible();
+
+    await categoryInput.fill(updatedCategoryName);
+    await categoryInput
+      .locator("xpath=ancestor::form")
+      .getByRole("button", { name: "OK" })
+      .click();
+    await expect(page.getByText("Categorie mise a jour.")).toBeVisible();
+
+    await page.locator("#title").fill(recipeTitle);
+    await page.locator("#description").fill("Recette creee par Playwright.");
+    await page.locator("#servings").fill("2");
+    await page.locator("#prepTime").fill("15");
+    await page.locator("#cookTime").fill("25");
+    await page.locator("#steps").fill("1. Preparer\n2. Cuire\n3. Servir");
+    const createRecipeForm = page
+      .locator("form")
+      .filter({ has: page.getByRole("heading", { name: "Nouvelle recette" }) });
+    await createRecipeForm
+      .locator("#categoryId")
+      .selectOption({ label: updatedCategoryName });
+    await createRecipeForm
+      .getByRole("button", { name: "Creer la recette" })
+      .click();
+    await expect(page.getByRole("link", { name: recipeTitle })).toBeVisible();
+
+    await page.locator("#query").fill(recipeTitle);
+    await page.getByRole("button", { name: "Filtrer" }).click();
+    await expect(page.getByRole("link", { name: recipeTitle })).toBeVisible();
+
+    await page.locator("#maxTotalTime").fill("10");
+    await page.getByRole("button", { name: "Filtrer" }).click();
+    await expect(page.getByRole("link", { name: recipeTitle })).toBeHidden();
+    await expect(page.getByText("Aucune recette pour le moment")).toBeVisible();
+
+    await page.goto("/recipes");
+    await page.getByRole("link", { name: recipeTitle }).click();
+    await expect(page.getByRole("heading", { name: recipeTitle })).toBeVisible();
+
+    await page.locator("#edit-title").fill(updatedRecipeTitle);
+    await page.locator("#edit-prepTime").fill("20");
+    await page.locator("#edit-cookTime").fill("30");
+    await page.locator("#edit-steps").fill("1. Couper\n2. Melanger\n3. Servir");
+    await page.getByRole("button", { name: "Enregistrer" }).click();
+    await expect(page.getByText("Recette mise a jour.")).toBeVisible();
+
+    await page.locator("#ingredient-name").fill(ingredientName);
+    await page.locator("#ingredient-quantity").fill("3");
+    await page.locator("#ingredient-unit").fill("piece");
+    await page.getByRole("button", { name: "Ajouter l'ingredient" }).click();
+    const ingredientInput = page.locator(
+      `input[id^="ingredient-name-"][value="${ingredientName}"]`,
+    );
+    await expect(ingredientInput).toBeVisible();
+
+    await ingredientInput.fill(updatedIngredientName);
+    const ingredientForm = ingredientInput.locator("xpath=ancestor::form");
+    await ingredientForm.locator('input[name="quantity"]').fill("4");
+    await ingredientForm.locator('input[name="unit"]').fill("g");
+    await ingredientForm.getByRole("button", { name: "Enregistrer" }).click();
+    await expect(page.getByText("Ingredient mis a jour.")).toBeVisible();
+
+    page.once("dialog", (dialog) => dialog.accept());
+    await page.getByRole("button", { name: "Supprimer cet ingredient" }).click();
+    await expect(page.getByText("Aucun ingredient")).toBeVisible();
+
+    page.once("dialog", (dialog) => dialog.accept());
+    await page.getByRole("button", { name: "Supprimer la recette" }).click();
+    await expect(page).toHaveURL(/\/recipes$/);
+    await expect(
+      page.getByRole("link", { name: updatedRecipeTitle }),
+    ).toBeHidden();
+  } finally {
+    await deleteTestUsers(email);
+  }
+});
+
+test("weekly planning generates and updates the shopping list", async ({
+  page,
+}) => {
+  const uniqueId = Date.now();
+  const email = `e2e-planning-${uniqueId}@example.com`;
+  const ingredientName = `Ingredient courses ${uniqueId}`;
+  const recipeTitle = `Recette planning ${uniqueId}`;
+
+  await deleteTestUsers(email);
+
+  try {
+    const user = await createTestUser({ email, password });
+    await createRecipeWithIngredient({
+      userId: user.id,
+      categoryName: `Categorie planning ${uniqueId}`,
+      recipeTitle,
+      ingredientName,
+      quantity: 5,
+      unit: "g",
+    });
+
+    await signIn(page, email, password);
+
+    await page.goto("/meal-plan");
+    await expect(
+      page.getByRole("heading", { name: "Planning hebdomadaire" }),
+    ).toBeVisible();
+    await page.locator("#recipeId").selectOption({ label: recipeTitle });
+    await page.locator("#mealType").selectOption("DINNER");
+    await page.getByRole("button", { name: "Planifier" }).click();
+    await expect(page.getByRole("link", { name: recipeTitle })).toBeVisible();
+
+    await page.goto("/shopping-list");
+    await expect(
+      page.getByRole("heading", { name: "Liste de courses" }),
+    ).toBeVisible();
+    const itemRow = page.getByRole("row", {
+      name: new RegExp(escapeRegExp(ingredientName)),
+    });
+    await expect(itemRow).toContainText("5 g");
+    await expect(itemRow).toContainText(recipeTitle);
+
+    await page.getByRole("checkbox", { name: `Marquer ${ingredientName}` }).click();
+    await expect(
+      page.getByRole("checkbox", { name: `Marquer ${ingredientName}` }),
+    ).toBeChecked();
+    await expect(itemRow.locator("td").nth(1)).toHaveClass(/line-through/);
+    await expect(itemRow.locator("td").nth(2)).toHaveClass(/line-through/);
+    await expect(itemRow.locator("td").nth(3)).toHaveClass(/line-through/);
+
+    page.once("dialog", (dialog) => dialog.accept());
+    await page.getByRole("button", { name: "Reinitialiser" }).click();
+    await expect(
+      page.getByRole("checkbox", { name: `Marquer ${ingredientName}` }),
+    ).not.toBeChecked();
+
+    await page.goto("/meal-plan");
+    page.once("dialog", (dialog) => dialog.accept());
+    const removeMealButton = page.getByRole("button", {
+      name: "Retirer ce repas du planning",
+    });
+    await expect(removeMealButton).toBeVisible();
+    await removeMealButton.evaluate((button) => {
+      if (!(button instanceof HTMLButtonElement)) {
+        throw new Error("Expected a button element.");
+      }
+
+      button.form?.requestSubmit(button);
+    });
+    await expect(page.getByRole("link", { name: recipeTitle })).toBeHidden();
+
+    await page.goto("/shopping-list");
+    await expect(page.getByText("Liste vide")).toBeVisible();
+  } finally {
+    await deleteTestUsers(email);
+  }
+});
+
+test("admin can inspect, edit and delete a user", async ({ page }) => {
+  const uniqueId = Date.now();
+  const adminEmail = `e2e-admin-${uniqueId}@example.com`;
+  const userEmail = `e2e-admin-user-${uniqueId}@example.com`;
+  const updatedUserEmail = `e2e-admin-user-updated-${uniqueId}@example.com`;
+  const userRecipeTitle = `Recette utilisateur admin ${uniqueId}`;
+  const updatedName = `Utilisateur gere ${uniqueId}`;
+
+  await deleteTestUsers(adminEmail, userEmail, updatedUserEmail);
+
+  try {
+    await createTestUser({
+      email: adminEmail,
+      password,
+      name: "Admin E2E",
+      role: "ADMIN",
+    });
+    const user = await createTestUser({
+      email: userEmail,
+      password,
+      name: "Utilisateur admin E2E",
+    });
+    await createRecipeWithIngredient({
+      userId: user.id,
+      categoryName: `Categorie admin ${uniqueId}`,
+      recipeTitle: userRecipeTitle,
+      ingredientName: `Ingredient admin ${uniqueId}`,
+    });
+
+    await signIn(page, adminEmail, password);
+    await page.goto("/admin");
+    await expect(
+      page.getByRole("heading", { name: "Pilotage de l'application" }),
+    ).toBeVisible();
+    const userRow = page.getByRole("row", {
+      name: new RegExp(escapeRegExp(userEmail)),
+    });
+    await expect(userRow).toBeVisible();
+    await expect(page.getByText(userRecipeTitle).first()).toBeVisible();
+    await userRow.getByRole("link", { name: "Gerer" }).click();
+    await expect(page.getByRole("heading", { name: "Utilisateur admin E2E" }))
+      .toBeVisible();
+    await expect(page.getByText(userRecipeTitle)).toBeVisible();
+
+    await page.locator("#admin-user-name").fill(updatedName);
+    await page.locator("#admin-user-email").fill(updatedUserEmail);
+    await page.locator("#admin-user-role").selectOption("ADMIN");
+    await page.getByRole("button", { name: "Enregistrer" }).click();
+    await expect(page.getByText("Utilisateur mis a jour.")).toBeVisible();
+
+    page.once("dialog", (dialog) => dialog.accept());
+    await page.getByRole("button", { name: "Supprimer" }).click();
+    await expect(page).toHaveURL(/\/admin$/);
+    await expect(page.getByText(updatedUserEmail)).toBeHidden();
+  } finally {
+    await deleteTestUsers(adminEmail, userEmail, updatedUserEmail);
+  }
+});
+
+async function signIn(
+  page: Page,
+  email: string,
+  userPassword: string,
+  options: { expectedError?: string } = {},
+) {
+  await page.goto("/auth/sign-in");
+  await page.getByLabel("Email").fill(email);
+  await page.getByLabel("Mot de passe").fill(userPassword);
+  await page.getByRole("button", { name: "Se connecter" }).click();
+
+  if (options.expectedError) {
+    await expect(page.getByText(options.expectedError)).toBeVisible();
+    return;
+  }
+
+  await expect(page).toHaveURL(/\/dashboard$/, { timeout: 15_000 });
+  await expect(page.getByRole("heading", { name: "Tableau de bord" }))
+    .toBeVisible();
+}
+
+function escapeRegExp(value: string) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
