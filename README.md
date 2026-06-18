@@ -24,7 +24,9 @@ securite, Git/GitHub et deploiement.
 - Liste de courses cochable, imprimable et exportable en CSV.
 - Tableau de bord utilisateur.
 - Profil utilisateur avec modification du nom et de l'email.
+- Deconnexion et suppression definitive du compte avec confirmation.
 - Interface admin protegee par role en base de donnees.
+- Envoi d'emails transactionnels avec suivi structure des erreurs SMTP.
 
 ## Stack technique
 
@@ -111,8 +113,9 @@ Notes :
 - `EMAIL_FROM` est l'expediteur utilise pour les emails transactionnels.
 - L'acces admin est stocke en base via `User.role`, pas dans les variables d'environnement.
 
-Sans configuration SMTP complete, les liens de verification email et de
-reinitialisation de mot de passe sont seulement journalises cote serveur.
+Sans configuration SMTP complete, l'envoi est refuse et une erreur structuree
+est journalisee cote serveur. Les liens de verification et de reinitialisation
+ne sont jamais ecrits dans les logs.
 
 Pour un projet sans nom de domaine personnalise, Gmail SMTP peut etre utilise
 avec une adresse Gmail technique et un mot de passe d'application Google.
@@ -164,16 +167,37 @@ npm run test:e2e
 
 Le test e2e couvre le parcours principal :
 
-- inscription ;
+- verification obligatoire de l'adresse email ;
 - connexion ;
-- creation de categorie ;
-- creation de recette ;
-- ajout d'ingredient ;
-- planification d'un repas ;
-- generation de liste de courses ;
-- modification du profil.
-- deconnexion ;
-- suppression du compte.
+- creation, edition et suppression des categories ;
+- creation, edition et suppression des recettes et ingredients ;
+- recherche et filtrage des recettes ;
+- planification et suppression d'un repas ;
+- generation et mise a jour de la liste de courses ;
+- consultation, modification et suppression d'un utilisateur par un admin.
+
+Les parcours d'inscription avec envoi SMTP reel, de reinitialisation du mot de
+passe, de modification du profil et de suppression du compte restent a ajouter
+a la couverture automatisee.
+
+## Surveillance SMTP
+
+Les envois SMTP produisent des evenements JSON consultables dans le terminal en
+local et dans les Runtime Logs de Vercel :
+
+```txt
+smtp_email_sent
+smtp_email_failed
+smtp_config_incomplete
+```
+
+Les logs contiennent un destinataire masque, l'identifiant du message en cas de
+succes et les informations techniques utiles en cas d'echec (`code`, `command`,
+`responseCode`). Ils ne contiennent ni mot de passe SMTP, ni contenu d'email,
+ni lien d'authentification.
+
+Dans Vercel, ouvrir le projet puis **Logs** et rechercher le nom de l'evenement,
+par exemple `smtp_email_failed`.
 
 ## Base De Donnees
 
@@ -210,6 +234,7 @@ Points de securite deja en place :
 - role admin en base de donnees ;
 - rate limiting sur inscription et connexion ;
 - absence de SQL brut applicatif ;
+- journalisation SMTP sans secret ni lien d'authentification ;
 - `.env` ignore par Git.
 
 ## Deploiement
@@ -235,4 +260,6 @@ src/
 
 ## Statut
 
-Projet en phase de stabilisation avant deploiement.
+Application deployee sur Vercel et en phase de stabilisation. Les priorites
+restantes concernent la robustesse des tests E2E, le rate limiting distribue,
+la revocation des sessions et la surveillance de la production.

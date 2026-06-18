@@ -9,6 +9,18 @@ type SendEmailInput = {
   html: string;
 };
 
+type SmtpError = Error & {
+  code?: string;
+  command?: string;
+  responseCode?: number;
+};
+
+type SmtpSendResult = {
+  messageId?: string;
+  accepted?: unknown[];
+  rejected?: unknown[];
+};
+
 export async function sendEmail({ to, subject, text, html }: SendEmailInput) {
   const from = process.env.EMAIL_FROM;
   const host = process.env.SMTP_HOST;
@@ -18,13 +30,21 @@ export async function sendEmail({ to, subject, text, html }: SendEmailInput) {
   const password = process.env.SMTP_PASSWORD?.replace(/\s/g, "");
 
   if (!from || !host || !user || !password) {
-    console.info(
-      [
-        "Email delivery skipped because SMTP configuration is incomplete.",
-        `To: ${to}`,
-        `Subject: ${subject}`,
-        text,
-      ].join("\n"),
+    const missingVariables = [
+      ["EMAIL_FROM", from],
+      ["SMTP_HOST", host],
+      ["SMTP_USER", user],
+      ["SMTP_PASSWORD", password],
+    ]
+      .filter(([, value]) => !value)
+      .map(([name]) => name);
+
+    console.error(
+      JSON.stringify({
+        event: "smtp_config_incomplete",
+        recipient: maskEmailAddress(to),
+        missingVariables,
+      }),
     );
 
     return {
@@ -46,25 +66,70 @@ export async function sendEmail({ to, subject, text, html }: SendEmailInput) {
   });
 
   try {
-    await transporter.sendMail({
+    const info = (await transporter.sendMail({
       from,
       to,
       subject,
       text,
       html,
-    });
+    })) as SmtpSendResult;
+
+    console.info(
+      JSON.stringify({
+        event: "smtp_email_sent",
+        recipient: maskEmailAddress(to),
+        messageId: info.messageId,
+        acceptedCount: Array.isArray(info.accepted) ? info.accepted.length : 0,
+        rejectedCount: Array.isArray(info.rejected) ? info.rejected.length : 0,
+      }),
+    );
   } catch (error) {
-    console.error("Email delivery failed:", error);
+    const smtpError = normalizeSmtpError(error);
+
+    console.error(
+      JSON.stringify({
+        event: "smtp_email_failed",
+        recipient: maskEmailAddress(to),
+        error: smtpError,
+      }),
+    );
 
     return {
       delivered: false,
     };
   }
 
-  console.info(`Email delivered to ${to} with subject "${subject}".`);
-
   return {
     delivered: true,
+  };
+}
+
+function maskEmailAddress(email: string) {
+  const [localPart, domain] = email.split("@");
+
+  if (!localPart || !domain) {
+    return "invalid-email";
+  }
+
+  return `${localPart.slice(0, 2)}***@${domain}`;
+}
+
+function normalizeSmtpError(error: unknown) {
+  if (!(error instanceof Error)) {
+    return {
+      name: "UnknownError",
+      message: "Unknown SMTP error",
+    };
+  }
+
+  const smtpError = error as SmtpError;
+
+  return {
+    name: smtpError.name,
+    message: smtpError.message,
+    code: smtpError.code,
+    command: smtpError.command,
+    responseCode: smtpError.responseCode,
   };
 }
 
