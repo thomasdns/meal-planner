@@ -1,5 +1,8 @@
+import Link from "next/link";
+
 import { AdminUserList } from "@/features/admin/admin-user-list";
 import { getAdminDashboardData } from "@/features/admin/admin.data";
+import { adminUserFiltersSchema } from "@/features/admin/admin.validation";
 
 const mealTypeLabels: Record<string, string> = {
   BREAKFAST: "Petit-dejeuner",
@@ -8,8 +11,24 @@ const mealTypeLabels: Record<string, string> = {
   SNACK: "Snack",
 };
 
-export default async function AdminPage() {
-  const data = await getAdminDashboardData();
+type AdminPageProps = {
+  searchParams: Promise<{
+    q?: string | string[];
+    role?: string | string[];
+    page?: string | string[];
+  }>;
+};
+
+export default async function AdminPage({ searchParams }: AdminPageProps) {
+  const params = await searchParams;
+  const query = firstSearchParam(params.q);
+  const role = firstSearchParam(params.role);
+  const filters = adminUserFiltersSchema.parse({
+    query,
+    role: role || undefined,
+    page: firstSearchParam(params.page),
+  });
+  const data = await getAdminDashboardData(filters);
 
   return (
     <div className="space-y-8">
@@ -115,17 +134,136 @@ export default async function AdminPage() {
       </section>
 
       <section className="space-y-4">
-        <div>
-          <h2 className="text-xl font-semibold">Utilisateurs</h2>
-          <p className="text-sm text-slate-600">
-            Accede au detail pour modifier un utilisateur, le supprimer ou
-            consulter ses recettes.
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <h2 className="text-xl font-semibold">Utilisateurs</h2>
+            <p className="text-sm text-slate-600">
+              {data.usersPagination.totalItems} compte
+              {data.usersPagination.totalItems > 1 ? "s" : ""} trouve
+              {data.usersPagination.totalItems > 1 ? "s" : ""}.
+            </p>
+          </div>
+          <p className="text-sm text-slate-500">
+            Page {data.usersPagination.currentPage} sur {data.usersPagination.totalPages}
           </p>
         </div>
+
+        <form
+          action="/admin"
+          className="grid gap-3 border-y border-slate-200 py-4 sm:grid-cols-[minmax(0,1fr)_220px_auto]"
+        >
+          <div>
+            <label htmlFor="admin-user-query" className="text-sm font-medium">
+              Rechercher
+            </label>
+            <input
+              id="admin-user-query"
+              name="q"
+              type="search"
+              defaultValue={filters.query}
+              placeholder="Nom ou adresse email"
+              className="mt-1 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-emerald-600"
+            />
+          </div>
+          <div>
+            <label htmlFor="admin-user-role-filter" className="text-sm font-medium">
+              Role
+            </label>
+            <select
+              id="admin-user-role-filter"
+              name="role"
+              defaultValue={filters.role ?? ""}
+              className="mt-1 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-emerald-600"
+            >
+              <option value="">Tous les roles</option>
+              <option value="USER">Utilisateurs</option>
+              <option value="ADMIN">Administrateurs</option>
+            </select>
+          </div>
+          <div className="flex items-end gap-2">
+            <button
+              type="submit"
+              className="rounded-md bg-emerald-700 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-800"
+            >
+              Filtrer
+            </button>
+            {filters.query || filters.role ? (
+              <Link
+                href="/admin"
+                className="rounded-md border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100"
+              >
+                Effacer
+              </Link>
+            ) : null}
+          </div>
+        </form>
+
         <AdminUserList users={data.users} />
+
+        {data.usersPagination.totalPages > 1 ? (
+          <nav
+            aria-label="Pagination des utilisateurs"
+            className="flex items-center justify-between gap-4 border-t border-slate-200 pt-4"
+          >
+            {data.usersPagination.currentPage > 1 ? (
+              <Link
+                href={buildAdminPageHref(filters, data.usersPagination.currentPage - 1)}
+                className="rounded-md border border-slate-300 px-3 py-2 text-sm font-medium hover:bg-slate-100"
+              >
+                Precedent
+              </Link>
+            ) : (
+              <span />
+            )}
+            <span className="text-sm text-slate-600">
+              {getPageRange(data.usersPagination)} sur {data.usersPagination.totalItems}
+            </span>
+            {data.usersPagination.currentPage < data.usersPagination.totalPages ? (
+              <Link
+                href={buildAdminPageHref(filters, data.usersPagination.currentPage + 1)}
+                className="rounded-md border border-slate-300 px-3 py-2 text-sm font-medium hover:bg-slate-100"
+              >
+                Suivant
+              </Link>
+            ) : (
+              <span />
+            )}
+          </nav>
+        ) : null}
       </section>
     </div>
   );
+}
+
+function firstSearchParam(value: string | string[] | undefined) {
+  return Array.isArray(value) ? value[0] ?? "" : value ?? "";
+}
+
+function buildAdminPageHref(
+  filters: { query: string; role?: "USER" | "ADMIN" },
+  page: number,
+) {
+  const params = new URLSearchParams();
+
+  if (filters.query) params.set("q", filters.query);
+  if (filters.role) params.set("role", filters.role);
+  params.set("page", String(page));
+
+  return `/admin?${params.toString()}`;
+}
+
+function getPageRange(pagination: {
+  currentPage: number;
+  pageSize: number;
+  totalItems: number;
+}) {
+  const first = (pagination.currentPage - 1) * pagination.pageSize + 1;
+  const last = Math.min(
+    pagination.currentPage * pagination.pageSize,
+    pagination.totalItems,
+  );
+
+  return `${first}-${last}`;
 }
 
 type AdminStatCardProps = {

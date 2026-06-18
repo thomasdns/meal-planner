@@ -13,4 +13,11 @@ export const updateAdminUserSchema = z.object({
   role: z.enum(userRoles),
 });
 
+export const adminUserFiltersSchema = z.object({
+  query: z.string().trim().max(100).catch(""),
+  role: z.enum(userRoles).optional().catch(undefined),
+  page: z.coerce.number().int().positive().catch(1),
+});
+
 export type UpdateAdminUserInput = z.infer<typeof updateAdminUserSchema>;
+export type AdminUserFilters = z.infer<typeof adminUserFiltersSchema>;

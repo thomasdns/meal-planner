@@ -25,7 +25,7 @@ securite, Git/GitHub et deploiement.
 - Tableau de bord utilisateur.
 - Profil utilisateur avec modification du nom et de l'email.
 - Deconnexion et suppression definitive du compte avec confirmation.
-- Interface admin protegee par role en base de donnees.
+- Interface admin protegee avec recherche, filtre et pagination des utilisateurs.
 - Envoi d'emails transactionnels avec suivi structure des erreurs SMTP.
 
 ## Stack technique

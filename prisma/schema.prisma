@@ -36,6 +36,9 @@ model User {
   shoppingListItems ShoppingListItem[]
   accounts          Account[]
   sessions          Session[]
+
+  @@index([createdAt])
+  @@index([role, createdAt])
 }
 
 model Category {

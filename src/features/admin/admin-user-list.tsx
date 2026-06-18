@@ -101,9 +101,17 @@ export function AdminUserList({ users }: AdminUserListProps) {
 }
 
 function RoleBadge({ role }: { role: AdminUserListItem["role"] }) {
+  const isAdmin = role === "ADMIN";
+
   return (
-    <span className="shrink-0 rounded-full bg-slate-100 px-2 py-1 text-xs font-medium text-slate-700">
-      {role}
+    <span
+      className={`shrink-0 rounded-full px-2 py-1 text-xs font-medium ${
+        isAdmin
+          ? "bg-emerald-100 text-emerald-800"
+          : "bg-slate-100 text-slate-700"
+      }`}
+    >
+      {isAdmin ? "Administrateur" : "Utilisateur"}
     </span>
   );
 }
