@@ -1,6 +1,7 @@
 import "server-only";
 
 import {
+  type AdminStatisticsPeriod,
   type AdminUserFilters,
   updateAdminUserSchema,
 } from "@/features/admin/admin.validation";
@@ -21,11 +22,11 @@ export type AdminUserListItem = {
 
 const adminUsersPageSize = 20;
 
-export async function getAdminStatisticsData() {
+export async function getAdminStatisticsData(periodDays: AdminStatisticsPeriod) {
   await requireAdmin();
 
-  const since = new Date();
-  since.setDate(since.getDate() - 7);
+  const periodStart = startOfDayDaysAgo(periodDays);
+  const previousPeriodStart = startOfDayDaysAgo(periodDays * 2);
 
   const [
     usersCount,
@@ -34,6 +35,11 @@ export async function getAdminStatisticsData() {
     ingredientsCount,
     mealPlansCount,
     newUsersCount,
+    previousNewUsersCount,
+    newRecipesCount,
+    previousNewRecipesCount,
+    newMealPlansCount,
+    previousNewMealPlansCount,
     usersWithoutRecipesCount,
     mostPlannedRecipes,
     mealTypeStats,
@@ -47,9 +53,25 @@ export async function getAdminStatisticsData() {
     prisma.user.count({
       where: {
         createdAt: {
-          gte: since,
+          gte: periodStart,
         },
       },
+    }),
+    prisma.user.count({
+      where: {
+        createdAt: {
+          gte: previousPeriodStart,
+          lt: periodStart,
+        },
+      },
+    }),
+    prisma.recipe.count({ where: { createdAt: { gte: periodStart } } }),
+    prisma.recipe.count({
+      where: { createdAt: { gte: previousPeriodStart, lt: periodStart } },
+    }),
+    prisma.mealPlan.count({ where: { createdAt: { gte: periodStart } } }),
+    prisma.mealPlan.count({
+      where: { createdAt: { gte: previousPeriodStart, lt: periodStart } },
     }),
     prisma.user.count({
       where: {
@@ -82,6 +104,11 @@ export async function getAdminStatisticsData() {
     }),
     prisma.mealPlan.groupBy({
       by: ["mealType"],
+      where: {
+        createdAt: {
+          gte: periodStart,
+        },
+      },
       _count: {
         mealType: true,
       },
@@ -114,17 +141,39 @@ export async function getAdminStatisticsData() {
       categoriesCount,
       ingredientsCount,
       mealPlansCount,
-      newUsersCount,
+      usersWithRecipesRate:
+        usersCount === 0
+          ? 0
+          : Math.round(
+              ((usersCount - usersWithoutRecipesCount) / usersCount) * 100,
+            ),
       usersWithoutRecipesCount,
       averageRecipesPerUser:
         usersCount === 0 ? 0 : Number((recipesCount / usersCount).toFixed(1)),
     },
-    mostPlannedRecipes: mostPlannedRecipes.map((recipe) => ({
-      id: recipe.id,
-      title: recipe.title,
-      ownerEmail: recipe.user.email,
-      plannedCount: recipe._count.mealPlans,
-    })),
+    activity: {
+      periodDays,
+      newUsers: {
+        current: newUsersCount,
+        previous: previousNewUsersCount,
+      },
+      newRecipes: {
+        current: newRecipesCount,
+        previous: previousNewRecipesCount,
+      },
+      plannedMeals: {
+        current: newMealPlansCount,
+        previous: previousNewMealPlansCount,
+      },
+    },
+    mostPlannedRecipes: mostPlannedRecipes
+      .map((recipe) => ({
+        id: recipe.id,
+        title: recipe.title,
+        ownerEmail: recipe.user.email,
+        plannedCount: recipe._count.mealPlans,
+      }))
+      .filter((recipe) => recipe.plannedCount > 0),
     mealTypeStats: mealTypeStats.map((item) => ({
       mealType: item.mealType,
       count: item._count.mealType,
@@ -182,6 +231,13 @@ export async function getAdminUsersData(filters: AdminUserFilters) {
       pageSize: adminUsersPageSize,
     },
   };
+}
+
+function startOfDayDaysAgo(days: number) {
+  const date = new Date();
+  date.setHours(0, 0, 0, 0);
+  date.setDate(date.getDate() - days);
+  return date;
 }
 
 function buildAdminUserWhere(filters: AdminUserFilters) {

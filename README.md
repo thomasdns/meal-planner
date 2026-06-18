@@ -27,6 +27,7 @@ securite, Git/GitHub et deploiement.
 - Deconnexion et suppression definitive du compte avec confirmation.
 - Interface admin protegee avec des onglets dedies aux utilisateurs et aux statistiques.
 - Recherche, filtre et pagination des utilisateurs dans l'administration.
+- Statistiques comparatives sur 7, 30 ou 90 jours.
 - Envoi d'emails transactionnels avec suivi structure des erreurs SMTP.
 
 ## Stack technique

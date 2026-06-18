@@ -19,5 +19,13 @@ export const adminUserFiltersSchema = z.object({
   page: z.coerce.number().int().positive().catch(1),
 });
 
+export const adminStatisticsPeriodSchema = z
+  .enum(["7", "30", "90"])
+  .catch("30")
+  .transform(Number);
+
 export type UpdateAdminUserInput = z.infer<typeof updateAdminUserSchema>;
 export type AdminUserFilters = z.infer<typeof adminUserFiltersSchema>;
+export type AdminStatisticsPeriod = z.infer<
+  typeof adminStatisticsPeriodSchema
+>;

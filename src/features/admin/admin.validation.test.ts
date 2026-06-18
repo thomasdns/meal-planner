@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  adminStatisticsPeriodSchema,
   adminUserFiltersSchema,
   updateAdminUserSchema,
 } from "@/features/admin/admin.validation";
@@ -42,6 +43,16 @@ describe("admin user validation", () => {
     });
 
     expect(result.success).toBe(false);
+  });
+});
+
+describe("admin statistics period", () => {
+  it("accepts a supported period", () => {
+    expect(adminStatisticsPeriodSchema.parse("90")).toBe(90);
+  });
+
+  it("falls back to 30 days", () => {
+    expect(adminStatisticsPeriodSchema.parse("365")).toBe(30);
   });
 });
 

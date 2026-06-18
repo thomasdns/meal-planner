@@ -6,7 +6,10 @@ import {
   getAdminStatisticsData,
   getAdminUsersData,
 } from "@/features/admin/admin.data";
-import { adminUserFiltersSchema } from "@/features/admin/admin.validation";
+import {
+  adminStatisticsPeriodSchema,
+  adminUserFiltersSchema,
+} from "@/features/admin/admin.validation";
 
 type AdminView = "users" | "statistics";
 
@@ -16,6 +19,7 @@ type AdminPageProps = {
     q?: string | string[];
     role?: string | string[];
     page?: string | string[];
+    period?: string | string[];
   }>;
 };
 
@@ -28,6 +32,9 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
     role: firstSearchParam(params.role) || undefined,
     page: firstSearchParam(params.page),
   });
+  const statisticsPeriod = adminStatisticsPeriodSchema.parse(
+    firstSearchParam(params.period),
+  );
 
   return (
     <div className="space-y-8">
@@ -57,7 +64,10 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
       </nav>
 
       {activeView === "statistics" ? (
-        <AdminStatistics data={await getAdminStatisticsData()} />
+        <AdminStatistics
+          data={await getAdminStatisticsData(statisticsPeriod)}
+          periodDays={statisticsPeriod}
+        />
       ) : (
         <AdminUsersPanel
           data={await getAdminUsersData(filters)}

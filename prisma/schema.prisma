@@ -76,6 +76,8 @@ model Recipe {
 
   ingredients RecipeIngredient[]
   mealPlans   MealPlan[]
+
+  @@index([createdAt])
 }
 
 model RecipeIngredient {
@@ -104,6 +106,7 @@ model MealPlan {
   recipe   Recipe @relation(fields: [recipeId], references: [id], onDelete: Cascade)
 
   @@unique([userId, date, mealType])
+  @@index([createdAt])
 }
 
 model ShoppingListItem {
