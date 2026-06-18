@@ -21,7 +21,7 @@ export type AdminUserListItem = {
 
 const adminUsersPageSize = 20;
 
-export async function getAdminDashboardData(filters: AdminUserFilters) {
+export async function getAdminStatisticsData() {
   await requireAdmin();
 
   const since = new Date();
@@ -35,7 +35,6 @@ export async function getAdminDashboardData(filters: AdminUserFilters) {
     mealPlansCount,
     newUsersCount,
     usersWithoutRecipesCount,
-    filteredUsersCount,
     mostPlannedRecipes,
     mealTypeStats,
     recentRecipes,
@@ -59,7 +58,6 @@ export async function getAdminDashboardData(filters: AdminUserFilters) {
         },
       },
     }),
-    prisma.user.count({ where: buildAdminUserWhere(filters) }),
     prisma.recipe.findMany({
       orderBy: {
         mealPlans: {
@@ -109,13 +107,44 @@ export async function getAdminDashboardData(filters: AdminUserFilters) {
     }),
   ]);
 
+  return {
+    stats: {
+      usersCount,
+      recipesCount,
+      categoriesCount,
+      ingredientsCount,
+      mealPlansCount,
+      newUsersCount,
+      usersWithoutRecipesCount,
+      averageRecipesPerUser:
+        usersCount === 0 ? 0 : Number((recipesCount / usersCount).toFixed(1)),
+    },
+    mostPlannedRecipes: mostPlannedRecipes.map((recipe) => ({
+      id: recipe.id,
+      title: recipe.title,
+      ownerEmail: recipe.user.email,
+      plannedCount: recipe._count.mealPlans,
+    })),
+    mealTypeStats: mealTypeStats.map((item) => ({
+      mealType: item.mealType,
+      count: item._count.mealType,
+    })),
+    recentRecipes,
+  };
+}
+
+export async function getAdminUsersData(filters: AdminUserFilters) {
+  await requireAdmin();
+
+  const where = buildAdminUserWhere(filters);
+  const filteredUsersCount = await prisma.user.count({ where });
   const totalPages = Math.max(
     1,
     Math.ceil(filteredUsersCount / adminUsersPageSize),
   );
   const currentPage = Math.min(filters.page, totalPages);
   const users = await prisma.user.findMany({
-    where: buildAdminUserWhere(filters),
+    where,
     orderBy: [{ createdAt: "desc" }, { id: "asc" }],
     skip: (currentPage - 1) * adminUsersPageSize,
     take: adminUsersPageSize,
@@ -136,17 +165,6 @@ export async function getAdminDashboardData(filters: AdminUserFilters) {
   });
 
   return {
-    stats: {
-      usersCount,
-      recipesCount,
-      categoriesCount,
-      ingredientsCount,
-      mealPlansCount,
-      newUsersCount,
-      usersWithoutRecipesCount,
-      averageRecipesPerUser:
-        usersCount === 0 ? 0 : Number((recipesCount / usersCount).toFixed(1)),
-    },
     users: users.map((user) => ({
       id: user.id,
       name: user.name,
@@ -157,23 +175,12 @@ export async function getAdminDashboardData(filters: AdminUserFilters) {
       categoriesCount: user._count.categories,
       plannedMealsCount: user._count.mealPlans,
     })),
-    usersPagination: {
+    pagination: {
       currentPage,
       totalPages,
       totalItems: filteredUsersCount,
       pageSize: adminUsersPageSize,
     },
-    mostPlannedRecipes: mostPlannedRecipes.map((recipe) => ({
-      id: recipe.id,
-      title: recipe.title,
-      ownerEmail: recipe.user.email,
-      plannedCount: recipe._count.mealPlans,
-    })),
-    mealTypeStats: mealTypeStats.map((item) => ({
-      mealType: item.mealType,
-      count: item._count.mealType,
-    })),
-    recentRecipes,
   };
 }
 
