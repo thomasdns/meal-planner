@@ -57,20 +57,53 @@ export function ShoppingList({ shoppingList }: ShoppingListProps) {
         </form>
       </div>
 
-      <div className="overflow-hidden rounded-lg border border-slate-200 bg-white">
+      <div className="space-y-3 md:hidden">
+        {shoppingList.items.map((item) => {
+          const checkedClass = item.checked
+            ? "text-slate-600 line-through"
+            : "";
+
+          return (
+            <article
+              key={item.key}
+              className={`rounded-lg border border-slate-200 bg-white p-4 ${
+                item.checked ? "bg-slate-50" : ""
+              }`}
+            >
+              <div className="flex items-start gap-3">
+                <ShoppingCheckForm item={item} />
+                <div className={`min-w-0 flex-1 ${checkedClass}`}>
+                  <h2 className="break-words font-semibold">{item.name}</h2>
+                  <p className="mt-1 text-sm">
+                    {formatQuantity(item.quantity, item.unit)}
+                  </p>
+                  <p className="mt-2 break-words text-sm text-slate-600">
+                    {item.recipeTitles.join(", ")}
+                  </p>
+                </div>
+              </div>
+            </article>
+          );
+        })}
+      </div>
+
+      <div className="hidden overflow-x-auto rounded-lg border border-slate-200 bg-white md:block">
         <table className="w-full text-left text-sm">
+          <caption className="sr-only">
+            Ingredients de la liste de courses
+          </caption>
           <thead className="border-b border-slate-200 bg-slate-50 text-slate-600">
             <tr>
-              <th className="px-4 py-3 font-medium print:hidden">Fait</th>
-              <th className="px-4 py-3 font-medium">Ingredient</th>
-              <th className="px-4 py-3 font-medium">Quantite</th>
-              <th className="px-4 py-3 font-medium">Recettes</th>
+              <th scope="col" className="px-4 py-3 font-medium print:hidden">Fait</th>
+              <th scope="col" className="px-4 py-3 font-medium">Ingredient</th>
+              <th scope="col" className="px-4 py-3 font-medium">Quantite</th>
+              <th scope="col" className="px-4 py-3 font-medium">Recettes</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-200">
             {shoppingList.items.map((item) => {
               const checkedClass = item.checked
-                ? "text-slate-400 line-through"
+                ? "text-slate-600 line-through"
                 : "";
 
               return (
@@ -79,24 +112,7 @@ export function ShoppingList({ shoppingList }: ShoppingListProps) {
                   className={item.checked ? "bg-slate-50" : ""}
                 >
                   <td className="px-4 py-3 print:hidden">
-                    <form action={toggleShoppingListItemAction}>
-                      <input type="hidden" name="name" value={item.name} />
-                      <input
-                        type="hidden"
-                        name="unit"
-                        value={item.unit ?? ""}
-                      />
-                      <input
-                        name="checked"
-                        type="checkbox"
-                        defaultChecked={item.checked}
-                        onChange={(event) =>
-                          event.currentTarget.form?.requestSubmit()
-                        }
-                        className="h-4 w-4 rounded border-slate-300 text-emerald-700"
-                        aria-label={`Marquer ${item.name}`}
-                      />
-                    </form>
+                    <ShoppingCheckForm item={item} />
                   </td>
                   <td className={`px-4 py-3 font-medium ${checkedClass}`}>
                     {item.name}
@@ -114,6 +130,31 @@ export function ShoppingList({ shoppingList }: ShoppingListProps) {
         </table>
       </div>
     </div>
+  );
+}
+
+function ShoppingCheckForm({
+  item,
+}: {
+  item: WeeklyShoppingList["items"][number];
+}) {
+  return (
+    <form action={toggleShoppingListItemAction} className="shrink-0">
+      <input type="hidden" name="name" value={item.name} />
+      <input type="hidden" name="unit" value={item.unit ?? ""} />
+      <label className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-md hover:bg-slate-100">
+        <span className="sr-only">
+          {item.checked ? "Marquer comme non achete" : "Marquer comme achete"} : {item.name}
+        </span>
+        <input
+          name="checked"
+          type="checkbox"
+          defaultChecked={item.checked}
+          onChange={(event) => event.currentTarget.form?.requestSubmit()}
+          className="h-5 w-5 rounded border-slate-300 text-emerald-700"
+        />
+      </label>
+    </form>
   );
 }
 

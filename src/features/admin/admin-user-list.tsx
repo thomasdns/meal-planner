@@ -58,14 +58,15 @@ export function AdminUserList({ users }: AdminUserListProps) {
 
       <div className="hidden overflow-hidden rounded-lg border border-slate-200 bg-white md:block">
         <table className="w-full text-left text-sm">
+          <caption className="sr-only">Liste des utilisateurs</caption>
           <thead className="border-b border-slate-200 bg-slate-50 text-slate-600">
             <tr>
-              <th className="px-4 py-3 font-medium">Utilisateur</th>
-              <th className="px-4 py-3 font-medium">Role</th>
-              <th className="px-4 py-3 font-medium">Recettes</th>
-              <th className="px-4 py-3 font-medium">Repas planifies</th>
-              <th className="px-4 py-3 font-medium">Inscription</th>
-              <th className="px-4 py-3 font-medium">Action</th>
+              <th scope="col" className="px-4 py-3 font-medium">Utilisateur</th>
+              <th scope="col" className="px-4 py-3 font-medium">Role</th>
+              <th scope="col" className="px-4 py-3 font-medium">Recettes</th>
+              <th scope="col" className="px-4 py-3 font-medium">Repas planifies</th>
+              <th scope="col" className="px-4 py-3 font-medium">Inscription</th>
+              <th scope="col" className="px-4 py-3 font-medium">Action</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-200">

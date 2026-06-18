@@ -6,6 +6,8 @@ import { RecipeFilters } from "@/features/recipes/recipe-filters";
 import { RecipeList } from "@/features/recipes/recipe-list";
 import { getCurrentUserRecipes } from "@/features/recipes/recipes.data";
 
+export const metadata = { title: "Recettes" };
+
 type RecipesPageProps = {
   searchParams: Promise<{
     query?: string;

@@ -2,7 +2,10 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Meal Planner",
+  title: {
+    default: "Meal Planner",
+    template: "%s | Meal Planner",
+  },
   description: "Planificateur de repas hebdomadaire",
 };
 

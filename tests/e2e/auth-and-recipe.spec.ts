@@ -252,19 +252,16 @@ test("weekly planning generates and updates the shopping list", async ({
     await expect(itemRow).toContainText("5 g");
     await expect(itemRow).toContainText(recipeTitle);
 
-    await page.getByRole("checkbox", { name: `Marquer ${ingredientName}` }).click();
-    await expect(
-      page.getByRole("checkbox", { name: `Marquer ${ingredientName}` }),
-    ).toBeChecked();
+    const itemCheckbox = itemRow.getByRole("checkbox");
+    await itemCheckbox.click();
+    await expect(itemCheckbox).toBeChecked();
     await expect(itemRow.locator("td").nth(1)).toHaveClass(/line-through/);
     await expect(itemRow.locator("td").nth(2)).toHaveClass(/line-through/);
     await expect(itemRow.locator("td").nth(3)).toHaveClass(/line-through/);
 
     page.once("dialog", (dialog) => dialog.accept());
     await page.getByRole("button", { name: "Reinitialiser" }).click();
-    await expect(
-      page.getByRole("checkbox", { name: `Marquer ${ingredientName}` }),
-    ).not.toBeChecked();
+    await expect(itemCheckbox).not.toBeChecked();
 
     await page.goto("/meal-plan");
     page.once("dialog", (dialog) => dialog.accept());

@@ -18,7 +18,7 @@ export function DeleteMealPlanForm({ mealPlanId }: DeleteMealPlanFormProps) {
     >
       <button
         type="submit"
-        className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-red-200 text-red-700 hover:bg-red-50"
+        className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-red-200 text-red-700 hover:bg-red-50"
         aria-label="Retirer ce repas du planning"
         title="Retirer ce repas du planning"
       >

@@ -1,7 +1,13 @@
 "use client";
 
 import { signOut } from "next-auth/react";
-import { useActionState, useEffect, useId, useState } from "react";
+import {
+  useActionState,
+  useEffect,
+  useId,
+  useRef,
+  useState,
+} from "react";
 
 import { deleteAccountAction } from "@/features/profile/profile.actions";
 
@@ -14,6 +20,8 @@ export function DeleteAccountForm() {
   const [isOpen, setIsOpen] = useState(false);
   const titleId = useId();
   const descriptionId = useId();
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const dialogRef = useRef<HTMLDivElement>(null);
   const [state, formAction, isPending] = useActionState(
     deleteAccountAction,
     initialState,
@@ -24,6 +32,50 @@ export function DeleteAccountForm() {
       void signOut({ callbackUrl: "/auth/sign-in" });
     }
   }, [state.success]);
+
+  useEffect(() => {
+    if (!isOpen) {
+      return;
+    }
+
+    const triggerElement = triggerRef.current;
+
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        setIsOpen(false);
+        return;
+      }
+
+      if (event.key !== "Tab") {
+        return;
+      }
+
+      const focusableElements = dialogRef.current?.querySelectorAll<HTMLElement>(
+        'button:not([disabled]), input:not([disabled]), [href], [tabindex]:not([tabindex="-1"])',
+      );
+
+      if (!focusableElements?.length) {
+        return;
+      }
+
+      const firstElement = focusableElements[0];
+      const lastElement = focusableElements[focusableElements.length - 1];
+
+      if (event.shiftKey && document.activeElement === firstElement) {
+        event.preventDefault();
+        lastElement.focus();
+      } else if (!event.shiftKey && document.activeElement === lastElement) {
+        event.preventDefault();
+        firstElement.focus();
+      }
+    }
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+      triggerElement?.focus();
+    };
+  }, [isOpen]);
 
   return (
     <section className="space-y-4 rounded-lg border border-red-200 bg-white p-5">
@@ -36,6 +88,7 @@ export function DeleteAccountForm() {
       </div>
 
       <button
+        ref={triggerRef}
         type="button"
         onClick={() => setIsOpen(true)}
         className="inline-flex rounded-md border border-red-300 px-4 py-2 text-sm font-medium text-red-700 hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50"
@@ -45,6 +98,7 @@ export function DeleteAccountForm() {
 
       {isOpen ? (
         <div
+          ref={dialogRef}
           role="dialog"
           aria-modal="true"
           aria-labelledby={titleId}
@@ -66,7 +120,7 @@ export function DeleteAccountForm() {
             </div>
 
             {state.error ? (
-              <p className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+              <p role="alert" className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
                 {state.error}
               </p>
             ) : null}

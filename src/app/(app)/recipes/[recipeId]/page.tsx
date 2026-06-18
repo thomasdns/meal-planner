@@ -8,6 +8,8 @@ import { EditRecipeForm } from "@/features/recipes/edit-recipe-form";
 import { IngredientList } from "@/features/recipes/ingredient-list";
 import { getCurrentUserRecipeDetail } from "@/features/recipes/recipes.data";
 
+export const metadata = { title: "Detail recette" };
+
 type RecipeDetailPageProps = {
   params: Promise<{
     recipeId: string;

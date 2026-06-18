@@ -2,6 +2,8 @@ import Link from "next/link";
 
 import { ResetPasswordForm } from "@/features/auth/reset-password-form";
 
+export const metadata = { title: "Reinitialiser le mot de passe" };
+
 type ResetPasswordPageProps = {
   searchParams: Promise<{
     token?: string;

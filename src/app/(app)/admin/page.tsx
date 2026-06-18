@@ -11,6 +11,8 @@ import {
   adminUserFiltersSchema,
 } from "@/features/admin/admin.validation";
 
+export const metadata = { title: "Administration" };
+
 type AdminView = "users" | "statistics";
 
 type AdminPageProps = {

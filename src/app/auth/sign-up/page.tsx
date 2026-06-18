@@ -1,5 +1,7 @@
 import { SignUpForm } from "@/features/auth/sign-up-form";
 
+export const metadata = { title: "Creer un compte" };
+
 export default function SignUpPage() {
   return (
     <main className="mx-auto flex min-h-screen max-w-md flex-col justify-center px-6">

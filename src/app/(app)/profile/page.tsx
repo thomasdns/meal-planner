@@ -3,6 +3,8 @@ import { ProfileForm } from "@/features/profile/profile-form";
 import { ProfileSummary } from "@/features/profile/profile-summary";
 import { getCurrentUserProfile } from "@/features/profile/profile.data";
 
+export const metadata = { title: "Profil" };
+
 export default async function ProfilePage() {
   const profile = await getCurrentUserProfile();
 

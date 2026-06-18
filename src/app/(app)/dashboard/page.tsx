@@ -2,6 +2,8 @@ import { getCurrentUserDashboardData } from "@/features/dashboard/dashboard.data
 import { SummaryCard } from "@/features/dashboard/summary-card";
 import { UpcomingMeals } from "@/features/dashboard/upcoming-meals";
 
+export const metadata = { title: "Tableau de bord" };
+
 export default async function DashboardPage() {
   const dashboard = await getCurrentUserDashboardData();
 

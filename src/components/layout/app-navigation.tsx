@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { SignOutButton } from "@/features/auth/sign-out-button";
 
@@ -18,13 +18,31 @@ type AppNavigationProps = {
 export function AppNavigation({ items }: AppNavigationProps) {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    if (!isOpen) {
+      return;
+    }
+
+    function handleEscape(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        setIsOpen(false);
+        menuButtonRef.current?.focus();
+      }
+    }
+
+    document.addEventListener("keydown", handleEscape);
+    return () => document.removeEventListener("keydown", handleEscape);
+  }, [isOpen]);
 
   return (
     <div className="md:flex md:items-center">
       <button
+        ref={menuButtonRef}
         type="button"
         onClick={() => setIsOpen((current) => !current)}
-        className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-slate-300 text-slate-700 hover:bg-slate-100 md:hidden"
+        className="inline-flex h-11 w-11 items-center justify-center rounded-md border border-slate-300 text-slate-700 hover:bg-slate-100 md:hidden"
         aria-expanded={isOpen}
         aria-controls="mobile-navigation"
         aria-label={isOpen ? "Fermer le menu" : "Ouvrir le menu"}
@@ -68,6 +86,7 @@ export function AppNavigation({ items }: AppNavigationProps) {
                 <Link
                   href={item.href}
                   onClick={() => setIsOpen(false)}
+                  aria-current={isActive ? "page" : undefined}
                   className={`flex rounded-md px-3 py-2 text-sm font-medium ${
                     isActive
                       ? "bg-emerald-50 text-emerald-800"

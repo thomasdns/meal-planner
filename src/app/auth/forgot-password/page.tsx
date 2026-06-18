@@ -1,5 +1,7 @@
 import { ForgotPasswordForm } from "@/features/auth/forgot-password-form";
 
+export const metadata = { title: "Mot de passe oublie" };
+
 export default function ForgotPasswordPage() {
   return (
     <main className="mx-auto flex min-h-screen max-w-md flex-col justify-center px-6">

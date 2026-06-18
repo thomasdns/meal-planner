@@ -41,7 +41,7 @@ export function WeeklyMealPlan({ days, meals }: WeeklyMealPlanProps) {
         ))}
       </div>
 
-      <div className="hidden overflow-hidden rounded-lg border border-slate-200 bg-white md:block">
+      <div className="hidden overflow-x-auto rounded-lg border border-slate-200 bg-white md:block">
         <div className="grid min-w-[760px] grid-cols-[150px_repeat(7,minmax(120px,1fr))]">
           <div className="border-b border-r border-slate-200 bg-slate-50 p-3 text-sm font-semibold text-slate-600">
             Repas
@@ -97,7 +97,7 @@ function MobileMeal({
           <DeleteMealPlanForm mealPlanId={meal.id} />
         </div>
       ) : (
-        <p className="text-sm text-slate-400">Libre</p>
+        <p className="text-sm text-slate-600">Libre</p>
       )}
     </div>
   );
@@ -141,7 +141,7 @@ function Row({
                 <DeleteMealPlanForm mealPlanId={meal.id} />
               </div>
             ) : (
-              <p className="text-sm text-slate-400">Libre</p>
+              <p className="text-sm text-slate-600">Libre</p>
             )}
           </div>
         );

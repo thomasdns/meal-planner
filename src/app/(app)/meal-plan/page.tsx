@@ -7,6 +7,8 @@ import {
   getCurrentUserWeeklyMealPlan,
 } from "@/features/meal-plans/meal-plans.data";
 
+export const metadata = { title: "Planning hebdomadaire" };
+
 type MealPlanPageProps = {
   searchParams: Promise<{
     week?: string;

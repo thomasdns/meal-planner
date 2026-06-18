@@ -1,5 +1,7 @@
 import { SignInForm } from "@/features/auth/sign-in-form";
 
+export const metadata = { title: "Connexion" };
+
 type SignInPageProps = {
   searchParams: Promise<{
     registered?: string;

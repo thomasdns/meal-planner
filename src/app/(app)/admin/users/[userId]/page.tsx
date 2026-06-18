@@ -5,6 +5,8 @@ import { AdminUserForm } from "@/features/admin/admin-user-form";
 import { DeleteAdminUserForm } from "@/features/admin/delete-admin-user-form";
 import { getAdminUserDetail } from "@/features/admin/admin.data";
 
+export const metadata = { title: "Detail utilisateur" };
+
 type AdminUserDetailPageProps = {
   params: Promise<{
     userId: string;
@@ -77,14 +79,17 @@ export default async function AdminUserDetailPage({
           </div>
 
           {user.recipes.length > 0 ? (
-            <div className="overflow-hidden rounded-lg border border-slate-200 bg-white">
-              <table className="w-full text-left text-sm">
+            <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white">
+              <table className="min-w-[680px] w-full text-left text-sm">
+                <caption className="sr-only">
+                  Recettes de l&apos;utilisateur
+                </caption>
                 <thead className="border-b border-slate-200 bg-slate-50 text-slate-600">
                   <tr>
-                    <th className="px-4 py-3 font-medium">Recette</th>
-                    <th className="px-4 py-3 font-medium">Categorie</th>
-                    <th className="px-4 py-3 font-medium">Ingredients</th>
-                    <th className="px-4 py-3 font-medium">Planifications</th>
+                    <th scope="col" className="px-4 py-3 font-medium">Recette</th>
+                    <th scope="col" className="px-4 py-3 font-medium">Categorie</th>
+                    <th scope="col" className="px-4 py-3 font-medium">Ingredients</th>
+                    <th scope="col" className="px-4 py-3 font-medium">Planifications</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-200">

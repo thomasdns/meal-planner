@@ -1,6 +1,8 @@
 import { ShoppingList } from "@/features/shopping-list/shopping-list";
 import { getCurrentUserWeeklyShoppingList } from "@/features/shopping-list/shopping-list.data";
 
+export const metadata = { title: "Liste de courses" };
+
 export default async function ShoppingListPage() {
   const shoppingList = await getCurrentUserWeeklyShoppingList();
 
