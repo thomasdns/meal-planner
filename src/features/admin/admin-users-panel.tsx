@@ -82,31 +82,72 @@ export function AdminUsersPanel({ data, filters }: AdminUsersPanelProps) {
       {data.pagination.totalPages > 1 ? (
         <nav
           aria-label="Pagination des utilisateurs"
-          className="flex items-center justify-between gap-4 border-t border-slate-200 pt-4"
+          className="space-y-3 border-t border-slate-200 pt-4"
         >
-          {data.pagination.currentPage > 1 ? (
-            <PaginationLink
-              filters={filters}
-              page={data.pagination.currentPage - 1}
-            >
-              Precedent
-            </PaginationLink>
-          ) : (
-            <span />
-          )}
-          <span className="text-sm text-slate-600">
+          <p className="text-center text-sm text-slate-600">
             {getPageRange(data.pagination)} sur {data.pagination.totalItems}
-          </span>
-          {data.pagination.currentPage < data.pagination.totalPages ? (
-            <PaginationLink
-              filters={filters}
-              page={data.pagination.currentPage + 1}
-            >
-              Suivant
-            </PaginationLink>
-          ) : (
-            <span />
-          )}
+          </p>
+
+          <div className="flex flex-wrap items-center justify-center gap-2">
+            {data.pagination.currentPage > 1 ? (
+              <PaginationLink
+                filters={filters}
+                page={data.pagination.currentPage - 1}
+                label="Page precedente"
+              >
+                Precedent
+              </PaginationLink>
+            ) : (
+              <DisabledPaginationItem>Precedent</DisabledPaginationItem>
+            )}
+
+            {getPaginationItems(
+              data.pagination.currentPage,
+              data.pagination.totalPages,
+            ).map((item) =>
+              typeof item === "number" ? (
+                item === data.pagination.currentPage ? (
+                  <span
+                    key={item}
+                    aria-current="page"
+                    className="inline-flex h-10 min-w-10 items-center justify-center rounded-md bg-emerald-700 px-3 text-sm font-semibold text-white"
+                  >
+                    {item}
+                  </span>
+                ) : (
+                  <PaginationLink
+                    key={item}
+                    filters={filters}
+                    page={item}
+                    label={`Page ${item}`}
+                    compact
+                  >
+                    {item}
+                  </PaginationLink>
+                )
+              ) : (
+                <span
+                  key={item}
+                  aria-hidden="true"
+                  className="inline-flex h-10 min-w-8 items-center justify-center text-sm text-slate-500"
+                >
+                  ...
+                </span>
+              ),
+            )}
+
+            {data.pagination.currentPage < data.pagination.totalPages ? (
+              <PaginationLink
+                filters={filters}
+                page={data.pagination.currentPage + 1}
+                label="Page suivante"
+              >
+                Suivant
+              </PaginationLink>
+            ) : (
+              <DisabledPaginationItem>Suivant</DisabledPaginationItem>
+            )}
+          </div>
         </nav>
       ) : null}
     </section>
@@ -116,10 +157,14 @@ export function AdminUsersPanel({ data, filters }: AdminUsersPanelProps) {
 function PaginationLink({
   filters,
   page,
+  label,
+  compact = false,
   children,
 }: {
   filters: AdminUserFilters;
   page: number;
+  label: string;
+  compact?: boolean;
   children: React.ReactNode;
 }) {
   const params = new URLSearchParams({ view: "users", page: String(page) });
@@ -130,11 +175,55 @@ function PaginationLink({
   return (
     <Link
       href={`/admin?${params.toString()}`}
-      className="rounded-md border border-slate-300 px-3 py-2 text-sm font-medium hover:bg-slate-100"
+      aria-label={label}
+      className={`inline-flex h-10 items-center justify-center rounded-md border border-slate-300 text-sm font-medium hover:bg-slate-100 ${
+        compact ? "min-w-10 px-3" : "px-3"
+      }`}
     >
       {children}
     </Link>
   );
+}
+
+function DisabledPaginationItem({ children }: { children: React.ReactNode }) {
+  return (
+    <span
+      aria-disabled="true"
+      className="inline-flex h-10 items-center justify-center rounded-md border border-slate-200 px-3 text-sm font-medium text-slate-400"
+    >
+      {children}
+    </span>
+  );
+}
+
+function getPaginationItems(currentPage: number, totalPages: number) {
+  if (totalPages <= 7) {
+    return Array.from({ length: totalPages }, (_, index) => index + 1);
+  }
+
+  const pages = new Set([
+    1,
+    totalPages,
+    currentPage - 1,
+    currentPage,
+    currentPage + 1,
+  ]);
+  const visiblePages = [...pages]
+    .filter((page) => page >= 1 && page <= totalPages)
+    .sort((left, right) => left - right);
+  const items: Array<number | "start-ellipsis" | "end-ellipsis"> = [];
+
+  visiblePages.forEach((page, index) => {
+    const previousPage = visiblePages[index - 1];
+
+    if (previousPage && page - previousPage > 1) {
+      items.push(index === 1 ? "start-ellipsis" : "end-ellipsis");
+    }
+
+    items.push(page);
+  });
+
+  return items;
 }
 
 function getPageRange(pagination: {
