@@ -66,8 +66,7 @@ Criteres d'acceptation :
 - Les erreurs restent volontairement peu detaillees cote utilisateur.
 - Les validations serveur restent obligatoires.
 
-Statut : premiere protection en place. Evolution recommandee vers Redis ou
-Vercel KV pour une production plus robuste.
+Statut : termine avec Upstash Redis et repli local journalise.
 
 ## Priorite moyenne
 
@@ -82,6 +81,8 @@ Criteres d'acceptation :
 - Les ingredients associes restent coherents.
 - Un utilisateur ne peut pas modifier les recettes d'un autre utilisateur.
 
+Statut : termine.
+
 ### Amelioration du planning
 
 Objectif : rendre le planning plus pratique au quotidien.
@@ -92,6 +93,8 @@ Criteres d'acceptation :
 - L'utilisateur peut retirer une recette d'un repas.
 - L'affichage reste lisible sur mobile et desktop.
 
+Statut : termine.
+
 ### Liste de courses avancee
 
 Objectif : rendre la liste de courses plus exploitable.
@@ -101,6 +104,8 @@ Criteres d'acceptation :
 - Les ingredients peuvent etre coches.
 - Les ingredients peuvent etre regroupes par categorie.
 - La liste peut etre imprimee ou exportee.
+
+Statut : termine.
 
 ## Priorite basse
 
@@ -113,6 +118,8 @@ Criteres d'acceptation :
 - Recherche par nom de recette.
 - Filtre par categorie.
 - Filtre par temps de preparation ou type de repas si ces champs existent.
+
+Statut : termine.
 
 ### Experience utilisateur
 

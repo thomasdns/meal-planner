@@ -45,7 +45,7 @@ export async function requestPasswordResetAction(
     };
   }
 
-  const rateLimit = checkRateLimit(`password-reset:${parsed.data.email}`, {
+  const rateLimit = await checkRateLimit(`password-reset:${parsed.data.email}`, {
     limit: 3,
     windowMs: 60 * 60 * 1000,
   });
@@ -123,6 +123,9 @@ export async function resetPasswordAction(
     },
     data: {
       password: await bcrypt.hash(parsed.data.password, 12),
+      sessionVersion: {
+        increment: 1,
+      },
     },
   });
 

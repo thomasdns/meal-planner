@@ -23,6 +23,8 @@ SMTP_SECURE
 SMTP_USER
 SMTP_PASSWORD
 EMAIL_FROM
+UPSTASH_REDIS_REST_URL
+UPSTASH_REDIS_REST_TOKEN
 ```
 
 `DATABASE_URL` doit pointer vers la base PostgreSQL en ligne.
@@ -42,6 +44,10 @@ L'acces admin est gere en base de donnees via le champ `User.role`.
 Les variables SMTP permettent d'envoyer les emails de verification et de
 reinitialisation de mot de passe. Sans nom de domaine personnalise, utiliser un
 compte Gmail technique avec un mot de passe d'application Google.
+
+Les variables Upstash activent un rate limiting partage entre toutes les
+instances Vercel. Creer une base Redis dans Upstash, puis copier son URL REST et
+son token REST dans les variables Production et Preview de Vercel.
 
 ## Commande de build Vercel
 
@@ -123,6 +129,8 @@ SMTP_SECURE
 SMTP_USER
 SMTP_PASSWORD
 EMAIL_FROM
+UPSTASH_REDIS_REST_URL
+UPSTASH_REDIS_REST_TOKEN
 ```
 
 `NEXTAUTH_URL` doit correspondre a l'URL publique exacte de l'application.

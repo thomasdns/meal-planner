@@ -12,6 +12,7 @@ securite, Git/GitHub et deploiement.
 
 - Inscription et connexion par email / mot de passe.
 - Verification email automatique apres inscription.
+- Nouvelle verification et deconnexion apres modification de l'adresse email.
 - Reinitialisation du mot de passe par lien securise.
 - Gestion des recettes.
 - Gestion des ingredients.
@@ -102,6 +103,8 @@ SMTP_SECURE
 SMTP_USER
 SMTP_PASSWORD
 EMAIL_FROM
+UPSTASH_REDIS_REST_URL
+UPSTASH_REDIS_REST_TOKEN
 ```
 
 Notes :
@@ -113,6 +116,9 @@ Notes :
 - `SMTP_HOST`, `SMTP_PORT` et `SMTP_SECURE` configurent le serveur SMTP.
 - `SMTP_USER` et `SMTP_PASSWORD` identifient le compte email technique.
 - `EMAIL_FROM` est l'expediteur utilise pour les emails transactionnels.
+- Les variables `UPSTASH_REDIS_REST_*` activent le rate limiting distribue.
+- Elles sont requises sur Vercel. En local, leur absence active un repli en
+  memoire et journalise `rate_limit_redis_not_configured`.
 - L'acces admin est stocke en base via `User.role`, pas dans les variables d'environnement.
 
 Sans configuration SMTP complete, l'envoi est refuse et une erreur structuree
@@ -131,8 +137,15 @@ USER
 ADMIN
 ```
 
-Pour donner l'acces admin a un utilisateur local, mettre son champ `role` a
-`ADMIN` via Prisma Studio ou une requete SQL.
+Pour donner l'acces admin a un utilisateur existant :
+
+```bash
+npm run admin:promote -- admin@example.com
+```
+
+La commande utilise la base pointee par `DATABASE_URL`.
+
+Prisma Studio reste disponible pour inspecter les donnees :
 
 Ouvrir Prisma Studio :
 
@@ -147,6 +160,7 @@ npm run dev
 npm run lint
 npm test
 npm run test:e2e
+npm run test:e2e:local
 npm run build
 npm run audit
 npm run vercel-build
@@ -164,23 +178,34 @@ Tests end-to-end :
 
 ```bash
 npx playwright install chromium
-npm run test:e2e
+npm run test:e2e:local
 ```
+
+`test:e2e:local` demarre PostgreSQL, applique les migrations, construit
+l'application puis lance Playwright. `test:e2e` reconstruit l'application sans
+demarrer la base. `test:e2e:ci` lance uniquement Playwright sur un build deja
+genere et est reserve a la CI.
+
+Le projet utilise Node.js 24, a partir de `24.14.0`. La version de reference
+est definie dans `.nvmrc` et `.node-version`. Apres un changement de version
+Node, reinstaller les dependances avant de relancer Playwright.
 
 Le test e2e couvre le parcours principal :
 
 - verification obligatoire de l'adresse email ;
 - connexion ;
+- modification et reverification d'une adresse email ;
+- revocation de session apres reinitialisation du mot de passe ;
 - creation, edition et suppression des categories ;
 - creation, edition et suppression des recettes et ingredients ;
 - recherche et filtrage des recettes ;
 - planification et suppression d'un repas ;
 - generation et mise a jour de la liste de courses ;
-- consultation, modification et suppression d'un utilisateur par un admin.
+- consultation, modification et suppression d'un utilisateur par un admin ;
+- revocation de session apres modification administrative d'un compte.
 
-Les parcours d'inscription avec envoi SMTP reel, de reinitialisation du mot de
-passe, de modification du profil et de suppression du compte restent a ajouter
-a la couverture automatisee.
+L'envoi SMTP reel reste volontairement hors des tests automatises : Playwright
+utilise un transport JSON local qui ne transmet aucun email.
 
 ## Surveillance SMTP
 
@@ -234,7 +259,8 @@ Points de securite deja en place :
 - protection des pages privees par session ;
 - controles d'autorisation cote serveur ;
 - role admin en base de donnees ;
-- rate limiting sur inscription et connexion ;
+- rate limiting distribue Upstash avec repli local journalise ;
+- revocation des sessions apres changement sensible ;
 - absence de SQL brut applicatif ;
 - journalisation SMTP sans secret ni lien d'authentification ;
 - `.env` ignore par Git.
@@ -262,6 +288,7 @@ src/
 
 ## Statut
 
-Application deployee sur Vercel et en phase de stabilisation. Les priorites
-restantes concernent la robustesse des tests E2E, le rate limiting distribue,
-la revocation des sessions et la surveillance de la production.
+Application deployee sur Vercel. Les parcours critiques sont couverts par les
+tests E2E, le rate limiting distribue est disponible avec Upstash et les
+sessions sont revoquees apres les changements sensibles. Les prochaines
+ameliorations sont suivies dans `ROADMAP.md`.

@@ -320,7 +320,7 @@ export async function getAdminUserDetail(userId: string) {
   };
 }
 
-export async function updateUserAsAdmin(
+export async function validateUserUpdateAsAdmin(
   userId: string,
   input: unknown,
 ) {
@@ -328,30 +328,58 @@ export async function updateUserAsAdmin(
 
   const parsed = updateAdminUserSchema.parse(input);
 
-  const existingUser = await prisma.user.findFirst({
-    where: {
-      email: parsed.email,
-      NOT: {
-        id: userId,
+  const [existingUser, currentUser] = await Promise.all([
+    prisma.user.findFirst({
+      where: {
+        email: parsed.email,
+        NOT: {
+          id: userId,
+        },
       },
-    },
-    select: {
-      id: true,
-    },
-  });
+      select: { id: true },
+    }),
+    prisma.user.findUnique({
+      where: { id: userId },
+      select: { email: true, role: true },
+    }),
+  ]);
 
-  if (existingUser) {
-    throw new Error("Email already used");
+  if (existingUser || !currentUser) {
+    throw new Error("Invalid user update");
   }
+
+  return {
+    input: parsed,
+    emailChanged: currentUser.email !== parsed.email,
+    securityChanged:
+      currentUser.email !== parsed.email || currentUser.role !== parsed.role,
+  };
+}
+
+export async function updateUserAsAdmin(
+  userId: string,
+  input: ReturnType<typeof updateAdminUserSchema.parse>,
+  emailChanged: boolean,
+  securityChanged: boolean,
+) {
+  await requireAdmin();
 
   await prisma.user.update({
     where: {
       id: userId,
     },
     data: {
-      name: parsed.name ?? null,
-      email: parsed.email,
-      role: parsed.role,
+      name: input.name ?? null,
+      email: input.email,
+      role: input.role,
+      ...(emailChanged ? { emailVerified: null } : {}),
+      ...(securityChanged
+        ? {
+            sessionVersion: {
+              increment: 1,
+            },
+          }
+        : {}),
     },
   });
 }

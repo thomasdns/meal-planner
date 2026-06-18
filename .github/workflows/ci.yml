@@ -33,7 +33,8 @@ jobs:
       NEXTAUTH_URL: http://localhost:3000
       NEXTAUTH_SECRET: Y2ktbmV4dGF1dGgtc2VjcmV0LW1lYWwtcGxhbm5lcg==
       NEXT_SERVER_ACTIONS_ENCRYPTION_KEY: Y2ktc2VydmVyLWFjdGlvbnMta2V5LTMyLWJ5dGVzISE=
-      ADMIN_EMAILS: admin@example.com
+      SMTP_TEST_MODE: "true"
+      EMAIL_FROM: "Meal Planner CI <ci@example.com>"
 
     steps:
       - name: Checkout repository
@@ -42,7 +43,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 24.14.0
           cache: npm
 
       - name: Install dependencies
@@ -64,4 +65,4 @@ jobs:
         run: npx playwright install --with-deps chromium
 
       - name: Run end-to-end tests
-        run: npm run test:e2e
+        run: npm run test:e2e:ci

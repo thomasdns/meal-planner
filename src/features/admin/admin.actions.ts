@@ -4,7 +4,13 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 import { updateAdminUserSchema } from "@/features/admin/admin.validation";
-import { deleteUserAsAdmin, updateUserAsAdmin } from "@/features/admin/admin.data";
+import {
+  deleteUserAsAdmin,
+  updateUserAsAdmin,
+  validateUserUpdateAsAdmin,
+} from "@/features/admin/admin.data";
+import { createEmailVerificationLink } from "@/features/auth/email-verification.actions";
+import { sendEmailVerificationEmail } from "@/lib/email";
 
 export type UpdateAdminUserState = {
   error?: string;
@@ -32,8 +38,40 @@ export async function updateAdminUserAction(
     };
   }
 
+  let updateContext: Awaited<ReturnType<typeof validateUserUpdateAsAdmin>>;
+
   try {
-    await updateUserAsAdmin(userId, parsed.data);
+    updateContext = await validateUserUpdateAsAdmin(userId, parsed.data);
+  } catch {
+    return {
+      error: "Impossible de mettre a jour cet utilisateur.",
+    };
+  }
+
+  if (updateContext.emailChanged) {
+    const verificationLink = await createEmailVerificationLink(
+      updateContext.input.email,
+    );
+    const emailResult = await sendEmailVerificationEmail(
+      updateContext.input.email,
+      verificationLink,
+    );
+
+    if (!emailResult.delivered) {
+      return {
+        error:
+          "Impossible d'envoyer le lien de verification. L'utilisateur n'a pas ete modifie.",
+      };
+    }
+  }
+
+  try {
+    await updateUserAsAdmin(
+      userId,
+      updateContext.input,
+      updateContext.emailChanged,
+      updateContext.securityChanged,
+    );
   } catch {
     return {
       error: "Impossible de mettre a jour cet utilisateur.",

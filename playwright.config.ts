@@ -20,6 +20,10 @@ export default defineConfig({
   webServer: {
     command: "npm run start -- --port 3000",
     url: "http://localhost:3000",
+    env: {
+      SMTP_TEST_MODE: "true",
+      EMAIL_FROM: "Meal Planner Tests <tests@example.com>",
+    },
     reuseExistingServer: false,
     timeout: 120_000,
   },

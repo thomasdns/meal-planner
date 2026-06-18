@@ -29,7 +29,7 @@ export function ProfileForm({ name, email }: ProfileFormProps) {
         <h2 className="text-lg font-semibold">Informations personnelles</h2>
         <p className="text-sm text-slate-600">
           Ton email sert d&apos;identifiant de connexion. Si tu le modifies, il
-          faudra utiliser le nouvel email a la prochaine connexion.
+          faudra verifier la nouvelle adresse avant de te reconnecter.
         </p>
       </div>
 

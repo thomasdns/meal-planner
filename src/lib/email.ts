@@ -28,6 +28,22 @@ export async function sendEmail({ to, subject, text, html }: SendEmailInput) {
   const secure = process.env.SMTP_SECURE !== "false";
   const user = process.env.SMTP_USER;
   const password = process.env.SMTP_PASSWORD?.replace(/\s/g, "");
+  const useTestTransport =
+    process.env.SMTP_TEST_MODE === "true" &&
+    process.env.VERCEL_ENV !== "production";
+
+  if (useTestTransport) {
+    console.info(
+      JSON.stringify({
+        event: "smtp_email_test_delivered",
+        recipient: maskEmailAddress(to),
+      }),
+    );
+
+    return {
+      delivered: true,
+    };
+  }
 
   if (!from || !host || !user || !password) {
     const missingVariables = [

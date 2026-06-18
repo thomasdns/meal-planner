@@ -13,21 +13,29 @@ surveiller avant une exploitation plus large.
 - Interface admin protegee par le role `ADMIN` stocke en base de donnees.
 - Protection anti-auto-suppression du compte admin courant.
 - Headers HTTP de securite configures dans `next.config.ts`.
+- Sessions revoquees apres changement de mot de passe, d'email ou de role.
+- Role utilisateur resynchronise avec la base pendant la validation du JWT.
 - Rate limiting applicatif sur :
   - inscription : 5 tentatives par email et par heure ;
-  - connexion : 10 tentatives par email toutes les 15 minutes.
+  - connexion : 10 tentatives par email toutes les 15 minutes ;
+  - reinitialisation du mot de passe : 3 demandes par email et par heure.
 
-## Limite du rate limiting actuel
+## Rate limiting distribue
 
-Le rate limiting actuel utilise une memoire locale du processus Node.js. C'est
-utile pour apprendre et limiter les abus simples, mais ce n'est pas suffisant
-pour une production a grande echelle avec plusieurs instances.
+En production, le rate limiting utilise l'API REST Upstash Redis. Les cles
+contenant un email sont hachees avant leur transmission a Redis.
 
-Evolution recommandee :
+Variables requises :
 
-- utiliser Redis, Vercel KV, Upstash ou un service equivalent ;
-- limiter aussi par adresse IP ;
-- journaliser les actions sensibles.
+```txt
+UPSTASH_REDIS_REST_URL
+UPSTASH_REDIS_REST_TOKEN
+```
+
+Si Redis est absent ou indisponible, l'application conserve un repli local et
+emet `rate_limit_redis_not_configured` ou `rate_limit_redis_failed` dans les
+logs. Ce repli est adapte au developpement, mais les variables Upstash doivent
+etre configurees sur Vercel.
 
 ## Audit dependances
 
@@ -39,7 +47,7 @@ npm run audit
 
 Etat actuel :
 
-- 7 vulnerabilites moderees signalees.
+- 8 vulnerabilites moderees signalees lors de la derniere installation.
 - Les correctifs proposes par npm utilisent `npm audit fix --force`.
 - Ces correctifs forceraient des changements cassants sur des dependances
   structurantes comme Prisma, Next ou NextAuth.

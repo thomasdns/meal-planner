@@ -5,6 +5,7 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import { signInSchema } from "@/features/auth/auth.validation";
 import { prisma } from "@/lib/prisma";
 import { checkRateLimit } from "@/lib/rate-limit";
+import { UserRole } from "@/lib/roles";
 
 export const authOptions: NextAuthOptions = {
   secret: process.env.NEXTAUTH_SECRET,
@@ -37,7 +38,7 @@ export const authOptions: NextAuthOptions = {
           return null;
         }
 
-        const rateLimit = checkRateLimit(`sign-in:${parsed.data.email}`, {
+        const rateLimit = await checkRateLimit(`sign-in:${parsed.data.email}`, {
           limit: 10,
           windowMs: 15 * 60 * 1000,
         });
@@ -75,22 +76,49 @@ export const authOptions: NextAuthOptions = {
           email: user.email,
           image: user.image,
           role: user.role,
+          sessionVersion: user.sessionVersion,
         };
       },
     }),
   ],
   callbacks: {
-    jwt({ token, user }) {
+    async jwt({ token, user }) {
       if (user) {
         token.role = user.role;
+        token.sessionVersion = user.sessionVersion;
+        token.invalid = false;
+
+        return token;
+      }
+
+      if (!token.sub) {
+        return token;
+      }
+
+      const currentUser = await prisma.user.findUnique({
+        where: { id: token.sub },
+        select: {
+          role: true,
+          sessionVersion: true,
+          emailVerified: true,
+        },
+      });
+
+      token.invalid =
+        !currentUser ||
+        !currentUser.emailVerified ||
+        token.sessionVersion !== currentUser.sessionVersion;
+
+      if (currentUser && !token.invalid) {
+        token.role = currentUser.role;
       }
 
       return token;
     },
     session({ session, token }) {
       if (session.user) {
-        session.user.id = token.sub ?? "";
-        session.user.role = token.role;
+        session.user.id = token.invalid ? "" : (token.sub ?? "");
+        session.user.role = token.role ?? UserRole.USER;
       }
 
       return session;

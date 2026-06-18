@@ -7,7 +7,6 @@ export type CurrentUserProfile = {
   id: string;
   name: string | null;
   email: string | null;
-  emailVerified: Date | null;
   createdAt: Date;
   stats: {
     recipesCount: number;
@@ -29,7 +28,6 @@ export async function getCurrentUserProfile(): Promise<CurrentUserProfile> {
           id: true,
           name: true,
           email: true,
-          emailVerified: true,
           createdAt: true,
         },
       }),
@@ -60,10 +58,12 @@ export async function getCurrentUserProfile(): Promise<CurrentUserProfile> {
   };
 }
 
-export async function updateCurrentUserProfile(input: {
+type ProfileUpdateInput = {
   name: string;
   email: string;
-}) {
+};
+
+export async function validateCurrentUserProfileUpdate(input: ProfileUpdateInput) {
   const user = await requireUser();
 
   const existingUser = await prisma.user.findFirst({
@@ -92,14 +92,32 @@ export async function updateCurrentUserProfile(input: {
   });
   const hasEmailChanged = currentUser.email !== input.email;
 
+  return {
+    userId: user.id,
+    hasEmailChanged,
+  };
+}
+
+export async function updateCurrentUserProfile(
+  userId: string,
+  input: ProfileUpdateInput,
+  hasEmailChanged: boolean,
+) {
   await prisma.user.update({
     where: {
-      id: user.id,
+      id: userId,
     },
     data: {
       name: input.name,
       email: input.email,
-      ...(hasEmailChanged ? { emailVerified: null } : {}),
+      ...(hasEmailChanged
+        ? {
+            emailVerified: null,
+            sessionVersion: {
+              increment: 1,
+            },
+          }
+        : {}),
     },
   });
 }

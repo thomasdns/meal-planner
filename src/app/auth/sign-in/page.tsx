@@ -3,11 +3,12 @@ import { SignInForm } from "@/features/auth/sign-in-form";
 type SignInPageProps = {
   searchParams: Promise<{
     registered?: string;
+    emailChanged?: string;
   }>;
 };
 
 export default async function SignInPage({ searchParams }: SignInPageProps) {
-  const { registered } = await searchParams;
+  const { registered, emailChanged } = await searchParams;
 
   return (
     <main className="mx-auto flex min-h-screen max-w-md flex-col justify-center px-6">
@@ -22,6 +23,12 @@ export default async function SignInPage({ searchParams }: SignInPageProps) {
       {registered === "1" ? (
         <div className="mb-4 rounded-md border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-800">
           Compte cree. Verifie ton adresse email avant de te connecter.
+        </div>
+      ) : null}
+
+      {emailChanged === "1" ? (
+        <div className="mb-4 rounded-md border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-800">
+          Adresse modifiee. Verifie le nouvel email avant de te reconnecter.
         </div>
       ) : null}
 

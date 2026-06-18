@@ -1,10 +1,8 @@
 import { createHash, randomBytes } from "node:crypto";
 
-import { loadEnvConfig } from "@next/env";
 import bcrypt from "bcryptjs";
+import "dotenv/config";
 import pg from "pg";
-
-loadEnvConfig(process.cwd());
 
 const { Client } = pg;
 
@@ -89,18 +87,29 @@ export async function createEmailVerificationToken(
   email: string,
   token: string,
 ) {
+  return createVerificationToken(
+    `email-verification:${email.toLowerCase()}`,
+    token,
+  );
+}
+
+export async function createPasswordResetToken(email: string, token: string) {
+  return createVerificationToken(`password-reset:${email.toLowerCase()}`, token);
+}
+
+async function createVerificationToken(identifier: string, token: string) {
   await withClient(async (client) => {
     await client.query(
       `DELETE FROM "VerificationToken"
        WHERE "identifier" = $1`,
-      [`email-verification:${email.toLowerCase()}`],
+      [identifier],
     );
 
     await client.query(
       `INSERT INTO "VerificationToken" ("identifier", "token", "expires")
        VALUES ($1, $2, NOW() + INTERVAL '1 day')`,
       [
-        `email-verification:${email.toLowerCase()}`,
+        identifier,
         createHash("sha256").update(token).digest("hex"),
       ],
     );
@@ -161,6 +170,31 @@ export async function deleteTestUsers(...emails: string[]) {
         email,
       ]);
     }
+  });
+}
+
+export async function getUserSecurityState(email: string) {
+  return withClient(async (client) => {
+    const userResult = await client.query<{
+      emailVerified: Date | null;
+      sessionVersion: number;
+    }>(
+      `SELECT "emailVerified", "sessionVersion"
+       FROM "User"
+       WHERE LOWER("email") = LOWER($1)`,
+      [email],
+    );
+    const tokenResult = await client.query<{ count: string }>(
+      `SELECT COUNT(*)::text AS count
+       FROM "VerificationToken"
+       WHERE "identifier" = $1`,
+      [`email-verification:${email.toLowerCase()}`],
+    );
+
+    return {
+      user: userResult.rows[0] ?? null,
+      verificationTokenCount: Number(tokenResult.rows[0]?.count ?? 0),
+    };
   });
 }
 

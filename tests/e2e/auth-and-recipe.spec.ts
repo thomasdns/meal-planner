@@ -2,9 +2,11 @@ import { expect, type Page, test } from "@playwright/test";
 
 import {
   createEmailVerificationToken,
+  createPasswordResetToken,
   createRecipeWithIngredient,
   createTestUser,
   deleteTestUsers,
+  getUserSecurityState,
 } from "./helpers/database";
 
 const password = "Password1234";
@@ -40,6 +42,70 @@ test("email verification is required before sign in", async ({ page }) => {
     ).toBeVisible();
   } finally {
     await deleteTestUsers(email);
+  }
+});
+
+test("resetting a password revokes the existing session", async ({ page }) => {
+  const uniqueId = Date.now();
+  const email = `e2e-password-${uniqueId}@example.com`;
+  const resetToken = `reset-token-${uniqueId}`;
+  const newPassword = "NewPassword1234";
+
+  await deleteTestUsers(email);
+
+  try {
+    await createTestUser({ email, password });
+    await signIn(page, email, password);
+    await createPasswordResetToken(email, resetToken);
+
+    await page.goto(`/auth/reset-password?token=${resetToken}`);
+    await page.getByLabel("Nouveau mot de passe").fill(newPassword);
+    await page.getByRole("button", { name: "Changer le mot de passe" }).click();
+    await expect(page.getByText("Mot de passe mis a jour.")).toBeVisible();
+
+    await page.goto("/dashboard");
+    await expect(page).toHaveURL(/\/auth\/sign-in/);
+
+    await signIn(page, email, newPassword);
+  } finally {
+    await deleteTestUsers(email);
+  }
+});
+
+test("changing email creates a verification and revokes the session", async ({
+  page,
+}) => {
+  const uniqueId = Date.now();
+  const email = `e2e-profile-${uniqueId}@example.com`;
+  const updatedEmail = `e2e-profile-updated-${uniqueId}@example.com`;
+
+  await deleteTestUsers(email, updatedEmail);
+
+  try {
+    await createTestUser({ email, password });
+    await signIn(page, email, password);
+
+    await page.goto("/profile");
+    await page.getByLabel("Email").fill(updatedEmail);
+    await page.getByRole("button", { name: "Mettre a jour" }).click();
+
+    await expect(page).toHaveURL(/\/auth\/sign-in\?emailChanged=1/);
+    await expect(
+      page.getByText(
+        "Adresse modifiee. Verifie le nouvel email avant de te reconnecter.",
+      ),
+    ).toBeVisible();
+
+    const securityState = await getUserSecurityState(updatedEmail);
+    expect(securityState.user?.emailVerified).toBeNull();
+    expect(securityState.user?.sessionVersion).toBe(1);
+    expect(securityState.verificationTokenCount).toBe(1);
+
+    await signIn(page, updatedEmail, password, {
+      expectedError: "Verifie ton adresse email avant de te connecter.",
+    });
+  } finally {
+    await deleteTestUsers(email, updatedEmail);
   }
 });
 
@@ -222,7 +288,9 @@ test("weekly planning generates and updates the shopping list", async ({
   }
 });
 
-test("admin can inspect, edit and delete a user", async ({ page }) => {
+test("admin can inspect, edit and delete a user", async ({ page, browser }) => {
+  test.setTimeout(60_000);
+
   const uniqueId = Date.now();
   const adminEmail = `e2e-admin-${uniqueId}@example.com`;
   const userEmail = `e2e-admin-user-${uniqueId}@example.com`;
@@ -251,16 +319,23 @@ test("admin can inspect, edit and delete a user", async ({ page }) => {
       ingredientName: `Ingredient admin ${uniqueId}`,
     });
 
+    const userPage = await browser.newPage();
+    await signIn(userPage, userEmail, password);
+
     await signIn(page, adminEmail, password);
     await page.goto("/admin");
     await expect(
       page.getByRole("heading", { name: "Pilotage de l'application" }),
     ).toBeVisible();
+    await page.getByRole("link", { name: "Statistiques" }).click();
+    await expect(page.getByRole("heading", { name: "Statistiques" })).toBeVisible();
+    await expect(page.getByText(userRecipeTitle).first()).toBeVisible();
+
+    await page.getByRole("link", { name: "Utilisateurs" }).click();
     const userRow = page.getByRole("row", {
       name: new RegExp(escapeRegExp(userEmail)),
     });
     await expect(userRow).toBeVisible();
-    await expect(page.getByText(userRecipeTitle).first()).toBeVisible();
     await userRow.getByRole("link", { name: "Gerer" }).click();
     await expect(page.getByRole("heading", { name: "Utilisateur admin E2E" }))
       .toBeVisible();
@@ -271,6 +346,10 @@ test("admin can inspect, edit and delete a user", async ({ page }) => {
     await page.locator("#admin-user-role").selectOption("ADMIN");
     await page.getByRole("button", { name: "Enregistrer" }).click();
     await expect(page.getByText("Utilisateur mis a jour.")).toBeVisible();
+
+    await userPage.goto("/dashboard");
+    await expect(userPage).toHaveURL(/\/auth\/sign-in/);
+    await userPage.close();
 
     page.once("dialog", (dialog) => dialog.accept());
     await page.getByRole("button", { name: "Supprimer" }).click();

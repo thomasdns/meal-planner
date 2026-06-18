@@ -31,7 +31,7 @@ export async function signUpAction(
     };
   }
 
-  const rateLimit = checkRateLimit(`sign-up:${parsed.data.email}`, {
+  const rateLimit = await checkRateLimit(`sign-up:${parsed.data.email}`, {
     limit: 5,
     windowMs: 60 * 60 * 1000,
   });

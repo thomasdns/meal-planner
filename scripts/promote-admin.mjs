@@ -27,7 +27,9 @@ async function main() {
 
   const result = await client.query(
     `UPDATE "User"
-     SET "role" = 'ADMIN', "updatedAt" = NOW()
+     SET "role" = 'ADMIN',
+         "sessionVersion" = "sessionVersion" + 1,
+         "updatedAt" = NOW()
      WHERE LOWER("email") = LOWER($1)
      RETURNING "id", "email", "role"`,
     [email],
