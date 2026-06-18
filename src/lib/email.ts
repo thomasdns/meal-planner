@@ -1,6 +1,6 @@
 import "server-only";
 
-import nodemailer from "nodemailer";
+import { SMTPClient } from "emailjs";
 
 type SendEmailInput = {
   to: string;
@@ -11,14 +11,7 @@ type SendEmailInput = {
 
 type SmtpError = Error & {
   code?: string;
-  command?: string;
-  responseCode?: number;
-};
-
-type SmtpSendResult = {
-  messageId?: string;
-  accepted?: unknown[];
-  rejected?: unknown[];
+  smtp?: string;
 };
 
 export async function sendEmail({ to, subject, text, html }: SendEmailInput) {
@@ -68,35 +61,29 @@ export async function sendEmail({ to, subject, text, html }: SendEmailInput) {
     };
   }
 
-  const transporter = nodemailer.createTransport({
+  const client = new SMTPClient({
     host,
     port,
-    secure,
-    connectionTimeout: 10_000,
-    greetingTimeout: 10_000,
-    socketTimeout: 15_000,
-    auth: {
-      user,
-      pass: password,
-    },
+    ssl: secure,
+    tls: secure ? false : true,
+    timeout: 15_000,
+    user,
+    password,
   });
 
   try {
-    const info = (await transporter.sendMail({
+    await client.sendAsync({
       from,
       to,
       subject,
       text,
-      html,
-    })) as SmtpSendResult;
+      attachment: [{ data: html, alternative: true }],
+    });
 
     console.info(
       JSON.stringify({
         event: "smtp_email_sent",
         recipient: maskEmailAddress(to),
-        messageId: info.messageId,
-        acceptedCount: Array.isArray(info.accepted) ? info.accepted.length : 0,
-        rejectedCount: Array.isArray(info.rejected) ? info.rejected.length : 0,
       }),
     );
   } catch (error) {
@@ -144,8 +131,7 @@ function normalizeSmtpError(error: unknown) {
     name: smtpError.name,
     message: smtpError.message,
     code: smtpError.code,
-    command: smtpError.command,
-    responseCode: smtpError.responseCode,
+    smtp: smtpError.smtp,
   };
 }
 

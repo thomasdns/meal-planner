@@ -1,0 +1,41 @@
+name: Production database migrations
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: production-database-migrations
+  cancel-in-progress: false
+
+jobs:
+  migrate:
+    name: Apply production migrations
+    runs-on: ubuntu-latest
+    environment: production
+    env:
+      DATABASE_URL: ${{ secrets.PRODUCTION_DATABASE_URL }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24.14.0
+          cache: npm
+
+      - name: Validate migration database URL
+        run: test -n "$DATABASE_URL"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Check migration status
+        run: npx prisma migrate status
+
+      - name: Apply migrations
+        run: npm run db:migrate:deploy

@@ -53,7 +53,8 @@ Criteres d'acceptation :
 - Aucune mise a jour cassante n'est appliquee sans verification.
 - Les tests, le lint et le build passent apres chaque mise a jour.
 
-Statut : en surveillance. Voir `SECURITY.md`.
+Statut : termine. `npm audit` ne signale plus de vulnerabilite connue ; la
+surveillance reguliere reste necessaire. Voir `SECURITY.md`.
 
 ### Protection contre les abus
 

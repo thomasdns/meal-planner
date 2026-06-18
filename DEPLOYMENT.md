@@ -61,15 +61,17 @@ Elle execute :
 
 ```bash
 prisma generate
-prisma migrate deploy
 next build
 ```
 
 Pourquoi :
 
 - `prisma generate` regenere le client Prisma pendant le build ;
-- `prisma migrate deploy` applique les migrations existantes ;
 - `next build` compile l'application Next.js.
+
+Les migrations ne sont volontairement pas executees par Vercel. Elles sont
+appliquees separement afin d'eviter plusieurs builds concurrents essayant de
+prendre le meme verrou PostgreSQL.
 
 ## Avant de deployer
 
@@ -89,8 +91,10 @@ Pour une premiere mise en production :
 1. Creer une base PostgreSQL en ligne.
 2. Copier l'URL de connexion dans `DATABASE_URL`.
 3. Ajouter les variables d'environnement dans Vercel.
-4. Lancer un premier deploiement.
-5. Verifier que les migrations sont appliquees.
+4. Configurer le secret GitHub `PRODUCTION_DATABASE_URL`.
+5. Lancer le workflow `Production database migrations`.
+6. Lancer un premier deploiement Vercel.
+7. Verifier que les migrations sont appliquees.
 
 ## Creation de la base PostgreSQL en ligne
 
@@ -113,6 +117,23 @@ Bonne pratique :
 - utiliser une base separee pour les environnements Preview si les previews
   appliquent des migrations ;
 - ne jamais utiliser la base Docker locale pour la production.
+
+## Migrations de production
+
+Dans GitHub, creer un environnement nomme `production`, puis ajouter le secret
+`PRODUCTION_DATABASE_URL`. Sa valeur doit etre la chaine de connexion directe
+Neon, sans suffixe `-pooler` dans le nom d'hote.
+
+Pour appliquer les migrations :
+
+1. Ouvrir l'onglet **Actions** du depot GitHub.
+2. Choisir **Production database migrations**.
+3. Cliquer sur **Run workflow** depuis la branche `main`.
+4. Verifier que `Check migration status` et `Apply migrations` reussissent.
+5. Redeployer ensuite l'application dans Vercel.
+
+Le workflow utilise un groupe de concurrence dedie. Deux executions ne peuvent
+donc pas modifier la base de production en meme temps.
 
 ## Variables a configurer dans Vercel
 
@@ -180,12 +201,11 @@ npm run vercel-build
 Cette commande :
 
 - regenere le client Prisma ;
-- applique les migrations Prisma existantes ;
 - compile l'application Next.js.
 
-Le script `postinstall` execute aussi `prisma generate` apres l'installation
-des dependances. Cela evite un client Prisma obsolete lorsque Vercel reutilise
-son cache d'installation.
+Les scripts `postinstall` et `prebuild` executent `prisma generate`. Cela evite
+un client Prisma obsolete apres une installation, une modification du schema ou
+la reutilisation du cache Vercel.
 
 ## Attention
 

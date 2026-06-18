@@ -47,14 +47,15 @@ npm run audit
 
 Etat actuel :
 
-- 8 vulnerabilites moderees signalees lors de la derniere installation.
-- Les correctifs proposes par npm utilisent `npm audit fix --force`.
-- Ces correctifs forceraient des changements cassants sur des dependances
-  structurantes comme Prisma, Next ou NextAuth.
+- aucune vulnerabilite connue signalee par `npm audit` ;
+- Nodemailer a ete remplace par EmailJS pour conserver SMTP sans accepter une
+  version vulnerable imposee par le peer optionnel de NextAuth 4 ;
+- les versions corrigees de dependances transitives sont verrouillees avec
+  `overrides` dans `package.json`.
 
 Decision :
 
-- ne pas appliquer `--force` automatiquement ;
+- ne jamais appliquer `--force` automatiquement ;
 - surveiller les mises a jour officielles ;
 - appliquer les upgrades manuellement, avec `npm run test`, `npm run lint`,
   `npm run build` et `npm run test:e2e`.

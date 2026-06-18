@@ -218,10 +218,9 @@ smtp_email_failed
 smtp_config_incomplete
 ```
 
-Les logs contiennent un destinataire masque, l'identifiant du message en cas de
-succes et les informations techniques utiles en cas d'echec (`code`, `command`,
-`responseCode`). Ils ne contiennent ni mot de passe SMTP, ni contenu d'email,
-ni lien d'authentification.
+Les logs contiennent un destinataire masque et les informations techniques
+utiles en cas d'echec (`code`, `smtp`). Ils ne contiennent ni mot de passe
+SMTP, ni contenu d'email, ni lien d'authentification.
 
 Dans Vercel, ouvrir le projet puis **Logs** et rechercher le nom de l'evenement,
 par exemple `smtp_email_failed`.
@@ -272,7 +271,8 @@ Le deploiement cible utilise :
 - Vercel pour l'application ;
 - PostgreSQL heberge, par exemple Neon ;
 - variables d'environnement configurees dans Vercel ;
-- migrations Prisma via `npm run vercel-build`.
+- migrations Prisma via le workflow GitHub Actions protege
+  `Production database migrations`.
 
 ## Organisation Du Projet
 
