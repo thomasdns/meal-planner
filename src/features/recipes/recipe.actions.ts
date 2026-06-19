@@ -57,8 +57,7 @@ export async function createRecipeAction(
   }
 
   revalidatePath("/recipes");
-
-  return {};
+  redirect("/recipes?status=recipe-created");
 }
 
 export async function updateRecipeAction(
@@ -96,10 +95,8 @@ export async function updateRecipeAction(
   }
 
   revalidatePath("/recipes");
-
-  return {
-    success: "Recette mise a jour.",
-  };
+  revalidatePath(`/recipes/${recipeId}`);
+  redirect(`/recipes/${recipeId}?status=recipe-updated`);
 }
 
 export async function deleteRecipeAction(recipeId: string) {

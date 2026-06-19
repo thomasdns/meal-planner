@@ -213,6 +213,7 @@ test("user can manage categories, recipes and ingredients", async ({ page }) => 
     await page.locator("#ingredient-quantity").fill("3");
     await page.locator("#ingredient-unit").fill("piece");
     await page.getByRole("button", { name: "Ajouter l'ingredient" }).click();
+    await expect(page.getByText("Ingredient ajoute.")).toBeVisible();
     const ingredientInput = page.locator(
       `input[id^="ingredient-name-"][value="${ingredientName}"]`,
     );
@@ -270,6 +271,7 @@ test("weekly planning generates and updates the shopping list", async ({
     await page.locator("#recipeId").selectOption({ label: recipeTitle });
     await page.locator("#mealType").selectOption("DINNER");
     await page.getByRole("button", { name: "Planifier" }).click();
+    await expect(page.getByText("Repas planifie.")).toBeVisible();
     await expect(page.getByRole("link", { name: recipeTitle })).toBeVisible();
 
     await page.goto("/shopping-list");
@@ -282,16 +284,21 @@ test("weekly planning generates and updates the shopping list", async ({
     await expect(itemRow).toContainText("5 g");
     await expect(itemRow).toContainText(recipeTitle);
 
-    const itemCheckbox = itemRow.getByRole("checkbox");
-    await itemCheckbox.click();
-    await expect(itemCheckbox).toBeChecked();
+    await itemRow
+      .getByRole("button", { name: /Marquer comme achete/ })
+      .click();
+    await expect(
+      itemRow.getByRole("button", { name: /Marquer comme non achete/ }),
+    ).toBeVisible();
     await expect(itemRow.locator("td").nth(1)).toHaveClass(/line-through/);
     await expect(itemRow.locator("td").nth(2)).toHaveClass(/line-through/);
     await expect(itemRow.locator("td").nth(3)).toHaveClass(/line-through/);
 
     page.once("dialog", (dialog) => dialog.accept());
     await page.getByRole("button", { name: "Reinitialiser" }).click();
-    await expect(itemCheckbox).not.toBeChecked();
+    await expect(
+      itemRow.getByRole("button", { name: /Marquer comme achete/ }),
+    ).toBeVisible();
 
     await page.goto("/meal-plan");
     page.once("dialog", (dialog) => dialog.accept());

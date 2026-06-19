@@ -4,6 +4,7 @@ const mocks = vi.hoisted(() => ({
   createRecipeForCurrentUser: vi.fn(),
   logError: vi.fn(),
   revalidatePath: vi.fn(),
+  redirect: vi.fn(),
 }));
 
 vi.mock("next/cache", () => ({
@@ -11,7 +12,7 @@ vi.mock("next/cache", () => ({
 }));
 
 vi.mock("next/navigation", () => ({
-  redirect: vi.fn(),
+  redirect: mocks.redirect,
 }));
 
 vi.mock("@/features/recipes/recipes.data", () => ({
@@ -45,9 +46,12 @@ describe("createRecipeAction integration", () => {
       createRecipeFormData("Soupe de legumes"),
     );
 
-    expect(result).toEqual({});
+    expect(result).toBeUndefined();
     expect(mocks.createRecipeForCurrentUser).toHaveBeenCalledOnce();
     expect(mocks.revalidatePath).toHaveBeenCalledWith("/recipes");
+    expect(mocks.redirect).toHaveBeenCalledWith(
+      "/recipes?status=recipe-created",
+    );
   });
 
   it("logs an unexpected persistence failure", async () => {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useEffect } from "react";
 
 import { ActionMessage } from "@/components/ui/action-message";
 import {
@@ -12,6 +12,8 @@ import type { MealPlanRecipeOption, WeekDay } from "@/features/meal-plans/meal-p
 
 const initialState = {
   error: undefined,
+  success: undefined,
+  redirectTo: undefined,
 };
 
 type MealPlanFormProps = {
@@ -24,6 +26,12 @@ export function MealPlanForm({ days, recipes }: MealPlanFormProps) {
     upsertMealPlanAction,
     initialState,
   );
+
+  useEffect(() => {
+    if (state.redirectTo) {
+      window.location.assign(state.redirectTo);
+    }
+  }, [state.redirectTo]);
   return (
     <form
       action={formAction}
@@ -38,6 +46,10 @@ export function MealPlanForm({ days, recipes }: MealPlanFormProps) {
 
       {state.error ? (
         <ActionMessage tone="error">{state.error}</ActionMessage>
+      ) : null}
+
+      {state.success ? (
+        <ActionMessage tone="success">{state.success}</ActionMessage>
       ) : null}
 
       <div className="space-y-1">

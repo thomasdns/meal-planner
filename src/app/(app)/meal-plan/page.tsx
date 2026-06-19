@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { ActionMessage } from "@/components/ui/action-message";
 import { MealPlanForm } from "@/features/meal-plans/meal-plan-form";
 import { WeeklyMealPlan } from "@/features/meal-plans/weekly-meal-plan";
 import {
@@ -12,13 +13,14 @@ export const metadata = { title: "Planning hebdomadaire" };
 type MealPlanPageProps = {
   searchParams: Promise<{
     week?: string;
+    status?: string;
   }>;
 };
 
 export default async function MealPlanPage({
   searchParams,
 }: MealPlanPageProps) {
-  const { week } = await searchParams;
+  const { week, status } = await searchParams;
   const [weeklyMealPlan, recipes] = await Promise.all([
     getCurrentUserWeeklyMealPlan(week),
     getCurrentUserRecipeOptions(),
@@ -27,6 +29,12 @@ export default async function MealPlanPage({
   return (
     <div className="grid min-w-0 gap-8 lg:grid-cols-[minmax(0,1fr)_360px]">
       <div className="min-w-0 space-y-6">
+        {status === "planned" ? (
+          <ActionMessage tone="success">Repas planifie.</ActionMessage>
+        ) : null}
+        {status === "removed" ? (
+          <ActionMessage tone="success">Repas retire du planning.</ActionMessage>
+        ) : null}
         <div className="space-y-2">
           <p className="text-sm font-medium text-emerald-700">Organisation</p>
           <h1 className="text-3xl font-semibold tracking-tight break-words">

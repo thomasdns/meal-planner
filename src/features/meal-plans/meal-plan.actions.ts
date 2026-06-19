@@ -1,7 +1,5 @@
 "use server";
 
-import { redirect } from "next/navigation";
-
 import { upsertMealPlanSchema } from "@/features/meal-plans/meal-plan.validation";
 import {
   deleteMealPlanForCurrentUser,
@@ -12,6 +10,7 @@ import { logError } from "@/lib/logger";
 export type UpsertMealPlanState = {
   error?: string;
   success?: string;
+  redirectTo?: string;
 };
 
 export async function upsertMealPlanAction(
@@ -41,7 +40,10 @@ export async function upsertMealPlanAction(
     };
   }
 
-  redirect(`/meal-plan?week=${parsed.data.date}`);
+  return {
+    success: "Repas planifie.",
+    redirectTo: `/meal-plan?week=${parsed.data.date}&status=planned`,
+  };
 }
 
 export async function deleteMealPlanAction(mealPlanId: string) {
@@ -55,5 +57,5 @@ export async function deleteMealPlanAction(mealPlanId: string) {
     return;
   }
 
-  redirect("/meal-plan");
+  return { success: true as const };
 }

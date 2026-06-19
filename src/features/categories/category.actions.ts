@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 
 import {
   createCategorySchema,
@@ -50,7 +51,7 @@ export async function createCategoryAction(
 
   revalidatePath("/recipes");
 
-  return {};
+  redirect("/recipes?status=category-created");
 }
 
 export async function updateCategoryAction(
@@ -86,9 +87,7 @@ export async function updateCategoryAction(
   revalidatePath("/shopping-list");
   revalidatePath("/dashboard");
 
-  return {
-    success: "Categorie mise a jour.",
-  };
+  redirect("/recipes?status=category-updated");
 }
 
 export async function deleteCategoryAction(categoryId: string) {
@@ -106,4 +105,6 @@ export async function deleteCategoryAction(categoryId: string) {
   revalidatePath("/meal-plan");
   revalidatePath("/shopping-list");
   revalidatePath("/dashboard");
+
+  redirect("/recipes?status=category-deleted");
 }

@@ -1,7 +1,6 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { useActionState, useEffect } from "react";
+import { useActionState } from "react";
 
 import { ActionMessage } from "@/components/ui/action-message";
 import { createIngredientAction } from "@/features/recipes/ingredient.actions";
@@ -20,14 +19,6 @@ export function CreateIngredientForm({ recipeId }: CreateIngredientFormProps) {
     createIngredientAction.bind(null, recipeId),
     initialState,
   );
-  const router = useRouter();
-
-  useEffect(() => {
-    if (state.success) {
-      router.refresh();
-    }
-  }, [router, state.success]);
-
   return (
     <form
       action={formAction}

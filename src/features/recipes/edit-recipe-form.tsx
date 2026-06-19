@@ -1,7 +1,6 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { useActionState, useEffect } from "react";
+import { useActionState } from "react";
 
 import { ActionMessage } from "@/components/ui/action-message";
 import { updateRecipeAction } from "@/features/recipes/recipe.actions";
@@ -34,14 +33,6 @@ export function EditRecipeForm({ recipe, categories }: EditRecipeFormProps) {
     updateRecipeAction.bind(null, recipe.id),
     initialState,
   );
-  const router = useRouter();
-
-  useEffect(() => {
-    if (state.success) {
-      router.refresh();
-    }
-  }, [router, state.success]);
-
   return (
     <form
       action={formAction}

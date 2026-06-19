@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { ActionMessage } from "@/components/ui/action-message";
 import { getCurrentUserCategories } from "@/features/categories/categories.data";
 import { CreateIngredientForm } from "@/features/recipes/create-ingredient-form";
 import { DeleteRecipeForm } from "@/features/recipes/delete-recipe-form";
@@ -14,12 +15,17 @@ type RecipeDetailPageProps = {
   params: Promise<{
     recipeId: string;
   }>;
+  searchParams: Promise<{
+    status?: string;
+  }>;
 };
 
 export default async function RecipeDetailPage({
   params,
+  searchParams,
 }: RecipeDetailPageProps) {
   const { recipeId } = await params;
+  const { status } = await searchParams;
   const [recipe, categories] = await Promise.all([
     getCurrentUserRecipeDetail(recipeId),
     getCurrentUserCategories(),
@@ -38,6 +44,11 @@ export default async function RecipeDetailPage({
   return (
     <div className="grid gap-8 lg:grid-cols-[1fr_360px]">
       <div className="space-y-6">
+        {getRecipeStatusMessage(status) ? (
+          <ActionMessage tone="success">
+            {getRecipeStatusMessage(status)}
+          </ActionMessage>
+        ) : null}
         <div className="space-y-3">
           <Link
             href="/recipes"
@@ -117,4 +128,14 @@ export default async function RecipeDetailPage({
       </aside>
     </div>
   );
+}
+
+function getRecipeStatusMessage(status?: string) {
+  const messages: Record<string, string> = {
+    "ingredient-created": "Ingredient ajoute.",
+    "ingredient-updated": "Ingredient mis a jour.",
+    "recipe-updated": "Recette mise a jour.",
+  };
+
+  return status ? messages[status] : undefined;
 }

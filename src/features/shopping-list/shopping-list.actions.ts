@@ -1,9 +1,7 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
-
 import { prisma } from "@/lib/prisma";
+import { logError } from "@/lib/logger";
 import { requireUser } from "@/lib/session";
 
 export async function toggleShoppingListItemAction(formData: FormData) {
@@ -19,54 +17,68 @@ export async function toggleShoppingListItemAction(formData: FormData) {
   const normalizedName = name.trim();
   const normalizedUnit = typeof unit === "string" && unit.trim() ? unit.trim() : null;
 
-  const existingItem = await prisma.shoppingListItem.findFirst({
-    where: {
-      userId: user.id,
-      name: normalizedName,
-      unit: normalizedUnit,
-    },
-    select: {
-      id: true,
-    },
-  });
-
-  if (existingItem && checked) {
-    await prisma.shoppingListItem.update({
+  try {
+    const existingItem = await prisma.shoppingListItem.findFirst({
       where: {
-        id: existingItem.id,
-      },
-      data: {
-        checked,
-      },
-    });
-  } else if (existingItem) {
-    await prisma.shoppingListItem.delete({
-      where: {
-        id: existingItem.id,
-      },
-    });
-  } else if (checked) {
-    await prisma.shoppingListItem.create({
-      data: {
         userId: user.id,
         name: normalizedName,
         unit: normalizedUnit,
-        checked,
+      },
+      select: {
+        id: true,
       },
     });
+
+    if (existingItem && checked) {
+      await prisma.shoppingListItem.update({
+        where: { id: existingItem.id },
+        data: { checked },
+      });
+    } else if (existingItem) {
+      await prisma.shoppingListItem.delete({
+        where: { id: existingItem.id },
+      });
+    } else if (checked) {
+      await prisma.shoppingListItem.create({
+        data: {
+          userId: user.id,
+          name: normalizedName,
+          unit: normalizedUnit,
+          checked,
+        },
+      });
+    }
+  } catch (error) {
+    await logError("server_action_failed", error, {
+      action: "toggleShoppingListItem",
+    });
+    return {
+      success: false as const,
+      error: "Impossible de mettre a jour cet article.",
+    };
   }
 
-  revalidatePath("/shopping-list");
+  return { success: true as const, checked };
 }
 
 export async function resetShoppingListChecksAction() {
   const user = await requireUser();
 
-  await prisma.shoppingListItem.deleteMany({
-    where: {
-      userId: user.id,
-    },
-  });
+  try {
+    await prisma.shoppingListItem.deleteMany({
+      where: {
+        userId: user.id,
+      },
+    });
+  } catch (error) {
+    await logError("server_action_failed", error, {
+      action: "resetShoppingListChecks",
+    });
+    return {
+      success: false as const,
+      error: "Impossible de reinitialiser la liste.",
+    };
+  }
 
-  redirect("/shopping-list");
+  return { success: true as const };
 }

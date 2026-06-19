@@ -54,10 +54,8 @@ export async function createIngredientAction(
   }
 
   revalidatePath("/recipes");
-
-  return {
-    success: "Ingredient ajoute.",
-  };
+  revalidatePath(`/recipes/${recipeId}`);
+  redirect(`/recipes/${recipeId}?status=ingredient-created`);
 }
 
 export async function updateIngredientAction(
@@ -77,8 +75,10 @@ export async function updateIngredientAction(
     };
   }
 
+  let recipeId: string;
+
   try {
-    const recipeId = await updateIngredientForCurrentUser(
+    recipeId = await updateIngredientForCurrentUser(
       ingredientId,
       parsed.data,
     );
@@ -97,9 +97,7 @@ export async function updateIngredientAction(
     };
   }
 
-  return {
-    success: "Ingredient mis a jour.",
-  };
+  redirect(`/recipes/${recipeId}?status=ingredient-updated`);
 }
 
 export async function deleteIngredientAction(ingredientId: string) {

@@ -1,3 +1,4 @@
+import { ActionMessage } from "@/components/ui/action-message";
 import { CategoryList } from "@/features/categories/category-list";
 import { CreateCategoryForm } from "@/features/categories/create-category-form";
 import { getCurrentUserCategories } from "@/features/categories/categories.data";
@@ -13,6 +14,7 @@ type RecipesPageProps = {
     query?: string;
     categoryId?: string;
     maxTotalTime?: string;
+    status?: string;
   }>;
 };
 
@@ -39,6 +41,11 @@ export default async function RecipesPage({ searchParams }: RecipesPageProps) {
   return (
     <div className="grid gap-8 lg:grid-cols-[1fr_360px]">
       <div className="space-y-6">
+        {getRecipesStatusMessage(filters.status) ? (
+          <ActionMessage tone="success">
+            {getRecipesStatusMessage(filters.status)}
+          </ActionMessage>
+        ) : null}
         <div className="space-y-2">
           <p className="text-sm font-medium text-emerald-700">Bibliotheque</p>
           <h1 className="text-3xl font-semibold tracking-tight">Recettes</h1>
@@ -67,4 +74,15 @@ export default async function RecipesPage({ searchParams }: RecipesPageProps) {
       </aside>
     </div>
   );
+}
+
+function getRecipesStatusMessage(status?: string) {
+  const messages: Record<string, string> = {
+    "category-created": "Categorie creee.",
+    "category-deleted": "Categorie supprimee.",
+    "category-updated": "Categorie mise a jour.",
+    "recipe-created": "Recette creee.",
+  };
+
+  return status ? messages[status] : undefined;
 }
