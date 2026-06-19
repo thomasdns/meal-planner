@@ -14,6 +14,7 @@ test("public pages meet accessibility rules on mobile", async ({ page }) => {
     "/auth/sign-in",
     "/auth/sign-up",
     "/auth/forgot-password",
+    "/auth/resend-verification",
   ]) {
     await page.goto(path);
     await expectNoSeriousAccessibilityViolations(page);
@@ -73,7 +74,7 @@ test("admin pages remain accessible on mobile", async ({ page }) => {
 
     for (const path of [
       "/admin",
-      "/admin?tab=users",
+      "/admin?view=users",
       `/admin/users/${admin.id}`,
     ]) {
       await page.goto(path);

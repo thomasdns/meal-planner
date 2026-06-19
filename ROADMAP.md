@@ -17,110 +17,34 @@ produit, les corrections techniques et les sujets de securite.
 ## Termine
 
 - Mise en production avec Vercel et PostgreSQL en ligne.
-- Interface admin protegee.
-- Categories avancees.
-- Planning hebdomadaire avance.
-- Liste de courses avancee.
+- Authentification, verification email et reinitialisation du mot de passe.
+- Recuperation d'un compte dont l'email reste non verifie.
+- Sessions revoquees apres une modification sensible.
+- Interface admin protegee, paginee et separee en deux vues.
+- Gestion complete des categories, recettes, ingredients et planning.
+- Liste de courses cochable, imprimable et exportable.
 - Recherche et filtres de recettes.
-- Tests unitaires.
-- Tests end-to-end.
-- Pipeline GitHub Actions.
-- Documentation de deploiement.
-- Documentation securite.
+- Rate limiting distribue avec Upstash Redis et repli local journalise.
+- Tests unitaires, end-to-end, accessibilite et affichage mobile.
+- Pipelines GitHub Actions pour la qualite et les migrations de production.
+- Documentation de deploiement et de securite.
 
-## Priorite haute restante
+## Priorite haute
 
-### Mise en production complete
+### Exploitation en production
 
-Objectif : deployer l'application avec une base PostgreSQL en ligne.
-
-Criteres d'acceptation :
-
-- Une base PostgreSQL distante est creee.
-- Les variables d'environnement sont configurees dans Vercel.
-- Les migrations Prisma sont appliquees en production.
-- L'inscription et la connexion fonctionnent sur l'URL publique.
-
-Statut : termine.
-
-### Corrections de securite dependances
-
-Objectif : suivre les vulnerabilites signalees par `npm audit`.
+Objectif : rendre les incidents visibles et recuperables.
 
 Criteres d'acceptation :
 
-- Les alertes sont analysees une par une.
-- Aucune mise a jour cassante n'est appliquee sans verification.
-- Les tests, le lint et le build passent apres chaque mise a jour.
-
-Statut : termine. `npm audit` ne signale plus de vulnerabilite connue ; la
-surveillance reguliere reste necessaire. Voir `SECURITY.md`.
-
-### Protection contre les abus
-
-Objectif : limiter les tentatives excessives sur les actions sensibles.
-
-Criteres d'acceptation :
-
-- Les formulaires d'authentification sont proteges contre les tentatives trop
-  frequentes.
-- Les erreurs restent volontairement peu detaillees cote utilisateur.
-- Les validations serveur restent obligatoires.
-
-Statut : termine avec Upstash Redis et repli local journalise.
+- Les erreurs SMTP et applicatives importantes declenchent une alerte.
+- Une procedure de sauvegarde et de restauration PostgreSQL est documentee et
+  testee.
+- Les migrations de production sont executees puis verifiees par le workflow
+  protege.
+- Les dependances et les journaux de production sont controles regulierement.
 
 ## Priorite moyenne
-
-### Edition et suppression des recettes
-
-Objectif : permettre a un utilisateur de maintenir ses recettes dans le temps.
-
-Criteres d'acceptation :
-
-- Une recette peut etre modifiee par son proprietaire.
-- Une recette peut etre supprimee par son proprietaire.
-- Les ingredients associes restent coherents.
-- Un utilisateur ne peut pas modifier les recettes d'un autre utilisateur.
-
-Statut : termine.
-
-### Amelioration du planning
-
-Objectif : rendre le planning plus pratique au quotidien.
-
-Criteres d'acceptation :
-
-- L'utilisateur peut naviguer entre les semaines.
-- L'utilisateur peut retirer une recette d'un repas.
-- L'affichage reste lisible sur mobile et desktop.
-
-Statut : termine.
-
-### Liste de courses avancee
-
-Objectif : rendre la liste de courses plus exploitable.
-
-Criteres d'acceptation :
-
-- Les ingredients peuvent etre coches.
-- Les ingredients peuvent etre regroupes par categorie.
-- La liste peut etre imprimee ou exportee.
-
-Statut : termine.
-
-## Priorite basse
-
-### Recherche et filtres
-
-Objectif : retrouver rapidement une recette.
-
-Criteres d'acceptation :
-
-- Recherche par nom de recette.
-- Filtre par categorie.
-- Filtre par temps de preparation ou type de repas si ces champs existent.
-
-Statut : termine.
 
 ### Experience utilisateur
 
@@ -131,6 +55,18 @@ Criteres d'acceptation :
 - Les etats de chargement sont visibles.
 - Les messages de succes et d'erreur sont homogenes.
 - Les formulaires conservent une experience claire en cas d'erreur.
+
+### Tests d'integration
+
+Objectif : completer les tests navigateur par des tests serveur plus rapides.
+
+Criteres d'acceptation :
+
+- Les Server Actions sensibles sont testees avec leurs autorisations.
+- Les erreurs de base de donnees et de service email sont couvertes.
+- Les tests ne dependent pas d'un fournisseur SMTP reel.
+
+## Priorite basse
 
 ### Donnees nutritionnelles
 
@@ -144,8 +80,6 @@ Criteres d'acceptation :
 
 ## Dette technique
 
-- Ajouter plus de tests d'integration sur les Server Actions.
-- Ajouter des tests d'interface sur les parcours critiques.
 - Centraliser les messages d'erreur reutilisables.
 - Documenter les conventions de nommage du projet.
 - Surveiller les evolutions de Next.js, Prisma et NextAuth.

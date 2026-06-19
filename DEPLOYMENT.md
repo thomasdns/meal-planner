@@ -129,7 +129,7 @@ Pour appliquer les migrations :
 1. Ouvrir l'onglet **Actions** du depot GitHub.
 2. Choisir **Production database migrations**.
 3. Cliquer sur **Run workflow** depuis la branche `main`.
-4. Verifier que `Check migration status` et `Apply migrations` reussissent.
+4. Verifier que `Apply migrations` puis `Verify migration status` reussissent.
 5. Redeployer ensuite l'application dans Vercel.
 
 Le workflow utilise un groupe de concurrence dedie. Deux executions ne peuvent

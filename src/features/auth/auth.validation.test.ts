@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   forgotPasswordSchema,
+  resendEmailVerificationSchema,
   resetPasswordSchema,
   signUpSchema,
 } from "@/features/auth/auth.validation";
@@ -50,5 +51,17 @@ describe("signUpSchema", () => {
     });
 
     expect(result.success).toBe(true);
+  });
+
+  it("normalizes an email verification recovery request", () => {
+    const result = resendEmailVerificationSchema.safeParse({
+      email: "  USER@example.COM  ",
+    });
+
+    expect(result.success).toBe(true);
+
+    if (result.success) {
+      expect(result.data.email).toBe("user@example.com");
+    }
   });
 });

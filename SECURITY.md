@@ -18,7 +18,8 @@ surveiller avant une exploitation plus large.
 - Rate limiting applicatif sur :
   - inscription : 5 tentatives par email et par heure ;
   - connexion : 10 tentatives par email toutes les 15 minutes ;
-  - reinitialisation du mot de passe : 3 demandes par email et par heure.
+  - reinitialisation du mot de passe : 3 demandes par email et par heure ;
+  - renvoi de verification email : 3 demandes par email et par heure.
 
 ## Rate limiting distribue
 

@@ -20,6 +20,8 @@ export const forgotPasswordSchema = z.object({
   email: z.string().trim().email("Adresse email invalide.").toLowerCase(),
 });
 
+export const resendEmailVerificationSchema = forgotPasswordSchema;
+
 export const resetPasswordSchema = z.object({
   token: z.string().trim().min(20, "Le lien de reinitialisation est invalide."),
   password: z

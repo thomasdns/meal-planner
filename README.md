@@ -12,6 +12,7 @@ securite, Git/GitHub et deploiement.
 
 - Inscription et connexion par email / mot de passe.
 - Verification email automatique apres inscription.
+- Renvoi d'un lien de verification pour recuperer un compte non verifie.
 - Nouvelle verification et deconnexion apres modification de l'adresse email.
 - Reinitialisation du mot de passe par lien securise.
 - Gestion des recettes.
@@ -193,6 +194,7 @@ Node, reinstaller les dependances avant de relancer Playwright.
 Le test e2e couvre le parcours principal :
 
 - verification obligatoire de l'adresse email ;
+- recuperation d'un compte non verifie par renvoi du lien ;
 - connexion ;
 - modification et reverification d'une adresse email ;
 - revocation de session apres reinitialisation du mot de passe ;
@@ -201,6 +203,8 @@ Le test e2e couvre le parcours principal :
 - recherche et filtrage des recettes ;
 - planification et suppression d'un repas ;
 - generation et mise a jour de la liste de courses ;
+- isolation des recettes entre utilisateurs ;
+- suppression definitive de son propre compte ;
 - consultation, modification et suppression d'un utilisateur par un admin ;
 - revocation de session apres modification administrative d'un compte.
 

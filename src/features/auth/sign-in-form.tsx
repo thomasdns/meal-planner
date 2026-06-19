@@ -115,6 +115,16 @@ export function SignInForm() {
           Reinitialiser
         </Link>
       </p>
+
+      <p className="text-sm text-gray-600">
+        Email non verifie ?{" "}
+        <Link
+          href="/auth/resend-verification"
+          className="font-medium text-emerald-700"
+        >
+          Renvoyer le lien
+        </Link>
+      </p>
     </form>
   );
 }

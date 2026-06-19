@@ -1,5 +1,6 @@
 "use server";
 
+import { resendEmailVerificationSchema } from "@/features/auth/auth.validation";
 import {
   authTokenPurpose,
   consumeAuthToken,
@@ -7,9 +8,65 @@ import {
   createAuthToken,
   createAuthTokenIdentifier,
 } from "@/lib/auth-tokens";
+import { sendEmailVerificationEmail } from "@/lib/email";
 import { prisma } from "@/lib/prisma";
+import { checkRateLimit } from "@/lib/rate-limit";
 
 const emailVerificationTokenTtlMs = 24 * 60 * 60 * 1000;
+
+export type ResendEmailVerificationState = {
+  error?: string;
+  success?: string;
+};
+
+export async function resendEmailVerificationAction(
+  _previousState: ResendEmailVerificationState,
+  formData: FormData,
+): Promise<ResendEmailVerificationState> {
+  const parsed = resendEmailVerificationSchema.safeParse({
+    email: formData.get("email"),
+  });
+
+  if (!parsed.success) {
+    return {
+      error: parsed.error.issues[0]?.message ?? "Email invalide.",
+    };
+  }
+
+  const rateLimit = await checkRateLimit(
+    `verify-email:${parsed.data.email}`,
+    {
+      limit: 3,
+      windowMs: 60 * 60 * 1000,
+    },
+  );
+
+  if (!rateLimit.allowed) {
+    return {
+      error: "Trop de demandes. Reessaie plus tard.",
+    };
+  }
+
+  const user = await prisma.user.findUnique({
+    where: {
+      email: parsed.data.email,
+    },
+    select: {
+      email: true,
+      emailVerified: true,
+    },
+  });
+
+  if (user && !user.emailVerified) {
+    const verificationLink = await createEmailVerificationLink(user.email);
+    await sendEmailVerificationEmail(user.email, verificationLink);
+  }
+
+  return {
+    success:
+      "Si un compte non verifie existe avec cet email, un nouveau lien a ete envoye.",
+  };
+}
 
 export async function createEmailVerificationLink(email: string) {
   const token = await createAuthToken(

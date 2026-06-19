@@ -45,6 +45,33 @@ test("email verification is required before sign in", async ({ page }) => {
   }
 });
 
+test("an unverified user can request a new verification link", async ({
+  page,
+}) => {
+  const email = `e2e-resend-verification-${Date.now()}@example.com`;
+
+  await deleteTestUsers(email);
+
+  try {
+    await createTestUser({ email, password, verified: false });
+
+    await page.goto("/auth/resend-verification");
+    await page.getByLabel("Email").fill(email);
+    await page.getByRole("button", { name: "Renvoyer le lien" }).click();
+
+    await expect(
+      page.getByText(
+        "Si un compte non verifie existe avec cet email, un nouveau lien a ete envoye.",
+      ),
+    ).toBeVisible();
+
+    const securityState = await getUserSecurityState(email);
+    expect(securityState.verificationTokenCount).toBe(1);
+  } finally {
+    await deleteTestUsers(email);
+  }
+});
+
 test("resetting a password revokes the existing session", async ({ page }) => {
   const uniqueId = Date.now();
   const email = `e2e-password-${uniqueId}@example.com`;
@@ -280,6 +307,58 @@ test("weekly planning generates and updates the shopping list", async ({
 
     await page.goto("/shopping-list");
     await expect(page.getByText("Liste vide")).toBeVisible();
+  } finally {
+    await deleteTestUsers(email);
+  }
+});
+
+test("a user cannot access another user's recipe", async ({ page }) => {
+  const uniqueId = Date.now();
+  const ownerEmail = `e2e-owner-${uniqueId}@example.com`;
+  const visitorEmail = `e2e-visitor-${uniqueId}@example.com`;
+
+  await deleteTestUsers(ownerEmail, visitorEmail);
+
+  try {
+    const owner = await createTestUser({ email: ownerEmail, password });
+    const recipe = await createRecipeWithIngredient({
+      userId: owner.id,
+      categoryName: `Categorie privee ${uniqueId}`,
+      recipeTitle: `Recette privee ${uniqueId}`,
+      ingredientName: `Ingredient prive ${uniqueId}`,
+    });
+    await createTestUser({ email: visitorEmail, password });
+    await signIn(page, visitorEmail, password);
+
+    const response = await page.goto(`/recipes/${recipe.recipeId}`);
+    expect(response?.status()).toBe(404);
+  } finally {
+    await deleteTestUsers(ownerEmail, visitorEmail);
+  }
+});
+
+test("a user can permanently delete their own account", async ({ page }) => {
+  const email = `e2e-delete-account-${Date.now()}@example.com`;
+
+  await deleteTestUsers(email);
+
+  try {
+    await createTestUser({ email, password });
+    await signIn(page, email, password);
+
+    await page.goto("/profile");
+    await page.getByRole("button", { name: "Supprimer mon compte" }).click();
+    const dialog = page.getByRole("dialog", {
+      name: "Confirmer la suppression",
+    });
+    await dialog
+      .getByLabel("Tape SUPPRIMER pour confirmer")
+      .fill("SUPPRIMER");
+    await dialog.getByRole("button", { name: "Confirmer" }).click();
+
+    await expect(page).toHaveURL(/\/auth\/sign-in$/, { timeout: 15_000 });
+    const securityState = await getUserSecurityState(email);
+    expect(securityState.user).toBeNull();
   } finally {
     await deleteTestUsers(email);
   }
