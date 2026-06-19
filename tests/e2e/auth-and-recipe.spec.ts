@@ -29,6 +29,9 @@ test("email verification is required before sign in", async ({ page }) => {
     await signIn(page, email, password, {
       expectedError: "Verifie ton adresse email avant de te connecter.",
     });
+    await expect(
+      page.getByRole("link", { name: "Renvoyer le lien de verification" }),
+    ).toBeVisible();
 
     await page.goto(`/auth/verify-email/confirm?token=${verificationToken}`);
     await expect(

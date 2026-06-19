@@ -12,12 +12,14 @@ export function SignInForm() {
   const router = useRouter();
 
   const [error, setError] = useState<string | null>(null);
+  const [isEmailNotVerified, setIsEmailNotVerified] = useState(false);
   const [isPending, setIsPending] = useState(false);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
     setError(null);
+    setIsEmailNotVerified(false);
     setIsPending(true);
 
     const formData = new FormData(event.currentTarget);
@@ -46,6 +48,7 @@ export function SignInForm() {
         result?.url?.includes("EMAIL_NOT_VERIFIED")
       ) {
         setError("Verifie ton adresse email avant de te connecter.");
+        setIsEmailNotVerified(true);
         return;
       }
 
@@ -60,9 +63,20 @@ export function SignInForm() {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       {error ? (
-        <p className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
-          {error}
-        </p>
+        <div
+          role="alert"
+          className="space-y-2 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700"
+        >
+          <p>{error}</p>
+          {isEmailNotVerified ? (
+            <Link
+              href="/auth/resend-verification"
+              className="inline-flex font-semibold underline underline-offset-2"
+            >
+              Renvoyer le lien de verification
+            </Link>
+          ) : null}
+        </div>
       ) : null}
 
       <div className="space-y-1">
@@ -116,15 +130,6 @@ export function SignInForm() {
         </Link>
       </p>
 
-      <p className="text-sm text-gray-600">
-        Email non verifie ?{" "}
-        <Link
-          href="/auth/resend-verification"
-          className="font-medium text-emerald-700"
-        >
-          Renvoyer le lien
-        </Link>
-      </p>
     </form>
   );
 }

@@ -41,7 +41,6 @@ export default async function AdminUserDetailPage({
               {user.name ?? "Sans nom"}
             </h1>
             <p className="mt-2 text-sm text-slate-600">{user.email}</p>
-            <p className="mt-1 text-sm text-slate-600">Role : {user.role}</p>
           </div>
         </div>
 
