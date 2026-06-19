@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/session";
@@ -67,5 +68,5 @@ export async function resetShoppingListChecksAction() {
     },
   });
 
-  revalidatePath("/shopping-list");
+  redirect("/shopping-list");
 }

@@ -2,11 +2,13 @@
 
 import { useActionState } from "react";
 
+import { ActionMessage } from "@/components/ui/action-message";
 import {
   deleteIngredientAction,
   updateIngredientAction,
 } from "@/features/recipes/ingredient.actions";
 import type { RecipeIngredientItem } from "@/features/recipes/recipes.data";
+import { confirmationMessages } from "@/lib/confirmation-messages";
 
 type IngredientListProps = {
   ingredients: RecipeIngredientItem[];
@@ -47,7 +49,6 @@ function EditableIngredientItem({ ingredient }: EditableIngredientItemProps) {
     updateIngredientAction.bind(null, ingredient.id),
     initialState,
   );
-
   return (
     <div className="rounded-lg border border-slate-200 bg-white p-4">
       <form action={formAction} className="space-y-3">
@@ -140,15 +141,11 @@ function EditableIngredientItem({ ingredient }: EditableIngredientItemProps) {
         </div>
 
         {state.error ? (
-          <p className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
-            {state.error}
-          </p>
+          <ActionMessage tone="error">{state.error}</ActionMessage>
         ) : null}
 
         {state.success ? (
-          <p className="rounded-md border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-700">
-            {state.success}
-          </p>
+          <ActionMessage tone="success">{state.success}</ActionMessage>
         ) : null}
       </form>
 
@@ -156,7 +153,7 @@ function EditableIngredientItem({ ingredient }: EditableIngredientItemProps) {
         id={`delete-ingredient-${ingredient.id}`}
         action={deleteIngredientAction.bind(null, ingredient.id)}
         onSubmit={(event) => {
-          if (!window.confirm("Supprimer cet ingredient ?")) {
+          if (!window.confirm(confirmationMessages.deleteIngredient)) {
             event.preventDefault();
           }
         }}

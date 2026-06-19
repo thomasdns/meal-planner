@@ -11,6 +11,7 @@ import {
 } from "@/features/admin/admin.data";
 import { createEmailVerificationLink } from "@/features/auth/email-verification.actions";
 import { sendEmailVerificationEmail } from "@/lib/email";
+import { logError } from "@/lib/logger";
 
 export type UpdateAdminUserState = {
   error?: string;
@@ -42,7 +43,11 @@ export async function updateAdminUserAction(
 
   try {
     updateContext = await validateUserUpdateAsAdmin(userId, parsed.data);
-  } catch {
+  } catch (error) {
+    await logError("server_action_failed", error, {
+      action: "validateAdminUserUpdate",
+      userId,
+    });
     return {
       error: "Impossible de mettre a jour cet utilisateur.",
     };
@@ -72,7 +77,11 @@ export async function updateAdminUserAction(
       updateContext.emailChanged,
       updateContext.securityChanged,
     );
-  } catch {
+  } catch (error) {
+    await logError("server_action_failed", error, {
+      action: "updateAdminUser",
+      userId,
+    });
     return {
       error: "Impossible de mettre a jour cet utilisateur.",
     };
@@ -94,7 +103,11 @@ export async function deleteAdminUserAction(
 
   try {
     await deleteUserAsAdmin(userId);
-  } catch {
+  } catch (error) {
+    await logError("server_action_failed", error, {
+      action: "deleteAdminUser",
+      userId,
+    });
     return {
       error: "Impossible de supprimer cet utilisateur.",
     };

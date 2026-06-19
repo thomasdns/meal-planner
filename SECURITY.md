@@ -15,6 +15,8 @@ surveiller avant une exploitation plus large.
 - Headers HTTP de securite configures dans `next.config.ts`.
 - Sessions revoquees apres changement de mot de passe, d'email ou de role.
 - Role utilisateur resynchronise avec la base pendant la validation du JWT.
+- Erreurs serveur et Server Actions journalisees sous forme JSON structuree.
+- Champs sensibles automatiquement masques avant ecriture dans les logs.
 - Rate limiting applicatif sur :
   - inscription : 5 tentatives par email et par heure ;
   - connexion : 10 tentatives par email toutes les 15 minutes ;
@@ -69,3 +71,4 @@ Decision :
 - Limiter le nombre de comptes avec le role `ADMIN`.
 - Verifier regulierement les logs de deploiement et les echecs de connexion.
 - Tester les parcours critiques apres chaque mise a jour majeure.
+- Tester regulierement la restauration d'une sauvegarde dans une base isolee.

@@ -1,6 +1,7 @@
 "use client";
 
 import { deleteRecipeAction } from "@/features/recipes/recipe.actions";
+import { confirmationMessages } from "@/lib/confirmation-messages";
 
 type DeleteRecipeFormProps = {
   recipeId: string;
@@ -12,9 +13,7 @@ export function DeleteRecipeForm({ recipeId }: DeleteRecipeFormProps) {
       action={deleteRecipeAction.bind(null, recipeId)}
       onSubmit={(event) => {
         if (
-          !window.confirm(
-            "Supprimer cette recette ? Les ingredients et repas planifies associes seront aussi supprimes.",
-          )
+          !window.confirm(confirmationMessages.deleteRecipe)
         ) {
           event.preventDefault();
         }

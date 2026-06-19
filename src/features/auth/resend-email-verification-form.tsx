@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useActionState } from "react";
 
+import { ActionMessage } from "@/components/ui/action-message";
 import { resendEmailVerificationAction } from "@/features/auth/email-verification.actions";
 
 const initialState = {
@@ -19,21 +20,11 @@ export function ResendEmailVerificationForm() {
   return (
     <form action={formAction} className="space-y-4">
       {state.error ? (
-        <p
-          role="alert"
-          className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700"
-        >
-          {state.error}
-        </p>
+        <ActionMessage tone="error">{state.error}</ActionMessage>
       ) : null}
 
       {state.success ? (
-        <p
-          role="status"
-          className="rounded-md border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-800"
-        >
-          {state.success}
-        </p>
+        <ActionMessage tone="success">{state.success}</ActionMessage>
       ) : null}
 
       <div className="space-y-1">

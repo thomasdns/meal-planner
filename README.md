@@ -31,6 +31,8 @@ securite, Git/GitHub et deploiement.
 - Recherche, filtre et pagination des utilisateurs dans l'administration.
 - Statistiques comparatives sur 7, 30 ou 90 jours.
 - Envoi d'emails transactionnels avec suivi structure des erreurs SMTP.
+- Journalisation JSON dans Vercel et pages d'erreur dediees.
+- Sauvegarde PostgreSQL et test de restauration isole.
 
 ## Stack technique
 
@@ -211,6 +213,9 @@ Le test e2e couvre le parcours principal :
 L'envoi SMTP reel reste volontairement hors des tests automatises : Playwright
 utilise un transport JSON local qui ne transmet aucun email.
 
+Les tests d'integration Vitest couvrent egalement l'orchestration des Server
+Actions d'inscription et de creation de recette, y compris leurs echecs.
+
 ## Surveillance SMTP
 
 Les envois SMTP produisent des evenements JSON consultables dans le terminal en
@@ -229,6 +234,9 @@ SMTP, ni contenu d'email, ni lien d'authentification.
 Dans Vercel, ouvrir le projet puis **Logs** et rechercher le nom de l'evenement,
 par exemple `smtp_email_failed`.
 
+La consultation et la recherche des erreurs Vercel sont detaillees dans
+[`OBSERVABILITY.md`](./OBSERVABILITY.md).
+
 ## Base De Donnees
 
 Les migrations Prisma sont dans :
@@ -241,6 +249,14 @@ Verifier l'etat des migrations :
 
 ```bash
 npx prisma migrate status
+```
+
+Les procedures de sauvegarde et de restauration sont documentees dans
+[`BACKUP_RESTORE.md`](./BACKUP_RESTORE.md). Commandes locales :
+
+```powershell
+npm run db:backup
+npm run db:restore:test -- backups/meal-planner-YYYYMMDD-HHMMSS.dump
 ```
 
 ## Qualite Et Securite
@@ -266,6 +282,7 @@ Points de securite deja en place :
 - revocation des sessions apres changement sensible ;
 - absence de SQL brut applicatif ;
 - journalisation SMTP sans secret ni lien d'authentification ;
+- journalisation structuree des erreurs serveur et des Server Actions ;
 - `.env` ignore par Git.
 
 ## Deploiement

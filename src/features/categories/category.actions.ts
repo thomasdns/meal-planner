@@ -11,6 +11,7 @@ import {
   deleteCategoryForCurrentUser,
   updateCategoryForCurrentUser,
 } from "@/features/categories/categories.data";
+import { logError } from "@/lib/logger";
 
 export type CreateCategoryState = {
   error?: string;
@@ -38,7 +39,10 @@ export async function createCategoryAction(
 
   try {
     await createCategoryForCurrentUser(parsed.data);
-  } catch {
+  } catch (error) {
+    await logError("server_action_failed", error, {
+      action: "createCategory",
+    });
     return {
       error: "Une categorie avec ce nom existe deja.",
     };
@@ -67,7 +71,11 @@ export async function updateCategoryAction(
 
   try {
     await updateCategoryForCurrentUser(categoryId, parsed.data);
-  } catch {
+  } catch (error) {
+    await logError("server_action_failed", error, {
+      action: "updateCategory",
+      categoryId,
+    });
     return {
       error: "Impossible de modifier cette categorie.",
     };
@@ -86,7 +94,11 @@ export async function updateCategoryAction(
 export async function deleteCategoryAction(categoryId: string) {
   try {
     await deleteCategoryForCurrentUser(categoryId);
-  } catch {
+  } catch (error) {
+    await logError("server_action_failed", error, {
+      action: "deleteCategory",
+      categoryId,
+    });
     return;
   }
 

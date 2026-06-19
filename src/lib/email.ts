@@ -2,6 +2,8 @@ import "server-only";
 
 import { SMTPClient } from "emailjs";
 
+import { logError, logEvent } from "@/lib/logger";
+
 type SendEmailInput = {
   to: string;
   subject: string;
@@ -26,12 +28,9 @@ export async function sendEmail({ to, subject, text, html }: SendEmailInput) {
     process.env.VERCEL_ENV !== "production";
 
   if (useTestTransport) {
-    console.info(
-      JSON.stringify({
-        event: "smtp_email_test_delivered",
-        recipient: maskEmailAddress(to),
-      }),
-    );
+    await logEvent("info", "smtp_email_test_delivered", {
+      recipient: maskEmailAddress(to),
+    });
 
     return {
       delivered: true,
@@ -48,12 +47,13 @@ export async function sendEmail({ to, subject, text, html }: SendEmailInput) {
       .filter(([, value]) => !value)
       .map(([name]) => name);
 
-    console.error(
-      JSON.stringify({
-        event: "smtp_config_incomplete",
+    await logEvent(
+      "error",
+      "smtp_config_incomplete",
+      {
         recipient: maskEmailAddress(to),
         missingVariables,
-      }),
+      },
     );
 
     return {
@@ -80,21 +80,20 @@ export async function sendEmail({ to, subject, text, html }: SendEmailInput) {
       attachment: [{ data: html, alternative: true }],
     });
 
-    console.info(
-      JSON.stringify({
-        event: "smtp_email_sent",
-        recipient: maskEmailAddress(to),
-      }),
-    );
+    await logEvent("info", "smtp_email_sent", {
+      recipient: maskEmailAddress(to),
+    });
   } catch (error) {
     const smtpError = normalizeSmtpError(error);
 
-    console.error(
-      JSON.stringify({
-        event: "smtp_email_failed",
+    await logError(
+      "smtp_email_failed",
+      error,
+      {
         recipient: maskEmailAddress(to),
-        error: smtpError,
-      }),
+        smtpCode: smtpError.code,
+        smtpResponse: smtpError.smtp,
+      },
     );
 
     return {

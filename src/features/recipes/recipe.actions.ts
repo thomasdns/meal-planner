@@ -12,6 +12,7 @@ import {
   deleteRecipeForCurrentUser,
   updateRecipeForCurrentUser,
 } from "@/features/recipes/recipes.data";
+import { logError } from "@/lib/logger";
 
 export type CreateRecipeState = {
   error?: string;
@@ -46,7 +47,10 @@ export async function createRecipeAction(
 
   try {
     await createRecipeForCurrentUser(parsed.data);
-  } catch {
+  } catch (error) {
+    await logError("server_action_failed", error, {
+      action: "createRecipe",
+    });
     return {
       error: "Impossible de creer la recette avec cette categorie.",
     };
@@ -81,14 +85,17 @@ export async function updateRecipeAction(
 
   try {
     await updateRecipeForCurrentUser(recipeId, parsed.data);
-  } catch {
+  } catch (error) {
+    await logError("server_action_failed", error, {
+      action: "updateRecipe",
+      recipeId,
+    });
     return {
       error: "Impossible de modifier cette recette.",
     };
   }
 
   revalidatePath("/recipes");
-  revalidatePath(`/recipes/${recipeId}`);
 
   return {
     success: "Recette mise a jour.",
@@ -98,7 +105,11 @@ export async function updateRecipeAction(
 export async function deleteRecipeAction(recipeId: string) {
   try {
     await deleteRecipeForCurrentUser(recipeId);
-  } catch {
+  } catch (error) {
+    await logError("server_action_failed", error, {
+      action: "deleteRecipe",
+      recipeId,
+    });
     return;
   }
 

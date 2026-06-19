@@ -10,6 +10,7 @@ import {
 } from "@/features/profile/profile.data";
 import { createEmailVerificationLink } from "@/features/auth/email-verification.actions";
 import { sendEmailVerificationEmail } from "@/lib/email";
+import { logError } from "@/lib/logger";
 import {
   deleteAccountSchema,
   updateProfileSchema,
@@ -46,7 +47,10 @@ export async function updateProfileAction(
 
   try {
     updateContext = await validateCurrentUserProfileUpdate(parsed.data);
-  } catch {
+  } catch (error) {
+    await logError("server_action_failed", error, {
+      action: "validateProfileUpdate",
+    });
     return {
       error: "Cette adresse email est deja utilisee.",
     };
@@ -75,7 +79,11 @@ export async function updateProfileAction(
       parsed.data,
       updateContext.hasEmailChanged,
     );
-  } catch {
+  } catch (error) {
+    await logError("server_action_failed", error, {
+      action: "updateProfile",
+      userId: updateContext.userId,
+    });
     return {
       error: "Impossible de mettre a jour le profil.",
     };

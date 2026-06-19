@@ -1,7 +1,9 @@
 "use client";
 
-import { useActionState } from "react";
+import { useRouter } from "next/navigation";
+import { useActionState, useEffect } from "react";
 
+import { ActionMessage } from "@/components/ui/action-message";
 import { updateRecipeAction } from "@/features/recipes/recipe.actions";
 
 type EditRecipeFormProps = {
@@ -32,6 +34,13 @@ export function EditRecipeForm({ recipe, categories }: EditRecipeFormProps) {
     updateRecipeAction.bind(null, recipe.id),
     initialState,
   );
+  const router = useRouter();
+
+  useEffect(() => {
+    if (state.success) {
+      router.refresh();
+    }
+  }, [router, state.success]);
 
   return (
     <form
@@ -46,15 +55,11 @@ export function EditRecipeForm({ recipe, categories }: EditRecipeFormProps) {
       </div>
 
       {state.error ? (
-        <p className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
-          {state.error}
-        </p>
+        <ActionMessage tone="error">{state.error}</ActionMessage>
       ) : null}
 
       {state.success ? (
-        <p className="rounded-md border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-700">
-          {state.success}
-        </p>
+        <ActionMessage tone="success">{state.success}</ActionMessage>
       ) : null}
 
       <div className="space-y-1">

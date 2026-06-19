@@ -299,13 +299,7 @@ test("weekly planning generates and updates the shopping list", async ({
       name: "Retirer ce repas du planning",
     });
     await expect(removeMealButton).toBeVisible();
-    await removeMealButton.evaluate((button) => {
-      if (!(button instanceof HTMLButtonElement)) {
-        throw new Error("Expected a button element.");
-      }
-
-      button.form?.requestSubmit(button);
-    });
+    await removeMealButton.click();
     await expect(page.getByRole("link", { name: recipeTitle })).toBeHidden();
 
     await page.goto("/shopping-list");
@@ -333,8 +327,11 @@ test("a user cannot access another user's recipe", async ({ page }) => {
     await createTestUser({ email: visitorEmail, password });
     await signIn(page, visitorEmail, password);
 
-    const response = await page.goto(`/recipes/${recipe.recipeId}`);
-    expect(response?.status()).toBe(404);
+    await page.goto(`/recipes/${recipe.recipeId}`);
+    await expect(
+      page.getByRole("heading", { name: "Page introuvable" }),
+    ).toBeVisible();
+    await expect(page.getByText(`Recette privee ${uniqueId}`)).toHaveCount(0);
   } finally {
     await deleteTestUsers(ownerEmail, visitorEmail);
   }

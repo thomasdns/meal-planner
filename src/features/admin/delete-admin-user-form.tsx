@@ -2,7 +2,9 @@
 
 import { useActionState } from "react";
 
+import { ActionMessage } from "@/components/ui/action-message";
 import { deleteAdminUserAction } from "@/features/admin/admin.actions";
+import { confirmationMessages } from "@/lib/confirmation-messages";
 
 type DeleteAdminUserFormProps = {
   userId: string;
@@ -26,7 +28,7 @@ export function DeleteAdminUserForm({
     <form
       action={formAction}
       onSubmit={(event) => {
-        if (!window.confirm("Supprimer cet utilisateur et toutes ses donnees ?")) {
+        if (!window.confirm(confirmationMessages.deleteAdminUser)) {
           event.preventDefault();
         }
       }}
@@ -39,9 +41,9 @@ export function DeleteAdminUserForm({
       </p>
 
       {state.error ? (
-        <p className="mt-3 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+        <ActionMessage tone="error" className="mt-3">
           {state.error}
-        </p>
+        </ActionMessage>
       ) : null}
 
       <button

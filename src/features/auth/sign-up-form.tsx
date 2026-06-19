@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useActionState } from "react";
 
+import { ActionMessage } from "@/components/ui/action-message";
 import { signUpAction } from "@/features/auth/sign-up.actions";
 
 const initialState = {
@@ -18,9 +19,7 @@ export function SignUpForm() {
   return (
     <form action={formAction} className="space-y-4">
       {state.error ? (
-        <p className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
-          {state.error}
-        </p>
+        <ActionMessage tone="error">{state.error}</ActionMessage>
       ) : null}
 
       <div className="space-y-1">

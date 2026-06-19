@@ -5,6 +5,7 @@ import {
   toggleShoppingListItemAction,
 } from "@/features/shopping-list/shopping-list.actions";
 import type { WeeklyShoppingList } from "@/features/shopping-list/shopping-list.data";
+import { confirmationMessages } from "@/lib/confirmation-messages";
 
 type ShoppingListProps = {
   shoppingList: WeeklyShoppingList;
@@ -43,7 +44,7 @@ export function ShoppingList({ shoppingList }: ShoppingListProps) {
         <form
           action={resetShoppingListChecksAction}
           onSubmit={(event) => {
-            if (!window.confirm("Reinitialiser tous les elements coches ?")) {
+            if (!window.confirm(confirmationMessages.resetShoppingList)) {
               event.preventDefault();
             }
           }}

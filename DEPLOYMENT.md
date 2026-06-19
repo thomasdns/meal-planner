@@ -49,6 +49,9 @@ Les variables Upstash activent un rate limiting partage entre toutes les
 instances Vercel. Creer une base Redis dans Upstash, puis copier son URL REST et
 son token REST dans les variables Production et Preview de Vercel.
 
+Les erreurs structurees sont disponibles dans les Runtime Logs Vercel sans
+variable supplementaire. Voir `OBSERVABILITY.md`.
+
 ## Commande de build Vercel
 
 Utiliser cette commande de build :

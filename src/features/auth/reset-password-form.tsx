@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useActionState } from "react";
 
+import { ActionMessage } from "@/components/ui/action-message";
 import { resetPasswordAction } from "@/features/auth/password-reset.actions";
 
 const initialState = {
@@ -25,18 +26,16 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
       <input type="hidden" name="token" value={token} />
 
       {state.error ? (
-        <p className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
-          {state.error}
-        </p>
+        <ActionMessage tone="error">{state.error}</ActionMessage>
       ) : null}
 
       {state.success ? (
-        <div className="space-y-2 rounded-md border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-800">
+        <ActionMessage tone="success" className="space-y-2">
           <p>{state.success}</p>
           <Link href="/auth/sign-in" className="font-medium underline">
             Aller a la connexion
           </Link>
-        </div>
+        </ActionMessage>
       ) : null}
 
       <div className="space-y-1">

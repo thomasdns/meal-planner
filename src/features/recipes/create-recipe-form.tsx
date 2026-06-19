@@ -2,6 +2,7 @@
 
 import { useActionState } from "react";
 
+import { ActionMessage } from "@/components/ui/action-message";
 import { createRecipeAction } from "@/features/recipes/recipe.actions";
 
 const initialState = {
@@ -35,9 +36,7 @@ export function CreateRecipeForm({ categories }: CreateRecipeFormProps) {
       </div>
 
       {state.error ? (
-        <p className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
-          {state.error}
-        </p>
+        <ActionMessage tone="error">{state.error}</ActionMessage>
       ) : null}
 
       <div className="space-y-1">

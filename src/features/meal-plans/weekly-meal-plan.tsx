@@ -123,14 +123,14 @@ function Row({
         return (
           <div
             key={`${day.date}-${mealType}`}
-            className="min-h-24 border-b border-r border-slate-200 p-3 last:border-r-0"
+            className="min-h-24 min-w-0 border-b border-r border-slate-200 p-3 last:border-r-0"
           >
             {meal ? (
-              <div className="flex items-start justify-between gap-2">
-                <div className="space-y-1">
+              <div className="flex min-w-0 items-start justify-between gap-2">
+                <div className="min-w-0 space-y-1">
                   <Link
                     href={`/recipes/${meal.recipe.id}`}
-                    className="text-sm font-semibold text-slate-950 hover:text-emerald-700"
+                    className="block truncate text-sm font-semibold text-slate-950 hover:text-emerald-700"
                   >
                     {meal.recipe.title}
                   </Link>

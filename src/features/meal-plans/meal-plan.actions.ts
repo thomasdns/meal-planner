@@ -1,15 +1,17 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 
 import { upsertMealPlanSchema } from "@/features/meal-plans/meal-plan.validation";
 import {
   deleteMealPlanForCurrentUser,
   upsertMealPlanForCurrentUser,
 } from "@/features/meal-plans/meal-plans.data";
+import { logError } from "@/lib/logger";
 
 export type UpsertMealPlanState = {
   error?: string;
+  success?: string;
 };
 
 export async function upsertMealPlanAction(
@@ -30,27 +32,28 @@ export async function upsertMealPlanAction(
 
   try {
     await upsertMealPlanForCurrentUser(parsed.data);
-  } catch {
+  } catch (error) {
+    await logError("server_action_failed", error, {
+      action: "upsertMealPlan",
+    });
     return {
       error: "Impossible de planifier cette recette.",
     };
   }
 
-  revalidatePath("/meal-plan");
-  revalidatePath("/shopping-list");
-  revalidatePath("/dashboard");
-
-  return {};
+  redirect(`/meal-plan?week=${parsed.data.date}`);
 }
 
 export async function deleteMealPlanAction(mealPlanId: string) {
   try {
     await deleteMealPlanForCurrentUser(mealPlanId);
-  } catch {
+  } catch (error) {
+    await logError("server_action_failed", error, {
+      action: "deleteMealPlan",
+      mealPlanId,
+    });
     return;
   }
 
-  revalidatePath("/meal-plan");
-  revalidatePath("/shopping-list");
-  revalidatePath("/dashboard");
+  redirect("/meal-plan");
 }

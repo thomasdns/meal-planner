@@ -1,5 +1,7 @@
 import { createHash } from "node:crypto";
 
+import { logError, logEvent } from "@/lib/logger";
+
 type RateLimitOptions = {
   limit: number;
   windowMs: number;
@@ -50,24 +52,16 @@ export async function checkRateLimit(
         redisToken,
       );
     } catch (error) {
-      console.error(
-        JSON.stringify({
-          event: "rate_limit_redis_failed",
-          error: normalizeError(error),
-        }),
-      );
+      await logError("rate_limit_redis_failed", error);
     }
   } else if (
     process.env.NODE_ENV === "production" &&
     !hasLoggedMissingRedisConfiguration
   ) {
     hasLoggedMissingRedisConfiguration = true;
-    console.warn(
-      JSON.stringify({
-        event: "rate_limit_redis_not_configured",
-        message: "Falling back to process-local rate limiting.",
-      }),
-    );
+    await logEvent("warn", "rate_limit_redis_not_configured", {
+      message: "Falling back to process-local rate limiting.",
+    });
   }
 
   return checkLocalRateLimit(key, options, now);
@@ -162,12 +156,6 @@ function checkLocalRateLimit(
 
 function hashKey(key: string) {
   return createHash("sha256").update(key.trim().toLowerCase()).digest("hex");
-}
-
-function normalizeError(error: unknown) {
-  return error instanceof Error
-    ? { name: error.name, message: error.message }
-    : { name: "UnknownError", message: "Unknown rate limit error" };
 }
 
 export function clearRateLimitStore() {

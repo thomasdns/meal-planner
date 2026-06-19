@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 
 import {
   createIngredientSchema,
@@ -11,9 +12,11 @@ import {
   deleteIngredientForCurrentUser,
   updateIngredientForCurrentUser,
 } from "@/features/recipes/recipes.data";
+import { logError } from "@/lib/logger";
 
 export type CreateIngredientState = {
   error?: string;
+  success?: string;
 };
 
 export type UpdateIngredientState = {
@@ -40,16 +43,21 @@ export async function createIngredientAction(
 
   try {
     await createIngredientForCurrentUserRecipe(recipeId, parsed.data);
-  } catch {
+  } catch (error) {
+    await logError("server_action_failed", error, {
+      action: "createIngredient",
+      recipeId,
+    });
     return {
       error: "Impossible d'ajouter cet ingredient a cette recette.",
     };
   }
 
-  revalidatePath(`/recipes/${recipeId}`);
   revalidatePath("/recipes");
 
-  return {};
+  return {
+    success: "Ingredient ajoute.",
+  };
 }
 
 export async function updateIngredientAction(
@@ -79,7 +87,11 @@ export async function updateIngredientAction(
     revalidatePath("/recipes");
     revalidatePath("/shopping-list");
     revalidatePath("/dashboard");
-  } catch {
+  } catch (error) {
+    await logError("server_action_failed", error, {
+      action: "updateIngredient",
+      ingredientId,
+    });
     return {
       error: "Impossible de modifier cet ingredient.",
     };
@@ -91,14 +103,22 @@ export async function updateIngredientAction(
 }
 
 export async function deleteIngredientAction(ingredientId: string) {
+  let recipeId: string;
+
   try {
-    const recipeId = await deleteIngredientForCurrentUser(ingredientId);
+    recipeId = await deleteIngredientForCurrentUser(ingredientId);
 
     revalidatePath(`/recipes/${recipeId}`);
     revalidatePath("/recipes");
     revalidatePath("/shopping-list");
     revalidatePath("/dashboard");
-  } catch {
+  } catch (error) {
+    await logError("server_action_failed", error, {
+      action: "deleteIngredient",
+      ingredientId,
+    });
     return;
   }
+
+  redirect(`/recipes/${recipeId}`);
 }

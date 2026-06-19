@@ -13,6 +13,8 @@
     "vercel-build": "npm run build",
     "db:generate": "prisma generate",
     "db:up": "docker compose up -d",
+    "db:backup": "powershell -ExecutionPolicy Bypass -File scripts/backup-postgres.ps1",
+    "db:restore:test": "powershell -ExecutionPolicy Bypass -File scripts/test-postgres-restore.ps1",
     "db:migrate:deploy": "prisma migrate deploy",
     "start": "next start",
     "lint": "eslint",

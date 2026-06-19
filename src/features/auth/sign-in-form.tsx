@@ -43,9 +43,11 @@ export function SignInForm() {
     setIsPending(false);
 
     if (!result?.ok) {
+      const errorString = String(result?.error ?? "");
+
       if (
-        result?.error === "EMAIL_NOT_VERIFIED" ||
-        result?.url?.includes("EMAIL_NOT_VERIFIED")
+        errorString.includes("EMAIL_NOT_VERIFIED") ||
+        String(result?.url ?? "").includes("EMAIL_NOT_VERIFIED")
       ) {
         setError("Verifie ton adresse email avant de te connecter.");
         setIsEmailNotVerified(true);
@@ -129,7 +131,6 @@ export function SignInForm() {
           Reinitialiser
         </Link>
       </p>
-
     </form>
   );
 }

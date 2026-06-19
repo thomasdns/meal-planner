@@ -1,6 +1,7 @@
 "use client";
 
 import { deleteMealPlanAction } from "@/features/meal-plans/meal-plan.actions";
+import { confirmationMessages } from "@/lib/confirmation-messages";
 
 type DeleteMealPlanFormProps = {
   mealPlanId: string;
@@ -11,10 +12,11 @@ export function DeleteMealPlanForm({ mealPlanId }: DeleteMealPlanFormProps) {
     <form
       action={deleteMealPlanAction.bind(null, mealPlanId)}
       onSubmit={(event) => {
-        if (!window.confirm("Retirer ce repas du planning ?")) {
+        if (!window.confirm(confirmationMessages.deleteMealPlan)) {
           event.preventDefault();
         }
       }}
+      className="shrink-0"
     >
       <button
         type="submit"

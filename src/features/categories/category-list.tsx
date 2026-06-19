@@ -2,11 +2,13 @@
 
 import { useActionState } from "react";
 
+import { ActionMessage } from "@/components/ui/action-message";
 import {
   deleteCategoryAction,
   updateCategoryAction,
 } from "@/features/categories/category.actions";
 import type { CategoryListItem } from "@/features/categories/categories.data";
+import { confirmationMessages } from "@/lib/confirmation-messages";
 
 type CategoryListProps = {
   categories: CategoryListItem[];
@@ -47,6 +49,7 @@ function EditableCategory({ category }: EditableCategoryProps) {
     updateCategoryAction.bind(null, category.id),
     initialState,
   );
+  // Do not auto-refresh here; keep action message visible for E2E assertions.
 
   return (
     <div className="rounded-lg border border-slate-200 bg-white p-4">
@@ -125,15 +128,11 @@ function EditableCategory({ category }: EditableCategoryProps) {
         </p>
 
         {state.error ? (
-          <p className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
-            {state.error}
-          </p>
+          <ActionMessage tone="error">{state.error}</ActionMessage>
         ) : null}
 
         {state.success ? (
-          <p className="rounded-md border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-700">
-            {state.success}
-          </p>
+          <ActionMessage tone="success">{state.success}</ActionMessage>
         ) : null}
       </form>
 
@@ -142,9 +141,7 @@ function EditableCategory({ category }: EditableCategoryProps) {
         action={deleteCategoryAction.bind(null, category.id)}
         onSubmit={(event) => {
           if (
-            !window.confirm(
-              "Supprimer cette categorie ? Les recettes associees passeront sans categorie.",
-            )
+            !window.confirm(confirmationMessages.deleteCategory)
           ) {
             event.preventDefault();
           }

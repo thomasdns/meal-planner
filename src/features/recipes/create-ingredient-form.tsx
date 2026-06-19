@@ -1,11 +1,14 @@
 "use client";
 
-import { useActionState } from "react";
+import { useRouter } from "next/navigation";
+import { useActionState, useEffect } from "react";
 
+import { ActionMessage } from "@/components/ui/action-message";
 import { createIngredientAction } from "@/features/recipes/ingredient.actions";
 
 const initialState = {
   error: undefined,
+  success: undefined,
 };
 
 type CreateIngredientFormProps = {
@@ -17,6 +20,13 @@ export function CreateIngredientForm({ recipeId }: CreateIngredientFormProps) {
     createIngredientAction.bind(null, recipeId),
     initialState,
   );
+  const router = useRouter();
+
+  useEffect(() => {
+    if (state.success) {
+      router.refresh();
+    }
+  }, [router, state.success]);
 
   return (
     <form
@@ -31,9 +41,11 @@ export function CreateIngredientForm({ recipeId }: CreateIngredientFormProps) {
       </div>
 
       {state.error ? (
-        <p className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
-          {state.error}
-        </p>
+        <ActionMessage tone="error">{state.error}</ActionMessage>
+      ) : null}
+
+      {state.success ? (
+        <ActionMessage tone="success">{state.success}</ActionMessage>
       ) : null}
 
       <div className="space-y-1">
