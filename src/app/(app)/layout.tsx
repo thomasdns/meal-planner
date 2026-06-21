@@ -2,6 +2,7 @@ import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 
 import { AppShell } from "@/components/layout/app-shell";
+import { SiteFooter } from "@/components/layout/site-footer";
 import { isAdminRole } from "@/lib/admin";
 import { authOptions } from "@/lib/auth";
 
@@ -17,8 +18,11 @@ export default async function AuthenticatedLayout({
   }
 
   return (
-    <AppShell showAdminNav={isAdminRole(session.user.role)}>
-      {children}
-    </AppShell>
+    <>
+      <AppShell showAdminNav={isAdminRole(session.user.role)}>
+        {children}
+      </AppShell>
+      <SiteFooter />
+    </>
   );
 }

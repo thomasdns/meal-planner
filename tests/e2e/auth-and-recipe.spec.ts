@@ -1,4 +1,5 @@
 import { expect, type Page, test } from "@playwright/test";
+import ExcelJS from "exceljs";
 
 import {
   createEmailVerificationToken,
@@ -64,7 +65,7 @@ test("an unverified user can request a new verification link", async ({
 
     await expect(
       page.getByText(
-        "Si un compte non verifie existe avec cet email, un nouveau lien a ete envoye.",
+        "Si un compte non verifie existe avec cet email, un nouveau lien valable 24 heures a ete envoye.",
       ),
     ).toBeVisible();
 
@@ -284,6 +285,23 @@ test("weekly planning generates and updates the shopping list", async ({
     await expect(itemRow).toContainText("5 g");
     await expect(itemRow).toContainText(recipeTitle);
 
+    const downloadPromise = page.waitForEvent("download");
+    await page.getByRole("link", { name: "Exporter vers Excel" }).click();
+    const download = await downloadPromise;
+    expect(download.suggestedFilename()).toMatch(/liste-courses-\d{4}-\d{2}-\d{2}\.xlsx/);
+    const stream = await download.createReadStream();
+    const chunks: Buffer[] = [];
+
+    for await (const chunk of stream) {
+      chunks.push(Buffer.from(chunk));
+    }
+
+    const workbook = new ExcelJS.Workbook();
+    await workbook.xlsx.load(Buffer.concat(chunks));
+    const shoppingSheet = workbook.getWorksheet("Liste de courses");
+    expect(shoppingSheet).toBeDefined();
+    expect(JSON.stringify(shoppingSheet?.model)).toContain(ingredientName);
+
     await itemRow
       .getByRole("button", { name: /Marquer comme achete/ })
       .click();
@@ -354,6 +372,7 @@ test("a user can permanently delete their own account", async ({ page }) => {
     await signIn(page, email, password);
 
     await page.goto("/profile");
+    await expect(page.getByRole("button", { name: "Mettre a jour" })).toBeDisabled();
     await page.getByRole("button", { name: "Supprimer mon compte" }).click();
     const dialog = page.getByRole("dialog", {
       name: "Confirmer la suppression",
@@ -406,6 +425,14 @@ test("admin can inspect, edit and delete a user", async ({ page, browser }) => {
     await signIn(userPage, userEmail, password);
 
     await signIn(page, adminEmail, password);
+    await page.goto("/profile");
+    await expect(
+      page.getByRole("heading", { name: "Suppression du compte indisponible" }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("button", { name: "Supprimer mon compte" }),
+    ).toHaveCount(0);
+
     await page.goto("/admin");
     await expect(
       page.getByRole("heading", { name: "Pilotage de l'application" }),

@@ -59,13 +59,13 @@ describe("admin statistics period", () => {
 describe("admin user filters", () => {
   it("normalizes valid search filters", () => {
     const result = adminUserFiltersSchema.parse({
-      query: "  thomas@example.com  ",
+      query: "  utilisateur@example.com  ",
       role: "ADMIN",
       page: "3",
     });
 
     expect(result).toEqual({
-      query: "thomas@example.com",
+      query: "utilisateur@example.com",
       role: "ADMIN",
       page: 3,
     });

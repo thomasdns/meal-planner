@@ -69,7 +69,7 @@ export function AdminUsersPanel({ data, filters }: AdminUsersPanelProps) {
           {filters.query || filters.role ? (
             <Link
               href="/admin?view=users"
-              className="rounded-md border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100"
+              className="button-secondary"
             >
               Effacer
             </Link>
@@ -176,7 +176,7 @@ function PaginationLink({
     <Link
       href={`/admin?${params.toString()}`}
       aria-label={label}
-      className={`inline-flex h-10 items-center justify-center rounded-md border border-slate-300 text-sm font-medium hover:bg-slate-100 ${
+      className={`inline-flex h-10 items-center justify-center rounded-md border border-emerald-700 bg-white text-sm font-medium text-emerald-800 hover:bg-emerald-50 ${
         compact ? "min-w-10 px-3" : "px-3"
       }`}
     >

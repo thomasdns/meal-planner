@@ -4,8 +4,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
-import { SignOutButton } from "@/features/auth/sign-out-button";
-
 type NavigationItem = {
   href: string;
   label: string;
@@ -42,7 +40,7 @@ export function AppNavigation({ items }: AppNavigationProps) {
         ref={menuButtonRef}
         type="button"
         onClick={() => setIsOpen((current) => !current)}
-        className="inline-flex h-11 w-11 items-center justify-center rounded-md border border-slate-300 text-slate-700 hover:bg-slate-100 md:hidden"
+        className="inline-flex h-11 w-11 items-center justify-center rounded-md border border-emerald-700 text-emerald-800 hover:bg-emerald-50 md:hidden"
         aria-expanded={isOpen}
         aria-controls="mobile-navigation"
         aria-label={isOpen ? "Fermer le menu" : "Ouvrir le menu"}
@@ -98,9 +96,6 @@ export function AppNavigation({ items }: AppNavigationProps) {
               </li>
             );
           })}
-          <li className="pt-2 md:pt-0">
-            <SignOutButton />
-          </li>
         </ul>
       </nav>
     </div>

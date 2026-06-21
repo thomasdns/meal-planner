@@ -34,7 +34,7 @@ export default async function VerifyEmailPage({
         };
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-md flex-col justify-center px-6">
+    <main id="main-content" tabIndex={-1} className="mx-auto flex min-h-screen max-w-md flex-col justify-center px-6">
       <div className="mb-8 space-y-3">
         <p className="text-sm font-medium text-emerald-700">Meal Planner</p>
         <h1 className="text-3xl font-semibold tracking-tight">

@@ -35,19 +35,12 @@ export function ShoppingList({ shoppingList }: ShoppingListProps) {
     <div className="space-y-4">
       {error ? <ActionMessage tone="error">{error}</ActionMessage> : null}
       <div className="flex flex-wrap gap-3 print:hidden">
-        <button
-          type="button"
-          onClick={() => window.print()}
-          className="inline-flex rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-800 hover:bg-slate-100"
-        >
-          Imprimer
-        </button>
         <a
-          href={createCsvDataUrl(items)}
-          download={`liste-courses-${shoppingList.startDate}.csv`}
+          href="/api/shopping-list/export"
+          download
           className="inline-flex rounded-md bg-emerald-700 px-3 py-2 text-sm font-medium text-white hover:bg-emerald-800"
         >
-          Exporter CSV
+          Exporter vers Excel
         </a>
         <form
           onSubmit={async (event) => {
@@ -72,7 +65,7 @@ export function ShoppingList({ shoppingList }: ShoppingListProps) {
           <button
             type="submit"
             disabled={isResetting}
-            className="inline-flex rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-800 hover:bg-slate-100"
+            className="button-secondary px-3"
           >
             {isResetting ? "Reinitialisation..." : "Reinitialiser"}
           </button>
@@ -223,7 +216,7 @@ function ShoppingCheckForm({
         aria-label={`${
           item.checked ? "Marquer comme non achete" : "Marquer comme achete"
         } : ${item.name}`}
-        className="flex h-10 w-10 items-center justify-center rounded-md hover:bg-slate-100"
+        className="flex h-10 w-10 items-center justify-center rounded-md hover:bg-emerald-50"
       >
         <span
           aria-hidden="true"
@@ -246,27 +239,4 @@ function formatQuantity(quantity: number | null, unit: string | null) {
   }
 
   return [quantity, unit].filter(Boolean).join(" ");
-}
-
-function createCsvDataUrl(items: WeeklyShoppingList["items"]) {
-  const rows = [
-    ["Ingredient", "Quantite", "Unite", "Coche", "Recettes"],
-    ...items.map((item) => [
-      item.name,
-      item.quantity?.toString() ?? "",
-      item.unit ?? "",
-      item.checked ? "oui" : "non",
-      item.recipeTitles.join(", "),
-    ]),
-  ];
-  const separator = ";";
-  const csv = rows
-    .map((row) =>
-      row
-        .map((cell) => `"${cell.replaceAll('"', '""')}"`)
-        .join(separator),
-    )
-    .join("\r\n");
-
-  return `data:text/csv;charset=utf-8,${encodeURIComponent(`\uFEFF${csv}`)}`;
 }

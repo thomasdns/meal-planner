@@ -14,11 +14,10 @@ import {
   createAuthToken,
   createAuthTokenIdentifier,
 } from "@/lib/auth-tokens";
+import { authTokenPolicy } from "@/lib/auth-token-policy";
 import { sendPasswordResetEmail } from "@/lib/email";
 import { prisma } from "@/lib/prisma";
 import { checkRateLimit } from "@/lib/rate-limit";
-
-const resetTokenTtlMs = 30 * 60 * 1000;
 
 export type ForgotPasswordState = {
   error?: string;
@@ -70,7 +69,7 @@ export async function requestPasswordResetAction(
   if (user) {
     const token = await createAuthToken(
       createAuthTokenIdentifier(authTokenPurpose.passwordReset, user.email),
-      resetTokenTtlMs,
+      authTokenPolicy.passwordReset.ttlMs,
     );
 
     resetLink = createAppUrl(`/auth/reset-password?token=${token}`);
@@ -86,7 +85,7 @@ export async function requestPasswordResetAction(
 
   return {
     success:
-      "Si un compte existe avec cet email, un lien de reinitialisation a ete genere.",
+      "Si un compte existe avec cet email, un lien de reinitialisation valable 30 minutes a ete envoye.",
     resetLink: canExposeAuthLinks() ? resetLink : undefined,
   };
 }

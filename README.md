@@ -23,7 +23,7 @@ securite, Git/GitHub et deploiement.
 - Association recette, jour et type de repas.
 - Suppression d'un repas planifie.
 - Generation automatique de liste de courses.
-- Liste de courses cochable, imprimable et exportable en CSV.
+- Liste de courses cochable et exportable au format Excel.
 - Tableau de bord utilisateur.
 - Profil utilisateur avec modification du nom et de l'email.
 - Deconnexion et suppression definitive du compte avec confirmation.
@@ -33,6 +33,10 @@ securite, Git/GitHub et deploiement.
 - Envoi d'emails transactionnels avec suivi structure des erreurs SMTP.
 - Journalisation JSON dans Vercel et pages d'erreur dediees.
 - Sauvegarde PostgreSQL et test de restauration isole.
+- Mentions legales et politique de confidentialite incluant les cookies.
+- Export Excel des donnees personnelles et purge quotidienne des jetons expires.
+- Vercel Web Analytics avec filtrage des URL sensibles.
+- Google Analytics bloque jusqu'au consentement de l'utilisateur.
 
 ## Stack technique
 
@@ -108,11 +112,23 @@ SMTP_PASSWORD
 EMAIL_FROM
 UPSTASH_REDIS_REST_URL
 UPSTASH_REDIS_REST_TOKEN
+CRON_SECRET
+LEGAL_PUBLISHER_NAME
+LEGAL_PUBLISHER_STATUS
+LEGAL_PUBLISHER_ADDRESS
+LEGAL_PUBLICATION_DIRECTOR
+LEGAL_PRIVACY_EMAIL
+LEGAL_SITE_URL
+LEGAL_HOST_NAME
+LEGAL_HOST_ADDRESS
+LEGAL_HOST_URL
+NEXT_PUBLIC_GOOGLE_ANALYTICS_ID
 ```
 
 Notes :
 
-- `DATABASE_URL` pointe vers PostgreSQL.
+- `DATABASE_URL` pointe vers PostgreSQL. Sur Vercel, utiliser l'URL Neon avec
+  pooler pour les connexions de l'application.
 - `NEXTAUTH_URL` vaut `http://localhost:3000` en local.
 - `NEXTAUTH_SECRET` doit etre une valeur secrete robuste.
 - `NEXT_SERVER_ACTIONS_ENCRYPTION_KEY` doit etre une cle base64 de 32 octets.
@@ -123,6 +139,21 @@ Notes :
 - Elles sont requises sur Vercel. En local, leur absence active un repli en
   memoire et journalise `rate_limit_redis_not_configured`.
 - L'acces admin est stocke en base via `User.role`, pas dans les variables d'environnement.
+- `CRON_SECRET` protege la purge quotidienne des jetons expires.
+- Les variables `LEGAL_*` sont facultatives : des valeurs publiques par defaut
+  sont fournies par l'application. Elles ne doivent contenir aucun secret.
+- `NEXT_PUBLIC_GOOGLE_ANALYTICS_ID` contient l'identifiant public `G-...` et
+  doit etre limite a l'environnement Vercel **Production**.
+
+Configuration de production recommandee :
+
+- Vercel contient les variables applicatives, SMTP, Upstash, `CRON_SECRET` et
+  `NEXT_PUBLIC_GOOGLE_ANALYTICS_ID` ;
+- GitHub Actions contient uniquement `PRODUCTION_DATABASE_URL` pour le workflow
+  de migrations ;
+- `PRODUCTION_DATABASE_URL` utilise l'URL Neon directe sans pooler ;
+- aucune valeur secrete ne doit etre placee dans les variables GitHub visibles,
+  le depot ou un fichier `.env.example`.
 
 Sans configuration SMTP complete, l'envoi est refuse et une erreur structuree
 est journalisee cote serveur. Les liens de verification et de reinitialisation
@@ -209,6 +240,25 @@ Le test e2e couvre le parcours principal :
 - suppression definitive de son propre compte ;
 - consultation, modification et suppression d'un utilisateur par un admin ;
 - revocation de session apres modification administrative d'un compte.
+- acces aux pages legales et gestion reversible des preferences cookies ;
+- navigation mobile au clavier et controle automatise WCAG avec axe-core ;
+- export des donnees personnelles sans mot de passe, session ni jeton.
+
+## Confidentialite Et Analytics
+
+Les procedures et le registre technique sont documentes dans :
+
+- `PRIVACY_GOVERNANCE.md` pour les durees et sous-traitants ;
+- `ANALYTICS_SETUP.md` pour Vercel Web Analytics et Google Analytics ;
+- `BACKUP_RESTORE.md` pour la retention des sauvegardes ;
+- `OBSERVABILITY.md` pour la retention et l'expurgation des journaux.
+
+Les informations publiques sont accessibles sur `/mentions-legales` et
+`/politique-de-confidentialite`. Cette derniere page regroupe la politique de
+confidentialite, les traceurs et la gestion du consentement. Les CGU ne sont pas
+affichees car le service est actuellement gratuit et leur publication n'est pas
+une obligation generale ; les regles essentielles d'utilisation figurent dans
+les mentions legales.
 
 L'envoi SMTP reel reste volontairement hors des tests automatises : Playwright
 utilise un transport JSON local qui ne transmet aucun email.

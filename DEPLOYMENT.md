@@ -25,6 +25,15 @@ SMTP_PASSWORD
 EMAIL_FROM
 UPSTASH_REDIS_REST_URL
 UPSTASH_REDIS_REST_TOKEN
+CRON_SECRET
+LEGAL_PUBLISHER_NAME
+LEGAL_PUBLISHER_STATUS
+LEGAL_PUBLISHER_ADDRESS
+LEGAL_PUBLICATION_DIRECTOR
+LEGAL_PRIVACY_EMAIL
+LEGAL_HOST_NAME
+LEGAL_HOST_ADDRESS
+LEGAL_HOST_URL
 ```
 
 `DATABASE_URL` doit pointer vers la base PostgreSQL en ligne.
@@ -51,6 +60,17 @@ son token REST dans les variables Production et Preview de Vercel.
 
 Les erreurs structurees sont disponibles dans les Runtime Logs Vercel sans
 variable supplementaire. Voir `OBSERVABILITY.md`.
+
+`CRON_SECRET` est une valeur aleatoire longue. Vercel l'envoie automatiquement
+dans l'en-tete `Authorization` de la tache definie dans `vercel.json`. Apres le
+deploiement, verifier dans **Settings > Crons** que
+`/api/cron/cleanup-auth-tokens` est planifiee chaque jour.
+
+Les variables `LEGAL_*` alimentent les pages legales. Elles sont gerees dans
+Vercel mais leur valeur est publique une fois la page rendue.
+
+Ne pas ajouter `NEXT_PUBLIC_GOOGLE_ANALYTICS_ID` avant d'avoir suivi toutes les
+etapes de `ANALYTICS_SETUP.md`. Son ajout exige un redeploiement.
 
 ## Commande de build Vercel
 

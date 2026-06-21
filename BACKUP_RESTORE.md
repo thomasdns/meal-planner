@@ -41,6 +41,11 @@ La base de developpement `meal_planner_db` n'est jamais modifiee par ce test.
 4. Limiter l'acces aux sauvegardes aux personnes autorisees.
 5. Tester trimestriellement une restauration dans un projet Neon temporaire.
 6. Noter la date, la duree et le resultat de chaque exercice.
+7. Supprimer automatiquement toute archive agee de plus de 30 jours.
+
+La duree cible de conservation des sauvegardes de production est de 30 jours.
+Une suppression de compte est immediate dans la base active ; les donnees
+residuelles disparaissent au plus tard a l'expiration des sauvegardes.
 
 Exemple de sauvegarde distante, avec une variable chargee dans le terminal :
 

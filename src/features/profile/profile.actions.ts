@@ -56,6 +56,12 @@ export async function updateProfileAction(
     };
   }
 
+  if (!updateContext.hasProfileChanged) {
+    return {
+      error: "Aucune modification a enregistrer.",
+    };
+  }
+
   if (updateContext.hasEmailChanged) {
     const verificationLink = await createEmailVerificationLink(
       parsed.data.email,
@@ -116,7 +122,14 @@ export async function deleteAccountAction(
     };
   }
 
-  await deleteCurrentUserAccount();
+  const deleted = await deleteCurrentUserAccount();
+
+  if (!deleted) {
+    return {
+      error: "Un compte administrateur ne peut pas etre supprime depuis le profil.",
+      success: false,
+    };
+  }
 
   return {
     success: true,

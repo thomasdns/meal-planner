@@ -8,11 +8,10 @@ import {
   createAuthToken,
   createAuthTokenIdentifier,
 } from "@/lib/auth-tokens";
+import { authTokenPolicy } from "@/lib/auth-token-policy";
 import { sendEmailVerificationEmail } from "@/lib/email";
 import { prisma } from "@/lib/prisma";
 import { checkRateLimit } from "@/lib/rate-limit";
-
-const emailVerificationTokenTtlMs = 24 * 60 * 60 * 1000;
 
 export type ResendEmailVerificationState = {
   error?: string;
@@ -64,14 +63,14 @@ export async function resendEmailVerificationAction(
 
   return {
     success:
-      "Si un compte non verifie existe avec cet email, un nouveau lien a ete envoye.",
+      "Si un compte non verifie existe avec cet email, un nouveau lien valable 24 heures a ete envoye.",
   };
 }
 
 export async function createEmailVerificationLink(email: string) {
   const token = await createAuthToken(
     createAuthTokenIdentifier(authTokenPurpose.emailVerification, email),
-    emailVerificationTokenTtlMs,
+    authTokenPolicy.emailVerification.ttlMs,
   );
 
   return createAppUrl(`/auth/verify-email/confirm?token=${token}`);

@@ -155,7 +155,7 @@ export function DeleteAccountForm() {
                 type="button"
                 disabled={isPending}
                 onClick={() => setIsOpen(false)}
-                className="inline-flex rounded-md border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
+                className="button-secondary"
               >
                 Annuler
               </button>

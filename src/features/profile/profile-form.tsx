@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 
 import { ActionMessage } from "@/components/ui/action-message";
 import { updateProfileAction } from "@/features/profile/profile.actions";
@@ -16,10 +16,17 @@ type ProfileFormProps = {
 };
 
 export function ProfileForm({ name, email }: ProfileFormProps) {
+  const initialName = name ?? "";
+  const initialEmail = email ?? "";
+  const [currentName, setCurrentName] = useState(initialName);
+  const [currentEmail, setCurrentEmail] = useState(initialEmail);
   const [state, formAction, isPending] = useActionState(
     updateProfileAction,
     initialState,
   );
+  const hasChanged =
+    currentName.trim() !== initialName.trim() ||
+    currentEmail.trim().toLowerCase() !== initialEmail.trim().toLowerCase();
 
   return (
     <form
@@ -51,7 +58,8 @@ export function ProfileForm({ name, email }: ProfileFormProps) {
           name="name"
           type="text"
           required
-          defaultValue={name ?? ""}
+          value={currentName}
+          onChange={(event) => setCurrentName(event.target.value)}
           className="w-full rounded-md border border-slate-300 bg-transparent px-3 py-2 text-sm outline-none focus:border-emerald-600"
         />
       </div>
@@ -65,14 +73,15 @@ export function ProfileForm({ name, email }: ProfileFormProps) {
           name="email"
           type="email"
           required
-          defaultValue={email ?? ""}
+          value={currentEmail}
+          onChange={(event) => setCurrentEmail(event.target.value)}
           className="w-full rounded-md border border-slate-300 bg-transparent px-3 py-2 text-sm outline-none focus:border-emerald-600"
         />
       </div>
 
       <button
         type="submit"
-        disabled={isPending}
+        disabled={isPending || !hasChanged}
         className="inline-flex rounded-md bg-emerald-700 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-800 disabled:cursor-not-allowed disabled:opacity-60"
       >
         {isPending ? "Mise a jour..." : "Mettre a jour"}

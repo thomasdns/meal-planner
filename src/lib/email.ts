@@ -2,6 +2,7 @@ import "server-only";
 
 import { SMTPClient } from "emailjs";
 
+import { authTokenPolicy } from "@/lib/auth-token-policy";
 import { logError, logEvent } from "@/lib/logger";
 
 type SendEmailInput = {
@@ -135,30 +136,36 @@ function normalizeSmtpError(error: unknown) {
 }
 
 export async function sendEmailVerificationEmail(email: string, url: string) {
+  const validity = authTokenPolicy.emailVerification.validityLabel;
+
   return sendEmail({
     to: email,
     subject: "Verifie ton email Meal Planner",
-    text: `Bienvenue sur Meal Planner. Verifie ton email avec ce lien : ${url}`,
+    text: `Bienvenue sur Meal Planner. Verifie ton email avec ce lien : ${url}\n\nCe lien est valable pendant ${validity}. Apres ce delai, demande un nouveau lien.`,
     html: `
       <main>
         <h1>Bienvenue sur Meal Planner</h1>
         <p>Confirme ton adresse email pour securiser ton compte.</p>
         <p><a href="${url}">Verifier mon email</a></p>
+        <p>Ce lien est valable pendant ${validity}. Apres ce delai, demande un nouveau lien.</p>
       </main>
     `,
   });
 }
 
 export async function sendPasswordResetEmail(email: string, url: string) {
+  const validity = authTokenPolicy.passwordReset.validityLabel;
+
   return sendEmail({
     to: email,
     subject: "Reinitialisation de ton mot de passe Meal Planner",
-    text: `Pour changer ton mot de passe, ouvre ce lien : ${url}`,
+    text: `Pour changer ton mot de passe, ouvre ce lien : ${url}\n\nCe lien est valable pendant ${validity}. Apres ce delai, demande un nouveau lien.`,
     html: `
       <main>
         <h1>Reinitialisation du mot de passe</h1>
         <p>Ouvre ce lien pour choisir un nouveau mot de passe.</p>
         <p><a href="${url}">Changer mon mot de passe</a></p>
+        <p>Ce lien est valable pendant ${validity}. Apres ce delai, demande un nouveau lien.</p>
       </main>
     `,
   });

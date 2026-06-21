@@ -49,7 +49,7 @@ export default async function MealPlanPage({
         <div className="grid gap-3 sm:grid-cols-3 lg:flex lg:flex-wrap lg:items-center">
           <Link
             href={`/meal-plan?week=${weeklyMealPlan.previousWeekStartDate}`}
-            className="inline-flex justify-center rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-800 hover:bg-slate-100"
+            className="button-secondary px-3"
           >
             Semaine precedente
           </Link>
@@ -61,7 +61,7 @@ export default async function MealPlanPage({
           </Link>
           <Link
             href={`/meal-plan?week=${weeklyMealPlan.nextWeekStartDate}`}
-            className="inline-flex justify-center rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-800 hover:bg-slate-100"
+            className="button-secondary px-3"
           >
             Semaine suivante
           </Link>

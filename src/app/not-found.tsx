@@ -2,7 +2,7 @@ import Link from "next/link";
 
 export default function NotFoundPage() {
   return (
-    <main className="mx-auto flex min-h-screen max-w-xl flex-col justify-center px-6 py-12">
+    <main id="main-content" tabIndex={-1} className="mx-auto flex min-h-screen max-w-xl flex-col justify-center px-6 py-12">
       <p className="text-sm font-medium text-emerald-700">Erreur 404</p>
       <h1 className="mt-2 text-3xl font-semibold tracking-tight">
         Page introuvable

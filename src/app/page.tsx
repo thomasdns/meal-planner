@@ -2,8 +2,8 @@ import Link from "next/link";
 
 export default function Home() {
   return (
-    <main className="min-h-screen bg-slate-50 text-slate-950">
-      <section className="mx-auto flex min-h-screen max-w-6xl flex-col justify-center px-6 py-16">
+    <main id="main-content" tabIndex={-1} className="flex flex-1 bg-slate-50 text-slate-950">
+      <section className="mx-auto flex min-h-[calc(100vh-120px)] w-full max-w-6xl flex-col justify-center px-6 py-16">
         <div className="max-w-3xl space-y-6">
           <p className="text-sm font-medium text-emerald-700">
             Planificateur de repas hebdomadaire
@@ -25,7 +25,7 @@ export default function Home() {
             </Link>
             <Link
               href="/auth/sign-in"
-              className="inline-flex justify-center rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-800 hover:bg-slate-100"
+              className="button-secondary"
             >
               Se connecter
             </Link>

@@ -38,3 +38,10 @@ Lors d'un controle de production, rechercher en priorite :
 Une integration externe pourra etre ajoutee plus tard si le volume ou les
 besoins d'astreinte le justifient. Elle n'est pas necessaire pour le projet
 actuel.
+
+## Conservation
+
+La duree cible des journaux applicatifs et de securite est de 30 jours. Verifier
+dans Vercel que la retention effective du plan utilise ne depasse pas cette
+duree. Les journaux ne doivent contenir ni contenu de recette, ni email complet,
+ni parametre d'URL, ni jeton d'authentification.

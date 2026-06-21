@@ -39,7 +39,7 @@ export function AdminStatistics({ data, periodDays }: AdminStatisticsProps) {
         <div>
           <p className="mb-2 text-xs font-medium text-slate-500">Periode analysee</p>
           <div
-            className="inline-flex overflow-hidden rounded-md border border-slate-300 bg-white"
+            className="inline-flex overflow-hidden rounded-md border border-emerald-700 bg-white"
             aria-label="Periode des statistiques"
           >
             {periods.map((period) => (
@@ -47,10 +47,10 @@ export function AdminStatistics({ data, periodDays }: AdminStatisticsProps) {
                 key={period}
                 href={`/admin?view=statistics&period=${period}`}
                 aria-current={period === periodDays ? "page" : undefined}
-                className={`border-r border-slate-300 px-4 py-2 text-sm font-medium last:border-r-0 ${
+                className={`border-r border-emerald-700 px-4 py-2 text-sm font-medium last:border-r-0 ${
                   period === periodDays
                     ? "bg-emerald-700 text-white"
-                    : "text-slate-700 hover:bg-slate-100"
+                    : "text-emerald-800 hover:bg-emerald-50"
                 }`}
               >
                 {period} jours

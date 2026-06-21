@@ -87,6 +87,16 @@ export async function consumeAuthToken(
   return verificationToken.identifier.slice(`${purpose}:`.length);
 }
 
+export async function deleteExpiredAuthTokens(now = new Date()) {
+  return prisma.verificationToken.deleteMany({
+    where: {
+      expires: {
+        lte: now,
+      },
+    },
+  });
+}
+
 function hashAuthToken(token: string) {
   return createHash("sha256").update(token).digest("hex");
 }
