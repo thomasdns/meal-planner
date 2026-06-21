@@ -1,5 +1,7 @@
 import { createHash } from "node:crypto";
 
+import "server-only";
+
 import { logError, logEvent } from "@/lib/logger";
 
 type RateLimitOptions = {
