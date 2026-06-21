@@ -1,21 +1,5 @@
 # Mise En Place Des Analytics
 
-## Vercel Web Analytics
-
-Le code et le filtrage sont deja integres. Les pages de reinitialisation et de
-confirmation email sont exclues. Les parametres d'URL sont retires et les IDs de
-recette ou d'utilisateur sont remplaces par des chemins generiques.
-
-Dans Vercel :
-
-1. ouvrir le projet `meal-planner` ;
-2. ouvrir **Analytics** puis **Enable Web Analytics** ;
-3. redeployer la branche `main` ;
-4. visiter quelques pages sans saisir de donnees sensibles dans l'URL ;
-5. verifier que les chemins affiches ne contiennent ni email, ni jeton, ni ID ;
-6. conserver les evenements personnalises desactives tant qu'ils ne sont pas
-   documentes dans la politique de confidentialite.
-
 ## Google Analytics 4
 
 Le consentement est integre. Google Analytics reste inactif sans identifiant de
@@ -28,12 +12,13 @@ Dans Google Analytics :
 
 1. creer une propriete GA4 et un flux Web pour l'URL de production ;
 2. copier l'identifiant au format `G-XXXXXXXXXX` ;
-3. regler la conservation des donnees liees aux utilisateurs et evenements sur
-   2 mois ;
-4. dans les mesures ameliorees, conserver uniquement les mesures reellement
-   necessaires et documentees ; pour la configuration minimale de Meal Planner,
-   conserver les pages vues et desactiver les interactions avec les formulaires,
-   la recherche interne, les videos et les telechargements ;
+3. regler la conservation des donnees liees aux utilisateurs et aux evenements
+   sur 2 mois, sans reinitialisation lors d'une nouvelle activite ;
+4. dans les mesures ameliorees, conserver les pages vues, les defilements, les
+   clics sortants, les telechargements et les interactions avec les formulaires ;
+   desactiver la recherche interne automatique afin de ne pas transmettre les
+   termes saisis, ainsi que la mesure video tant que le site ne contient pas de
+   videos ;
 5. desactiver les fonctions publicitaires, Google Signals, la collecte de
    donnees fournies par les utilisateurs et le partage publicitaire ;
 6. accepter les conditions de traitement et verifier les transferts applicables.

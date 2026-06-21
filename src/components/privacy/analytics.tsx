@@ -1,6 +1,5 @@
 "use client";
 
-import { Analytics as VercelAnalytics, type BeforeSendEvent } from "@vercel/analytics/react";
 import Script from "next/script";
 import { usePathname } from "next/navigation";
 import { useEffect, useMemo, useSyncExternalStore } from "react";
@@ -50,7 +49,6 @@ export function PrivacyAnalytics() {
 
   return (
     <>
-      <VercelAnalytics beforeSend={filterVercelAnalyticsEvent} />
       {googleAnalyticsId && consent?.audience ? (
         <>
           <Script
@@ -112,26 +110,6 @@ function sanitizeAnalyticsPath(pathname: string) {
   return pathname
     .replace(/^\/recipes\/[^/]+$/, "/recipes/[recipeId]")
     .replace(/^\/admin\/users\/[^/]+$/, "/admin/users/[userId]");
-}
-
-function filterVercelAnalyticsEvent(event: BeforeSendEvent) {
-  const url = new URL(event.url, window.location.origin);
-
-  if (
-    url.pathname.startsWith("/auth/reset-password") ||
-    url.pathname.startsWith("/auth/verify-email/confirm")
-  ) {
-    return null;
-  }
-
-  url.search = "";
-  url.hash = "";
-  url.pathname = sanitizeAnalyticsPath(url.pathname) ?? url.pathname;
-
-  return {
-    ...event,
-    url: url.toString(),
-  };
 }
 
 declare global {

@@ -62,8 +62,9 @@ export function CookieConsent() {
           <h2 id={titleId} className="sr-only">Choix des cookies</h2>
           <p className="max-w-4xl text-sm leading-6 text-slate-100">
             Ce site utilise des cookies necessaires au fonctionnement du compte.
-            Les statistiques Vercel sont filtrees pour exclure les donnees
-            sensibles. Google Analytics n'est charge qu'apres ton accord.{" "}
+            Google Analytics mesure l'audience et certaines interactions
+            uniquement apres ton accord, sans recevoir le contenu saisi dans
+            les formulaires.{" "}
             <a href="/politique-de-confidentialite#cookies" className="font-semibold text-white underline underline-offset-2">
               En savoir plus.
             </a>

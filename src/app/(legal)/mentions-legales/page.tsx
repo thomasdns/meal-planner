@@ -51,7 +51,7 @@ export default function LegalNoticePage() {
       </LegalSection>
 
       <LegalSection title="8. Données personnelles et cookies">
-        <p>Meal Planner traite les données nécessaires aux comptes et aux fonctionnalités de planification. Vercel Analytics fournit des statistiques techniques filtrées. La balise Google Analytics 4 est chargée uniquement après le consentement du visiteur et les fonctions publicitaires sont désactivées.</p>
+        <p>Meal Planner traite les données nécessaires aux comptes et aux fonctionnalités de planification. La balise Google Analytics 4 est chargée uniquement après le consentement du visiteur. Elle mesure l'audience, les caractéristiques techniques générales et certaines interactions utiles à l'amélioration du service. Les fonctions publicitaires, les signaux Google et la collecte de données fournies par les utilisateurs sont désactivés.</p>
         <p>Les finalités, durées de conservation, prestataires et modalités de gestion du consentement sont détaillées dans la <Link className="text-emerald-700 underline" href="/politique-de-confidentialite">politique de confidentialité</Link>.</p>
       </LegalSection>
 

@@ -1,6 +1,6 @@
 import "server-only";
 
-export const legalDocumentVersion = "1.3";
+export const legalDocumentVersion = "1.4";
 export const legalDocumentDate = "21 juin 2026";
 
 export const legalConfig = {

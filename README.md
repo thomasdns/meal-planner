@@ -35,7 +35,7 @@ securite, Git/GitHub et deploiement.
 - Sauvegarde PostgreSQL et test de restauration isole.
 - Mentions legales et politique de confidentialite incluant les cookies.
 - Export Excel des donnees personnelles et purge quotidienne des jetons expires.
-- Vercel Web Analytics avec filtrage des URL sensibles.
+- Google Analytics 4 soumis au consentement et filtrage des URL sensibles.
 - Google Analytics bloque jusqu'au consentement de l'utilisateur.
 
 ## Stack technique
@@ -261,7 +261,7 @@ Le test e2e couvre le parcours principal :
 Les procedures et le registre technique sont documentes dans :
 
 - `PRIVACY_GOVERNANCE.md` pour les durees et sous-traitants ;
-- `ANALYTICS_SETUP.md` pour Vercel Web Analytics et Google Analytics ;
+- `ANALYTICS_SETUP.md` pour Google Analytics 4 et la gestion du consentement ;
 - `BACKUP_RESTORE.md` pour la retention des sauvegardes ;
 - `OBSERVABILITY.md` pour la retention et l'expurgation des journaux.
 
