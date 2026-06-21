@@ -28,7 +28,7 @@ export default function PrivacyPage() {
         <h3 className="text-lg font-semibold text-slate-950">3.2 Contenus enregistrés</h3>
         <p>Les recettes, catégories, ingrédients, étapes de préparation, temps de réalisation, repas planifiés et éléments de la liste de courses sont enregistrés pour fournir les fonctionnalités demandées. Ces contenus restent associés au compte qui les a créés.</p>
         <h3 className="text-lg font-semibold text-slate-950">3.3 Données techniques et mesure d'audience</h3>
-        <p>Des informations techniques limitées peuvent être traitées pour sécuriser le service, limiter les abus et diagnostiquer les erreurs. Vercel Analytics mesure l'audience avec filtrage des paramètres sensibles. Google Analytics peut traiter les pages consultées, le type d'appareil, le navigateur et une localisation approximative uniquement après consentement.</p>
+        <p>Des informations techniques limitées peuvent être traitées pour sécuriser le service, limiter les abus et diagnostiquer les erreurs. Vercel Analytics mesure l'audience avec filtrage des paramètres sensibles. Après consentement, Google Analytics 4 peut traiter les pages consultées, le type d'appareil, le navigateur, une localisation approximative ainsi que les interactions de mesure améliorée laissées actives dans le flux Web. Les paramètres d'URL sont supprimés, les routes contenant un identifiant de recette ou d'utilisateur sont généralisées et les pages de confirmation email ou de réinitialisation sont exclues.</p>
       </LegalSection>
 
       <LegalSection title="4. Finalités et bases légales">
@@ -48,7 +48,7 @@ export default function PrivacyPage() {
         <h3 className="text-lg font-semibold text-slate-950">6.3 Upstash</h3>
         <p>Upstash fournit le stockage Redis utilisé pour limiter les tentatives et protéger l'application contre les abus. La localisation dépend de la région configurée dans le compte Upstash.</p>
         <h3 className="text-lg font-semibold text-slate-950">6.4 Google</h3>
-        <p>Google fournit l'envoi des emails transactionnels via Gmail SMTP et, après consentement, la mesure d'audience Google Analytics. Certains traitements peuvent être réalisés hors de l'Union européenne selon les garanties proposées par Google.</p>
+        <p>Google fournit l'envoi des emails transactionnels via Gmail SMTP et, après consentement, la mesure d'audience Google Analytics 4 au moyen de la balise gtag.js. Les signaux Google et la personnalisation publicitaire sont désactivés par l'application. Certains traitements peuvent être réalisés hors de l'Union européenne selon les garanties proposées par Google.</p>
       </LegalSection>
 
       <LegalSection title="7. Sécurité des données">
@@ -57,7 +57,7 @@ export default function PrivacyPage() {
 
       <LegalSection id="cookies" title="8. Cookies et technologies de suivi">
         <p>Les cookies nécessaires assurent la connexion, la protection contre les requêtes frauduleuses et la sécurité de la session. Le choix enregistré sous le nom analytics-consent mémorise pendant six mois la valeur accepted ou refused pour la mesure d'audience. Une date d'expiration technique distincte permet de redemander ce choix à l'issue de cette période.</p>
-        <p>Google Analytics utilise notamment les cookies _ga et _ga_* uniquement après acceptation. Le refus n'empêche pas d'utiliser l'application. Vercel Analytics reste configuré pour exclure les paramètres sensibles et ne reçoit pas les contenus saisis dans les recettes ou le profil.</p>
+        <p>Google Analytics utilise notamment les cookies _ga et _ga_* uniquement après acceptation. Le refus n'empêche pas d'utiliser l'application. Vercel Analytics reste configuré pour exclure les paramètres sensibles et ne reçoit pas les contenus saisis dans les recettes ou le profil. Aucun nom, email, contenu de recette, jeton de sécurité ou identifiant interne n'est volontairement envoyé à Google Analytics.</p>
       </LegalSection>
 
       <LegalSection title="9. Gestion du consentement">

@@ -35,14 +35,17 @@ export function PrivacyAnalytics() {
       return;
     }
 
-    Reflect.set(window, `ga-disable-${googleAnalyticsId}`, !consent?.audience);
+    const disableKey = `ga-disable-${googleAnalyticsId}`;
+    const analyticsPath = sanitizeAnalyticsPath(pathname);
+    const analyticsAllowed = Boolean(consent?.audience && analyticsPath);
+    Reflect.set(window, disableKey, !analyticsAllowed);
 
-    if (!consent?.audience) {
+    if (!analyticsAllowed || !analyticsPath) {
       window.gtag?.("consent", "update", deniedGoogleConsent);
       return;
     }
 
-    configureGoogleAnalytics(pathname);
+    configureGoogleAnalytics(analyticsPath);
   }, [consent?.audience, pathname]);
 
   return (
@@ -51,9 +54,9 @@ export function PrivacyAnalytics() {
       {googleAnalyticsId && consent?.audience ? (
         <>
           <Script
+            id="google-analytics"
             src={`https://www.googletagmanager.com/gtag/js?id=${googleAnalyticsId}`}
             strategy="afterInteractive"
-            onReady={() => configureGoogleAnalytics(pathname)}
           />
         </>
       ) : null}
@@ -85,6 +88,7 @@ function configureGoogleAnalytics(pathname: string) {
     window.gtag = (...args: unknown[]) => {
       window.dataLayer?.push(args);
     };
+    window.gtag("consent", "default", deniedGoogleConsent);
     window.gtag("js", new Date());
   }
 
@@ -92,7 +96,22 @@ function configureGoogleAnalytics(pathname: string) {
   window.gtag("config", googleAnalyticsId, {
     page_path: pathname,
     anonymize_ip: true,
+    allow_google_signals: false,
+    allow_ad_personalization_signals: false,
   });
+}
+
+function sanitizeAnalyticsPath(pathname: string) {
+  if (
+    pathname.startsWith("/auth/reset-password") ||
+    pathname.startsWith("/auth/verify-email/confirm")
+  ) {
+    return null;
+  }
+
+  return pathname
+    .replace(/^\/recipes\/[^/]+$/, "/recipes/[recipeId]")
+    .replace(/^\/admin\/users\/[^/]+$/, "/admin/users/[userId]");
 }
 
 function filterVercelAnalyticsEvent(event: BeforeSendEvent) {
@@ -107,9 +126,7 @@ function filterVercelAnalyticsEvent(event: BeforeSendEvent) {
 
   url.search = "";
   url.hash = "";
-  url.pathname = url.pathname
-    .replace(/^\/recipes\/[^/]+$/, "/recipes/[recipeId]")
-    .replace(/^\/admin\/users\/[^/]+$/, "/admin/users/[userId]");
+  url.pathname = sanitizeAnalyticsPath(url.pathname) ?? url.pathname;
 
   return {
     ...event,
@@ -119,6 +136,7 @@ function filterVercelAnalyticsEvent(event: BeforeSendEvent) {
 
 declare global {
   interface Window {
+    [key: string]: unknown;
     dataLayer?: unknown[];
     gtag?: (...args: unknown[]) => void;
   }

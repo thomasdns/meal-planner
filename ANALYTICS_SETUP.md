@@ -30,21 +30,36 @@ Dans Google Analytics :
 2. copier l'identifiant au format `G-XXXXXXXXXX` ;
 3. regler la conservation des donnees liees aux utilisateurs et evenements sur
    2 mois ;
-4. desactiver les fonctions publicitaires, Google Signals et le partage de
-   donnees tant qu'un besoin documente ne les justifie pas ;
-5. accepter les conditions de traitement et verifier les transferts applicables.
+4. dans les mesures ameliorees, conserver uniquement les mesures reellement
+   necessaires et documentees ; pour la configuration minimale de Meal Planner,
+   conserver les pages vues et desactiver les interactions avec les formulaires,
+   la recherche interne, les videos et les telechargements ;
+5. desactiver les fonctions publicitaires, Google Signals, la collecte de
+   donnees fournies par les utilisateurs et le partage publicitaire ;
+6. accepter les conditions de traitement et verifier les transferts applicables.
 
 Dans Vercel, seulement apres ces reglages :
 
-1. ajouter `NEXT_PUBLIC_GOOGLE_ANALYTICS_ID=G-EW6E6HMVFC` pour Production
-   uniquement afin de ne pas melanger les visites de previsualisation ;
+1. ajouter `NEXT_PUBLIC_GOOGLE_ANALYTICS_ID=G-EW6E6HMVFC` pour Production ;
 2. redeployer, car une variable `NEXT_PUBLIC_*` est integree au build ;
 3. ouvrir le site dans une fenetre privee et cliquer **Tout refuser** ;
 4. verifier dans les outils reseau qu'aucune requete vers
    `googletagmanager.com` ou `google-analytics.com` ne part ;
-5. rouvrir **Modifier mes preferences cookies**, accepter la mesure d'audience et verifier que
-   la visite apparait dans le rapport Temps reel ;
+5. rouvrir **Modifier mes preferences cookies**, accepter la mesure d'audience,
+   naviguer vers deux pages, puis verifier dans **Rapports > Temps reel** qu'un
+   utilisateur et des pages vues apparaissent ; la premiere remontee peut
+   demander quelques minutes ;
 6. retirer ensuite le consentement et verifier que les appels cessent.
+
+Meal Planner utilise directement la balise Google `gtag.js` avec l'identifiant
+`G-...`. Aucun conteneur Google Tag Manager `GTM-...` n'est necessaire. Un
+identifiant `GT-...` peut etre affiche par Google comme balise associee : il ne
+doit pas remplacer la variable `NEXT_PUBLIC_GOOGLE_ANALYTICS_ID`.
+
+Le code generalise les routes contenant un identifiant de recette ou
+d'utilisateur, retire les parametres d'URL et exclut les pages de confirmation
+email et de reinitialisation. Les signaux Google et la personnalisation
+publicitaire sont desactives dans la configuration envoyee a GA4.
 
 Ne jamais placer de nom, email, recette, user ID ou token dans un evenement
 Google Analytics.

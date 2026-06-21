@@ -9,8 +9,8 @@ const contentSecurityPolicy = `
   default-src 'self';
   script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""}${hasGoogleAnalytics ? " https://www.googletagmanager.com" : ""};
   style-src 'self' 'unsafe-inline';
-  img-src 'self' blob: data:;
-  connect-src 'self'${hasGoogleAnalytics ? " https://www.google-analytics.com https://region1.google-analytics.com https://analytics.google.com https://www.googletagmanager.com" : ""};
+  img-src 'self' blob: data:${hasGoogleAnalytics ? " https://www.google-analytics.com https://*.google-analytics.com" : ""};
+  connect-src 'self'${hasGoogleAnalytics ? " https://www.google-analytics.com https://*.google-analytics.com https://analytics.google.com https://*.analytics.google.com https://www.googletagmanager.com" : ""};
   font-src 'self';
   object-src 'none';
   base-uri 'self';

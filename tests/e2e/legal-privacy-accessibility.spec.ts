@@ -7,6 +7,12 @@ import { createTestUser, deleteTestUsers } from "./helpers/database";
 const password = "Password1234";
 
 test("legal pages and privacy choices are accessible", async ({ page }) => {
+  await page.route("https://www.googletagmanager.com/gtag/js**", (route) =>
+    route.fulfill({
+      contentType: "application/javascript",
+      body: "",
+    }),
+  );
   await page.goto("/");
 
   const consentPanel = page.getByRole("region", { name: "Choix des cookies" });
@@ -52,13 +58,30 @@ test("legal pages and privacy choices are accessible", async ({ page }) => {
   await expect.poll(() => page.evaluate(() => localStorage.getItem("analytics-consent"))).toBe("accepted");
   await expect.poll(() => page.evaluate(() => localStorage.getItem("analytics-consent-expires-at"))).not.toBeNull();
   await expect(page.locator('script[src*="googletagmanager.com"]')).toHaveCount(1);
+  await expect.poll(() =>
+    page.evaluate(() =>
+      window.dataLayer?.some(
+        (entry) =>
+          Array.isArray(entry) &&
+          entry[0] === "config" &&
+          typeof entry[1] === "string" &&
+          /^G-[A-Z0-9]+$/.test(entry[1]),
+      ) ?? false,
+    ),
+  ).toBe(true);
 
   await footer.getByRole("button", { name: "Modifier mes preferences cookies" }).click();
   await expect(consentPanel).toBeVisible();
   await page.getByRole("button", { name: "Refuser" }).click();
   await expect(consentPanel).toBeHidden();
   await expect.poll(() => page.evaluate(() => localStorage.getItem("analytics-consent"))).toBe("refused");
-  await expect.poll(() => page.evaluate(() => Reflect.get(window, "ga-disable-G-EW6E6HMVFC"))).toBe(true);
+  await expect.poll(() =>
+    page.evaluate(() => {
+      const key = Object.keys(window).find((key) => /^ga-disable-G-[A-Z0-9]+$/.test(key));
+      const val = key ? Reflect.get(window, key) : null;
+      return !!val;
+    }),
+  ).toBe(true);
   await expect(page.context().cookies()).resolves.not.toEqual(
     expect.arrayContaining([
       expect.objectContaining({ name: expect.stringMatching(/^_ga/) }),
@@ -120,11 +143,13 @@ test("authenticated user can export personal data without security secrets", asy
     const chunks: Buffer[] = [];
 
     for await (const chunk of stream) {
-      chunks.push(Buffer.from(chunk));
+      const data = chunk instanceof Uint8Array ? chunk : new Uint8Array(chunk as ArrayBuffer);
+      chunks.push(Buffer.from(data) as Buffer);
     }
 
     const workbook = new ExcelJS.Workbook();
-    await workbook.xlsx.load(Buffer.concat(chunks));
+    const concatBuffer = Buffer.concat(chunks);
+    await workbook.xlsx.load(concatBuffer);
     const profileSheet = workbook.getWorksheet("Profil");
     expect(profileSheet).toBeDefined();
     expect(workbook.getWorksheet("Courses")).toBeUndefined();

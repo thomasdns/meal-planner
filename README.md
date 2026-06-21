@@ -91,7 +91,15 @@ http://localhost:3000
 
 ## Variables D'environnement
 
-Copier `.env.example` vers `.env`, puis renseigner les valeurs locales.
+Le projet utilise exactement deux fichiers d'environnement :
+
+- `.env`, prive et ignore par Git, contient les valeurs locales reelles ;
+- `.env.example`, public et versionne, documente les variables attendues sans
+  contenir de secret.
+
+Copier `.env.example` vers `.env`, puis renseigner les valeurs locales. Ne pas
+creer de `.env.local`, afin d'eviter des valeurs concurrentes difficiles a
+diagnostiquer.
 
 ```powershell
 Copy-Item .env.example .env
@@ -142,13 +150,17 @@ Notes :
 - `CRON_SECRET` protege la purge quotidienne des jetons expires.
 - Les variables `LEGAL_*` sont facultatives : des valeurs publiques par defaut
   sont fournies par l'application. Elles ne doivent contenir aucun secret.
-- `NEXT_PUBLIC_GOOGLE_ANALYTICS_ID` contient l'identifiant public `G-...` et
-  doit etre limite a l'environnement Vercel **Production**.
+- `NEXT_PUBLIC_GOOGLE_ANALYTICS_ID` contient l'identifiant public GA4 `G-...`.
+  Il ne s'agit ni de l'identifiant de flux numerique ni de l'identifiant
+  `GT-...` affiche par l'interface Google Tag.
 
 Configuration de production recommandee :
 
 - Vercel contient les variables applicatives, SMTP, Upstash, `CRON_SECRET` et
   `NEXT_PUBLIC_GOOGLE_ANALYTICS_ID` ;
+- `NEXT_PUBLIC_GOOGLE_ANALYTICS_ID` doit etre active pour **Production**. Il
+  peut aussi etre active pour **Preview** uniquement si les visites de test
+  doivent etre mesurees dans une propriete distincte ;
 - GitHub Actions contient uniquement `PRODUCTION_DATABASE_URL` pour le workflow
   de migrations ;
 - `PRODUCTION_DATABASE_URL` utilise l'URL Neon directe sans pooler ;
