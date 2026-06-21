@@ -88,7 +88,6 @@ export async function updateAdminUserAction(
   }
 
   revalidatePath("/admin");
-  revalidatePath(`/admin/users/${userId}`);
 
   return {
     success: "Utilisateur mis a jour.",

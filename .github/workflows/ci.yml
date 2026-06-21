@@ -35,6 +35,7 @@ jobs:
       NEXT_SERVER_ACTIONS_ENCRYPTION_KEY: Y2ktc2VydmVyLWFjdGlvbnMta2V5LTMyLWJ5dGVzISE=
       SMTP_TEST_MODE: "true"
       EMAIL_FROM: "Meal Planner CI <ci@example.com>"
+      NEXT_PUBLIC_GOOGLE_ANALYTICS_ID: G-TEST123456
 
     steps:
       - name: Checkout repository

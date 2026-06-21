@@ -123,7 +123,7 @@ test("changing email creates a verification and revokes the session", async ({
     await expect(page).toHaveURL(/\/auth\/sign-in\?emailChanged=1/);
     await expect(
       page.getByText(
-        "Adresse modifiee. Verifie le nouvel email avant de te reconnecter.",
+        "Adresse modifiee. Verifie le nouvel email dans les 24 heures avant de te reconnecter.",
       ),
     ).toBeVisible();
 
@@ -461,8 +461,14 @@ test("admin can inspect, edit and delete a user", async ({ page, browser }) => {
     await expect(userPage).toHaveURL(/\/auth\/sign-in/);
     await userPage.close();
 
+    await page.locator("#admin-user-role").selectOption("USER");
+    await page.getByRole("button", { name: "Enregistrer" }).click();
+    await expect(page.getByText("Utilisateur mis a jour.")).toBeVisible();
+
+    const deleteUserButton = page.getByRole("button", { name: "Supprimer" });
+    await expect(deleteUserButton).toBeEnabled();
     page.once("dialog", (dialog) => dialog.accept());
-    await page.getByRole("button", { name: "Supprimer" }).click();
+    await deleteUserButton.click();
     await expect(page).toHaveURL(/\/admin$/);
     await expect(page.getByText(updatedUserEmail)).toBeHidden();
   } finally {
