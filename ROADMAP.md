@@ -22,7 +22,7 @@ produit, les corrections techniques et les sujets de securite.
 - Sessions revoquees apres une modification sensible.
 - Interface admin protegee, paginee et separee en deux vues.
 - Gestion complete des categories, recettes, ingredients et planning.
-- Liste de courses cochable, imprimable et exportable.
+- Liste de courses cochable et exportable au format Excel.
 - Recherche et filtres de recettes.
 - Rate limiting distribue avec Upstash Redis et repli local journalise.
 - Tests unitaires, end-to-end, accessibilite et affichage mobile.

@@ -16,18 +16,17 @@ fonction utilisateur.
 | Jeton de reinitialisation | 30 minutes | Consommation, remplacement ou purge quotidienne |
 | Jeton de verification email | 24 heures | Consommation, remplacement ou purge quotidienne |
 | Choix de consentement | 6 mois | Expiration locale ou nouveau choix |
-| Mesure Vercel | Selon la politique Vercel en vigueur | Statistiques agregees ; controle annuel de la configuration |
-| Google Analytics | Inactif par defaut | Regler la retention minimale avant activation |
+| Google Analytics | 2 mois | Mesure d'audience chargee uniquement apres consentement |
 
 ## Sous-traitants
 
 | Fournisseur | Usage | Region connue | Action de controle |
 | --- | --- | --- | --- |
-| Vercel | Hebergement, logs, Web Analytics | Infrastructure internationale | Verifier DPA, retention et garanties de transfert annuellement |
+| Vercel | Hebergement et logs techniques | Infrastructure internationale | Verifier DPA, retention et garanties de transfert annuellement |
 | Neon | PostgreSQL, sauvegardes | Londres pour la production actuelle | Verifier region, retention et DPA apres tout changement d'offre |
 | Upstash | Rate limiting distribue | A confirmer dans le tableau de bord | Choisir une region europeenne si disponible et conserver uniquement des cles techniques temporaires |
 | Google / Gmail | Emails transactionnels | Infrastructure internationale | Utiliser un compte technique et verifier les garanties contractuelles |
-| Google Analytics | Mesure d'audience facultative | Inactif | Activer uniquement apres consentement, DPA et reglage de retention |
+| Google Analytics | Mesure d'audience facultative | Infrastructure internationale | Activer uniquement apres consentement, DPA et reglage de retention minimale |
 
 ## Revue Obligatoire
 
